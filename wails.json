@@ -1,0 +1,15 @@
+{
+  "name": "minebangumi",
+  "outputfilename": "minebangumi",
+  "assetdir": "frontend/dist",
+  "frontend:install": "pnpm install",
+  "frontend:build": "pnpm run build",
+  "frontend:dev:build": "pnpm run build-only",
+  "frontend:dev:watcher": "pnpm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "debounceMS": 500,
+  "author": {
+    "name": "simonkimi",
+    "email": "git@z31.mozmail.com"
+  }
+}
