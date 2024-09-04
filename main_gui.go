@@ -1,8 +1,11 @@
+//go:build gui
+
 package main
 
 import (
 	"embed"
 	"log"
+	"minebangumi/gui"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -22,7 +25,7 @@ var icon []byte
 func main() {
 	// Create an instance of the app structure
 	// 创建一个App结构体实例
-	app := NewApp()
+	app := gui.NewApp()
 
 	// Create application with options
 	// 使用选项创建应用
@@ -43,10 +46,10 @@ func main() {
 		Menu:              nil,
 		Logger:            nil,
 		LogLevel:          logger.DEBUG,
-		OnStartup:         app.startup,
-		OnDomReady:        app.domReady,
-		OnBeforeClose:     app.beforeClose,
-		OnShutdown:        app.shutdown,
+		OnStartup:         app.Startup,
+		OnDomReady:        app.DomReady,
+		OnBeforeClose:     app.BeforeClose,
+		OnShutdown:        app.Shutdown,
 		WindowStartState:  options.Normal,
 		AssetServer: &assetserver.Options{
 			Assets:     assets,

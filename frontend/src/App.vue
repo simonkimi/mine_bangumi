@@ -52,8 +52,6 @@ document.body.addEventListener("click", function (event) {
 </template>
 
 <style lang="scss">
-@import url("./assets/css/reset.css");
-@import url("./assets/css/font.css");
 
 html {
   width: 100%;
