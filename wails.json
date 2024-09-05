@@ -8,6 +8,9 @@
   "frontend:dev:watcher": "pnpm run dev",
   "frontend:dev:serverUrl": "auto",
   "debounceMS": 500,
+  "build": {
+    "tmpdir": "tmp"
+  },
   "author": {
     "name": "simonkimi",
     "email": "git@z31.mozmail.com"

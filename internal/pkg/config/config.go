@@ -2,13 +2,15 @@ package config
 
 import (
 	"errors"
+	"github.com/simonkimi/minebangumi/tools/dir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"path/filepath"
 )
 
 var AppConfig *AppConfigModel
 
-const configName = "config.toml"
+var configPath = ""
 
 type AppConfigModel struct {
 	Database *DatabaseConfig `mapstructure:"database"`
@@ -29,13 +31,16 @@ func setDefault(key string, env string, value any) {
 }
 
 func Setup() {
+	configPath = filepath.Join(dir.GetConfigDir(), "config.toml")
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("bangumi")
-	setDefault("database.backends", "DATABASE_BACKENDS", "sqlite3")
 
-	viper.SetConfigName("config")
+	viper.SetConfigName(dir.GetConfigDir())
 	viper.AddConfigPath(".")
 	viper.SetConfigType("toml")
+
+	setDefault("database.backends", "DATABASE_BACKENDS", "sqlite3")
+	setDefault("sqlite.path", "SQLITE_PATH", filepath.Join(dir.GetConfigDir(), "bangumi.db"))
 
 	initConfig := false
 	err := viper.ReadInConfig()
@@ -48,7 +53,7 @@ func Setup() {
 		logrus.WithError(err).Fatal("Failed to unmarshal config")
 	}
 	if initConfig {
-		if err := viper.WriteConfigAs(configName); err != nil {
+		if err := viper.WriteConfigAs(configPath); err != nil {
 			logrus.WithError(err).Fatal("Failed to write config file")
 		}
 		logrus.Info("Config file created")
@@ -57,7 +62,7 @@ func Setup() {
 }
 
 func SaveConfig() {
-	if err := viper.WriteConfigAs(configName); err != nil {
+	if err := viper.WriteConfigAs(configPath); err != nil {
 		logrus.WithError(err).Fatal("Failed to write config file")
 	}
 	logrus.Info("Config file saved")

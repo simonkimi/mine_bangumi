@@ -12,7 +12,7 @@ var Db *gorm.DB
 func Setup() {
 	var conn gorm.Dialector
 	switch config.AppConfig.Database.Backends {
-	case "sqlite":
+	case "sqlite3":
 		conn = sqlite.Open(config.AppConfig.Sqlite.Path)
 	default:
 		logrus.Fatalf("Unsupported database backends: %s", config.AppConfig.Database.Backends)

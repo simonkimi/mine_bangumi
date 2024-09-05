@@ -6,6 +6,8 @@ import (
 	"github.com/simonkimi/minebangumi/internal/pkg/config"
 	"github.com/simonkimi/minebangumi/internal/pkg/db"
 	"github.com/simonkimi/minebangumi/pkg/logger"
+	"github.com/simonkimi/minebangumi/tools/dir"
+	"github.com/sirupsen/logrus"
 	"log"
 
 	"github.com/wailsapp/wails/v2"
@@ -16,16 +18,19 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
-//go:embed web/dist
+//go:embed frontend/dist
 var assets embed.FS
 
 //go:embed build/appicon.png
 var icon []byte
 
 func init() {
+	dir.Setup()
 	logger.Setup()
 	config.Setup()
 	db.Setup()
+	logrus.Debugf("Config dir: %s", dir.GetConfigDir())
+	logrus.Debugf("Temp dir: %s", dir.GetTempDir())
 }
 
 func main() {
