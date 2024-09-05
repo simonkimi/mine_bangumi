@@ -2,10 +2,12 @@ package gui
 
 import (
 	"context"
+	"github.com/simonkimi/minebangumi/internal/app"
 )
 
 type App struct {
-	ctx context.Context
+	ctx    context.Context
+	server *app.ServerManager
 }
 
 func NewApp() *App {
@@ -14,11 +16,12 @@ func NewApp() *App {
 
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
+
 }
 
 func (a *App) DomReady(ctx context.Context) {
-	// Add your action here
-	// 在这里添加你的操作
+	a.server = app.NewServerManager()
+	a.server.Start()
 }
 
 func (a *App) BeforeClose(ctx context.Context) (prevent bool) {
@@ -26,6 +29,5 @@ func (a *App) BeforeClose(ctx context.Context) (prevent bool) {
 }
 
 func (a *App) Shutdown(ctx context.Context) {
-	// Perform your teardown here
-	// 在此处做一些资源释放的操作
+	a.server.Shutdown()
 }

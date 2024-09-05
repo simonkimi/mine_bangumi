@@ -1,11 +1,9 @@
-//go:build server
-
 package main
 
 import (
+	"github.com/simonkimi/minebangumi/internal/app"
+	"github.com/simonkimi/minebangumi/pkg/logger"
 	"github.com/sirupsen/logrus"
-	"minebangumi/pkg/logger"
-	"minebangumi/service"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,7 +14,7 @@ func init() {
 }
 
 func main() {
-	server := service.NewServer()
+	server := app.NewServerManager()
 	logrus.Warn("Starting server...")
 	server.Start()
 	quit := make(chan os.Signal)

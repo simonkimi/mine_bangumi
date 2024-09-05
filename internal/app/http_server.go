@@ -1,25 +1,25 @@
-package http_service
+package app
 
 import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/simonkimi/minebangumi/internal/router"
 	"github.com/sirupsen/logrus"
-	"minebangumi/routers"
 	"net/http"
 	"sync"
 	"time"
 )
 
-func Start(ctx context.Context, wg *sync.WaitGroup) {
+func StartHttpService(ctx context.Context, wg *sync.WaitGroup) {
 	wg.Add(1)
 	defer wg.Done()
 	gin.SetMode(gin.DebugMode)
 
-	router := routers.InitRouter()
+	handler := router.InitRouter()
 	server := &http.Server{
 		Addr:    ":8080",
-		Handler: router,
+		Handler: handler,
 	}
 
 	go func() {

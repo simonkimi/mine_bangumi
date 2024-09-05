@@ -1,14 +1,14 @@
-//go:build gui
-
 package main
 
 import (
 	"embed"
+	"github.com/simonkimi/minebangumi/gui"
+	"github.com/simonkimi/minebangumi/internal/pkg/config"
+	"github.com/simonkimi/minebangumi/internal/pkg/db"
+	"github.com/simonkimi/minebangumi/pkg/logger"
 	"log"
-	"minebangumi/gui"
 
 	"github.com/wailsapp/wails/v2"
-	"github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/linux"
@@ -16,21 +16,23 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
-//go:embed frontend/dist
+//go:embed web/dist
 var assets embed.FS
 
 //go:embed build/appicon.png
 var icon []byte
 
+func init() {
+	logger.Setup()
+	config.Setup()
+	db.Setup()
+}
+
 func main() {
-	// Create an instance of the app structure
-	// 创建一个App结构体实例
 	app := gui.NewApp()
 
-	// Create application with options
-	// 使用选项创建应用
 	err := wails.Run(&options.App{
-		Title:             "minebangumi",
+		Title:             "Mine Bangumi",
 		Width:             900,
 		Height:            600,
 		MinWidth:          900,
@@ -44,8 +46,7 @@ func main() {
 		HideWindowOnClose: false,
 		BackgroundColour:  &options.RGBA{R: 255, G: 255, B: 255, A: 0},
 		Menu:              nil,
-		Logger:            nil,
-		LogLevel:          logger.DEBUG,
+		Logger:            gui.NewWailsLogger(),
 		OnStartup:         app.Startup,
 		OnDomReady:        app.DomReady,
 		OnBeforeClose:     app.BeforeClose,
@@ -59,8 +60,6 @@ func main() {
 		Bind: []interface{}{
 			app,
 		},
-		// Windows platform specific options
-		// Windows平台特定选项
 		Windows: &windows.Options{
 			WebviewIsTransparent:              true,
 			WindowIsTranslucent:               false,
@@ -70,8 +69,6 @@ func main() {
 			WebviewBrowserPath:                "",
 			Theme:                             windows.SystemDefault,
 		},
-		// Mac platform specific options
-		// Mac平台特定选项
 		Mac: &mac.Options{
 			TitleBar: &mac.TitleBar{
 				TitlebarAppearsTransparent: true,
