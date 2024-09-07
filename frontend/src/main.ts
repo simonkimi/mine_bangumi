@@ -7,8 +7,6 @@ import i18n from "./i18n";
 
 import "./style.scss";
 
-// import "./assets/main.css";
-
 const app = createApp(App);
 
 app.use(createPinia());
