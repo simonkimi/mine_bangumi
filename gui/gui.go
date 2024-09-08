@@ -19,15 +19,18 @@ func (a *App) Startup(ctx context.Context) {
 
 }
 
+//goland:noinspection ALL
 func (a *App) DomReady(ctx context.Context) {
 	a.server = app.NewServerManager()
 	a.server.Start()
 }
 
+//goland:noinspection ALL
 func (a *App) BeforeClose(ctx context.Context) (prevent bool) {
 	return false
 }
 
+//goland:noinspection ALL
 func (a *App) Shutdown(ctx context.Context) {
 	a.server.Shutdown()
 }

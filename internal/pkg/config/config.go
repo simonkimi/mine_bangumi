@@ -12,22 +12,40 @@ var AppConfig *AppConfigModel
 
 var configPath = ""
 
-type AppConfigModel struct {
-	Database *DatabaseConfig `mapstructure:"database"`
-	Sqlite   *SqliteConfig   `mapstructure:"sqlite"`
-}
-
-type DatabaseConfig struct {
-	Backends string `mapstructure:"backends"`
-}
-
-type SqliteConfig struct {
-	Path string `mapstructure:"path"`
-}
-
 func setDefault(key string, env string, value any) {
-	_ = viper.BindEnv(key, env)
+	if env != "" {
+		_ = viper.BindEnv(key, env)
+	}
 	viper.SetDefault(key, value)
+}
+
+func setDefaultConfig() {
+	setDefault("is_first_run", "", true)
+	// User
+	setDefault("user.username", "MBG_USERNAME", "admin")
+	setDefault("user.password", "MBG_PASSWORD", "admin")
+
+	// Path
+	setDefault("path.workdir", "MBG_WORKDIR", dir.GetConfigDir())
+
+	// Downloader
+	setDefault("downloader.client", "MBG_DOWNLOADER", "")
+
+	// qBittorrent
+	setDefault("downloader.qBittorrent.host", "MBG_QBITTORRENT_HOST", "http://localhost:8080")
+	setDefault("downloader.qBittorrent.username", "MBG_QBITTORRENT_USERNAME", "admin")
+	setDefault("downloader.qBittorrent.password", "MBG_QBITTORRENT_PASSWORD", "adminadmin")
+
+	// Aria2
+	setDefault("downloader.aria2.host", "MBG_ARIA2_HOST", "http://localhost:6800/jsonrpc")
+	setDefault("downloader.aria2.token", "MBG_ARIA2_TOKEN", "")
+
+	// MikanProxy
+	setDefault("mikan_proxy.enable", "MBG_MIKAN_PROXY_ENABLED", false)
+	setDefault("mikan_proxy.scheme", "MBG_MIKAN_PROXY_SCHEME", "")
+	setDefault("mikan_proxy.host", "MBG_MIKAN_PROXY_HOST", "")
+	setDefault("mikan_proxy.username", "MBG_MIKAN_PROXY_USERNAME", "")
+	setDefault("mikan_proxy.password", "MBG_MIKAN_PROXY_PASSWORD", "")
 }
 
 func Setup() {
@@ -38,9 +56,7 @@ func Setup() {
 	viper.SetConfigName(dir.GetConfigDir())
 	viper.AddConfigPath(".")
 	viper.SetConfigType("toml")
-
-	setDefault("database.backends", "DATABASE_BACKENDS", "sqlite3")
-	setDefault("sqlite.path", "SQLITE_PATH", filepath.Join(dir.GetConfigDir(), "bangumi.db"))
+	setDefaultConfig()
 
 	initConfig := false
 	err := viper.ReadInConfig()

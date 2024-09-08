@@ -5,18 +5,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"path/filepath"
 )
 
 var Db *gorm.DB
 
 func Setup() {
-	var conn gorm.Dialector
-	switch config.AppConfig.Database.Backends {
-	case "sqlite3":
-		conn = sqlite.Open(config.AppConfig.Sqlite.Path)
-	default:
-		logrus.Fatalf("Unsupported database backends: %s", config.AppConfig.Database.Backends)
-	}
+	conn := sqlite.Open(filepath.Join(config.AppConfig.Path.Workdir, "app.sqlite3"))
 	db, err := gorm.Open(conn, &gorm.Config{})
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to connect to database")
