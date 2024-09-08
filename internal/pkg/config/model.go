@@ -3,9 +3,17 @@ package config
 type AppConfigModel struct {
 	IsFirstRun bool              `mapstructure:"is_first_run"`
 	User       *UserConfig       `mapstructure:"user"`
+	Server     *ServerConfig     `mapstructure:"server"`
 	Path       *PathConfig       `mapstructure:"path"`
 	Downloader *DownloaderConfig `mapstructure:"downloader"`
 	MikanProxy *MikanProxyConfig `mapstructure:"mikan_proxy"`
+}
+
+type ServerConfig struct {
+	Ipv4Host string `mapstructure:"ipv4_host"`
+	Ipv4Port string `mapstructure:"Ipv4_port"`
+	Ipv6Host string `mapstructure:"ipv6_host"`
+	Ipv6Port string `mapstructure:"Ipv6_port"`
 }
 
 type MikanProxyConfig struct {

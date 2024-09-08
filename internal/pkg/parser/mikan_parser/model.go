@@ -8,6 +8,8 @@ type MikanBangumi struct {
 type MikanEpisode struct {
 	Title       string
 	Guid        string
+	Link        string
 	Torrent     string
+	Description string
 	TorrentSize int
 }

@@ -66,6 +66,8 @@ func ParseFromUrl(url string) (*MikanBangumi, error) {
 		bangumi.Episodes = append(bangumi.Episodes, &MikanEpisode{
 			Title:       item.Title,
 			Guid:        item.GUID,
+			Link:        item.Link,
+			Description: item.Description,
 			Torrent:     item.Enclosures[0].URL,
 			TorrentSize: torrentSize,
 		})

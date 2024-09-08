@@ -21,6 +21,11 @@ func setDefault(key string, env string, value any) {
 
 func setDefaultConfig() {
 	setDefault("is_first_run", "", true)
+	// Server
+	setDefault("server.ipv4_host", "MBG_SERVER_IPV4_HOST", "0.0.0.0")
+	setDefault("server.ipv4_port", "MBG_SERVER_IPV4_PORT", "7962")
+	setDefault("server.ipv6_host", "MBG_SERVER_IPV6_HOST", "[::1]")
+	setDefault("server.ipv6_port", "MBG_SERVER_IPV6_PORT", "7962")
 	// User
 	setDefault("user.username", "MBG_USERNAME", "admin")
 	setDefault("user.password", "MBG_PASSWORD", "admin")

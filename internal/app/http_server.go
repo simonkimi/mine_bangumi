@@ -3,8 +3,11 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/simonkimi/minebangumi/internal/pkg/config"
 	"github.com/simonkimi/minebangumi/internal/router"
+	"github.com/simonkimi/minebangumi/tools/stringt"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"sync"
@@ -17,24 +20,51 @@ func StartHttpService(ctx context.Context, wg *sync.WaitGroup) {
 	gin.SetMode(gin.DebugMode)
 
 	handler := router.InitRouter()
-	server := &http.Server{
-		Addr:    ":8080",
-		Handler: handler,
+	var ipv4Server *http.Server
+	var ipv6Server *http.Server
+
+	if !stringt.IsEmptyOrWhitespace(config.AppConfig.Server.Ipv4Host) {
+		ipv4Server = &http.Server{
+			Addr:    fmt.Sprintf("%s:%s", config.AppConfig.Server.Ipv4Port, config.AppConfig.Server.Ipv4Port),
+			Handler: handler,
+		}
+		go func() {
+			err := ipv4Server.ListenAndServe()
+			if err != nil && !errors.Is(err, http.ErrServerClosed) {
+				logrus.Fatalf("listen: %s\n", err)
+			}
+		}()
 	}
 
-	go func() {
-		err := server.ListenAndServe()
-		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			logrus.Fatalf("listen: %s\n", err)
+	if !stringt.IsEmptyOrWhitespace(config.AppConfig.Server.Ipv6Host) {
+		ipv6Server = &http.Server{
+			Addr:    fmt.Sprintf("%s:%s", config.AppConfig.Server.Ipv6Host, config.AppConfig.Server.Ipv6Port),
+			Handler: handler,
 		}
-	}()
+		go func() {
+			err := ipv6Server.ListenAndServe()
+			if err != nil && !errors.Is(err, http.ErrServerClosed) {
+				logrus.Fatalf("listen: %s\n", err)
+			}
+		}()
+	}
+
 	<-ctx.Done()
 
-	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	if err := server.Shutdown(timeoutCtx); err != nil {
-		logrus.Fatal("Server Shutdown:", err)
+	if ipv4Server != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := ipv4Server.Shutdown(ctx); err != nil {
+			logrus.Fatalf("Server shutdown failed: %v", err)
+		}
 	}
+	if ipv6Server != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := ipv6Server.Shutdown(ctx); err != nil {
+			logrus.Fatalf("Server shutdown failed: %v", err)
+		}
+	}
+
 	logrus.Println("Server exiting")
 }
