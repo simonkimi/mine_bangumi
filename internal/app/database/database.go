@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/simonkimi/minebangumi/internal/pkg/config"
+	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"

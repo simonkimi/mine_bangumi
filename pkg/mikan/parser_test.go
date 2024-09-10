@@ -2,7 +2,8 @@ package mikan
 
 import (
 	"github.com/joho/godotenv"
-	"github.com/simonkimi/minebangumi/internal/pkg/config"
+	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/internal/pkg/setup"
 	"os"
 	"testing"
 )
@@ -12,14 +13,14 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	config.Setup()
-	config.AppConfig.MikanProxy.Enable = os.Getenv("MIKAN_PROXY_ENABLED") == "1"
-	config.AppConfig.MikanProxy.Scheme = os.Getenv("MIKAN_PROXY_SCHEME")
-	config.AppConfig.MikanProxy.Host = os.Getenv("MIKAN_PROXY_HOST")
-	config.AppConfig.MikanProxy.Port = os.Getenv("MIKAN_PROXY_PORT")
-	config.AppConfig.MikanProxy.UseAuth = os.Getenv("MIKAN_PROXY_USE_AUTH") == "1"
-	config.AppConfig.MikanProxy.Username = os.Getenv("MIKAN_PROXY_USERNAME")
-	config.AppConfig.MikanProxy.Password = os.Getenv("MIKAN_PROXY_PASSWORD")
+	setup.SetupTest()
+	config.AppConfig.ProxyConfig.Enable = os.Getenv("PROXY_ENABLED") == "1"
+	config.AppConfig.ProxyConfig.Scheme = os.Getenv("PROXY_SCHEME")
+	config.AppConfig.ProxyConfig.Host = os.Getenv("PROXY_HOST")
+	config.AppConfig.ProxyConfig.Port = os.Getenv("PROXY_PORT")
+	config.AppConfig.ProxyConfig.UseAuth = os.Getenv("PROXY_USE_AUTH") == "1"
+	config.AppConfig.ProxyConfig.Username = os.Getenv("PROXY_USERNAME")
+	config.AppConfig.ProxyConfig.Password = os.Getenv("PROXY_PASSWORD")
 }
 
 func TestParseBangumi(t *testing.T) {

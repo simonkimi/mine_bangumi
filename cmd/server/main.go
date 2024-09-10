@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/simonkimi/minebangumi/internal/app"
+	"github.com/simonkimi/minebangumi/internal/app/manager"
 	"github.com/simonkimi/minebangumi/pkg/logger"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -14,7 +14,7 @@ func init() {
 }
 
 func main() {
-	server := app.NewServerManager()
+	server := manager.NewServerManager()
 	logrus.Warn("Starting server...")
 	server.Start()
 	quit := make(chan os.Signal)
