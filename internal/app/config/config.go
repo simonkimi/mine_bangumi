@@ -45,12 +45,17 @@ func setDefaultConfig() {
 	setDefault("downloader.aria2.host", "MBG_ARIA2_HOST", "http://localhost:6800/jsonrpc")
 	setDefault("downloader.aria2.token", "MBG_ARIA2_TOKEN", "")
 
-	// MikanProxy
-	setDefault("mikan_proxy.enable", "MBG_MIKAN_PROXY_ENABLED", false)
-	setDefault("mikan_proxy.scheme", "MBG_MIKAN_PROXY_SCHEME", "")
-	setDefault("mikan_proxy.host", "MBG_MIKAN_PROXY_HOST", "")
-	setDefault("mikan_proxy.username", "MBG_MIKAN_PROXY_USERNAME", "")
-	setDefault("mikan_proxy.password", "MBG_MIKAN_PROXY_PASSWORD", "")
+	// Proxy
+	setDefault("proxy.enable", "MBG_PROXY_ENABLED", false)
+	setDefault("proxy.scheme", "MBG_PROXY_SCHEME", "")
+	setDefault("proxy.host", "MBG_PROXY_HOST", "")
+	setDefault("proxy.port", "MBG_PROXY_PORT", "")
+	setDefault("proxy.use_auth", "MBG_PROXY_USE_AUTH", false)
+	setDefault("proxy.username", "MBG_PROXY_USERNAME", "")
+	setDefault("proxy.password", "MBG_PROXY_PASSWORD", "")
+
+	// Tmdb
+	setDefault("tmdb.api_key", "MBG_TMDB_API_KEY", "")
 }
 
 func Setup() {

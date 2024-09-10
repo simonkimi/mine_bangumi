@@ -13,7 +13,6 @@
   </n-config-provider>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { darkTheme } from "naive-ui";
-import AppBar from "@/components/AppBar.vue";
 </script>

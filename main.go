@@ -3,13 +3,11 @@ package main
 import (
 	"embed"
 	"github.com/simonkimi/minebangumi/gui"
-	"github.com/simonkimi/minebangumi/internal/pkg/config"
-	"github.com/simonkimi/minebangumi/internal/pkg/db"
+	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/internal/app/database"
 	"github.com/simonkimi/minebangumi/pkg/logger"
 	"github.com/simonkimi/minebangumi/tools/dir"
 	"github.com/sirupsen/logrus"
-	"log"
-
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -28,7 +26,7 @@ func init() {
 	dir.Setup()
 	logger.Setup()
 	config.Setup()
-	db.Setup()
+	database.Setup()
 	logrus.Debugf("Config dir: %s", dir.GetConfigDir())
 	logrus.Debugf("Temp dir: %s", dir.GetTempDir())
 }
@@ -98,6 +96,6 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 }

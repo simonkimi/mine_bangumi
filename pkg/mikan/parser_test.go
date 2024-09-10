@@ -1,4 +1,4 @@
-package mikan_parser
+package mikan
 
 import (
 	"github.com/joho/godotenv"

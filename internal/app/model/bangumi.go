@@ -1,7 +1,6 @@
-package repository
+package model
 
 import (
-	"github.com/simonkimi/minebangumi/internal/pkg/db"
 	"gorm.io/gorm"
 )
 
@@ -26,8 +25,4 @@ type Bangumi struct {
 	RuleName        string `gorm:"default:''"`               // 番剧规则名
 	SavePath        string `gorm:"default:''"`               // 番剧保存路径
 	IsDeleted       bool   `gorm:"default:false"`            // 是否已删除
-}
-
-func InsertBangumi(model *Bangumi) error {
-	return db.Db.Create(model).Error
 }

@@ -1,11 +1,11 @@
-package app
+package manager
 
 import (
 	"context"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/simonkimi/minebangumi/internal/pkg/config"
+	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/simonkimi/minebangumi/internal/router"
 	"github.com/simonkimi/minebangumi/tools/stringt"
 	"github.com/sirupsen/logrus"

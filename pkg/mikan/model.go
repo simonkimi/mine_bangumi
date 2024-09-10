@@ -1,11 +1,11 @@
-package mikan_parser
+package mikan
 
-type MikanBangumi struct {
+type Bangumi struct {
 	Title    string
-	Episodes []*MikanEpisode
+	Episodes []*Episode
 }
 
-type MikanEpisode struct {
+type Episode struct {
 	Title       string
 	Guid        string
 	Link        string
