@@ -1,10 +1,17 @@
-package torrent_parser
+package name_parser
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestParseTorrentName2(t *testing.T) {
+	filename := "[Nekomoe kissaten][Helck][01][1080p][JPTC].mp4"
+	bf := ParseTorrentName(filename, "", 0, TorrentFileTypeVideo).(*TorrentEpisodeFile)
+	fmt.Printf("%+v\n", bf)
+}
 
 func TestParseTorrentName(t *testing.T) {
 	fileName := "[Lilith-Raws] Boku no Kokoro no Yabai Yatsu - 01 [Baha][WEB-DL][1080p][AVC AAC][CHT][MP4].mp4"

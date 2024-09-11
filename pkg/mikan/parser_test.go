@@ -24,7 +24,7 @@ func init() {
 }
 
 func TestParseBangumi(t *testing.T) {
-	result, err := ParseFromUrl("https://mikanani.me/RSS/Bangumi?bangumiId=3386&subgroupid=615")
+	result, err := ParseRssData("https://mikanani.me/RSS/Bangumi?bangumiId=3386&subgroupid=615")
 	if err != nil {
 		t.Error(err)
 	}
@@ -32,7 +32,7 @@ func TestParseBangumi(t *testing.T) {
 }
 
 func TestParserMyBangumi(t *testing.T) {
-	result, err := ParseFromUrl("https://mikanani.me/RSS/MyBangumi?token=b99ffHuTfy1nTftJ9H9DK0Kz6jyN18DgL6JhmSvtjXQ%3d")
+	result, err := ParseRssData("https://mikanani.me/RSS/MyBangumi?token=b99ffHuTfy1nTftJ9H9DK0Kz6jyN18DgL6JhmSvtjXQ%3d")
 	if err != nil {
 		t.Error(err)
 	}

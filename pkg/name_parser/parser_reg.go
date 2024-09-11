@@ -1,4 +1,4 @@
-package torrent_parser
+package name_parser
 
 import (
 	"github.com/dlclark/regexp2"

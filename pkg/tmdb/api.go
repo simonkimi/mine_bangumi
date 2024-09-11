@@ -4,6 +4,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/simonkimi/minebangumi/domain"
 	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/pkg/errno"
 	"github.com/simonkimi/minebangumi/pkg/http_client"
 	"github.com/simonkimi/minebangumi/tools/stringt"
 	"strconv"
@@ -46,7 +47,7 @@ func Search(title string) ([]*SearchResultItem, error) {
 			SetResult(&result).
 			Get("/3/search/tv")
 		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to search tmdb tv series: %s", title)
+			return nil, errno.NewApiErrorWithCausef(errno.ErrorApiParse, err, "Failed to search tmdb tv series: %s", title)
 		}
 		if req.IsError() {
 			return nil, errors.Newf("Failed to search tmdb tv series: %s, status code: %d", title, req.StatusCode())

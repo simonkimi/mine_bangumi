@@ -1,7 +1,7 @@
 // This code references part of the implementation from AutoBangumi.
 // Project URL: https://github.com/EstrellaXD/Auto_Bangumi/blob/main/backend/src/module/parser/analyser/torrent_parser.py
 
-package torrent_parser
+package name_parser
 
 import (
 	"github.com/simonkimi/minebangumi/tools/stringt"

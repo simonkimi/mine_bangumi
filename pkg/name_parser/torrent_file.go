@@ -1,4 +1,4 @@
-package torrent_parser
+package name_parser
 
 type TorrentEpisodeFile struct {
 	Path    string
