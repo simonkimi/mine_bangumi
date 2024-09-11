@@ -1,7 +1,7 @@
 // This code references part of the implementation from AutoBangumi.
 // Project URL: https://github.com/EstrellaXD/Auto_Bangumi/blob/main/backend/src/module/parser/analyser/torrent_parser.py
 
-package name_parser
+package bangumi
 
 import (
 	"github.com/simonkimi/minebangumi/tools/stringt"
@@ -11,12 +11,7 @@ import (
 	"strings"
 )
 
-const (
-	TorrentFileTypeVideo = iota
-	TorrentFileTypeSubtitle
-)
-
-func ParseTorrentName(torrentPath string, torrentName string, season int, fileType int) any {
+func ParseBangumiSourceName(torrentPath string, torrentName string) *FilenamePart {
 	torrentPath = filepath.Base(torrentPath)
 	matchNames := make([]string, 0)
 	matchNames = append(matchNames, torrentPath)
@@ -31,33 +26,17 @@ func ParseTorrentName(torrentPath string, torrentName string, season int, fileTy
 				continue
 			}
 			group, title := getGroup(matchGroup.GroupByNumber(1).String())
-			if season == 0 {
-				title, season = getSeasonAndTitle(title)
-			} else {
-				title, _ = getSeasonAndTitle(title)
-			}
+			title, season := getSeasonAndTitle(title)
 			episode, _ := strconv.Atoi(matchGroup.GroupByNumber(2).String())
 			ext := filepath.Ext(torrentPath)
-			if fileType == TorrentFileTypeVideo {
-				return &TorrentEpisodeFile{
-					Path:    torrentPath,
-					Group:   group,
-					Title:   title,
-					Season:  season,
-					Episode: episode,
-					Ext:     ext,
-				}
-			}
-			if fileType == TorrentFileTypeSubtitle {
-				return &TorrentSubtitleFile{
-					Path:     torrentPath,
-					Group:    group,
-					Title:    title,
-					Season:   season,
-					Episode:  episode,
-					Ext:      ext,
-					Language: getSubtitleLanguage(torrentPath),
-				}
+			return &FilenamePart{
+				Path:     torrentPath,
+				Group:    group,
+				Title:    title,
+				Season:   season,
+				Episode:  episode,
+				Ext:      ext,
+				Language: getSubtitleLanguage(torrentPath),
 			}
 		}
 	}
@@ -80,12 +59,10 @@ func getGroup(groupAndTitle string) (group string, title string) {
 
 func getSeasonAndTitle(seasonAndTitle string) (title string, season int) {
 	match := seasonMatcher.FindStringSubmatch(seasonAndTitle)
-	season = 1
+	season = -1
 	if len(match) > 2 {
 		parsedSeason, err := strconv.Atoi(match[2])
-		if err != nil {
-			season = 1
-		} else {
+		if err == nil {
 			season = parsedSeason
 		}
 	}

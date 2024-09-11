@@ -1,10 +1,11 @@
-package magnet_parser
+package magnet
 
 import (
 	"context"
 	"github.com/anacrolix/torrent"
 	"github.com/simonkimi/minebangumi/pkg/errno"
 	"os"
+	"time"
 )
 
 type FileInfo struct {
@@ -12,7 +13,7 @@ type FileInfo struct {
 	Files []string
 }
 
-func ParseMagnet(magnet string, ctx context.Context) (*FileInfo, error) {
+func ParseMagnet(ctx context.Context, magnet string) (*FileInfo, error) {
 	clientConfig := torrent.NewDefaultClientConfig()
 	clientConfig.NoUpload = true
 	clientConfig.DataDir = os.TempDir()
@@ -30,20 +31,22 @@ func ParseMagnet(magnet string, ctx context.Context) (*FileInfo, error) {
 	if err != nil {
 		return nil, errno.NewApiErrorWithCausef(errno.InternalServerError, err, "failed to add magnet")
 	}
+	timeout, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
 	select {
-	case <-torrentFile.GotInfo():
 	case <-ctx.Done():
 		return nil, errno.NewApiError(errno.ErrorCancel)
-	}
-	info := torrentFile.Info()
-
-	fileInfo := &FileInfo{Name: info.Name}
-
-	for _, file := range info.UpvertedFiles() {
-		for _, path := range file.Path {
-			fileInfo.Files = append(fileInfo.Files, path)
+	case <-timeout.Done():
+		return nil, errno.NewApiErrorf(errno.ErrorTimeout, "Timeout to get torrent info")
+	case <-torrentFile.GotInfo():
+		info := torrentFile.Info()
+		fileInfo := &FileInfo{Name: info.Name}
+		for _, file := range info.UpvertedFiles() {
+			for _, path := range file.Path {
+				fileInfo.Files = append(fileInfo.Files, path)
+			}
 		}
+		return fileInfo, nil
 	}
-
-	return fileInfo, nil
 }

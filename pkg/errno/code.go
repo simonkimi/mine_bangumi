@@ -2,6 +2,7 @@ package errno
 
 const (
 	Success             = 200
+	BadRequest          = 400
 	InternalServerError = 500
 
 	// 10000 - 19999 用户相关错误
@@ -11,7 +12,9 @@ const (
 	ErrorUserTotpWrong     = 10002
 
 	// 20000 - 29999 业务相关错误
-	ErrorCancel = 20000
+
+	ErrorCancel  = 20000
+	ErrorTimeout = 20001
 
 	// 50000 - 59999 三方API错误
 

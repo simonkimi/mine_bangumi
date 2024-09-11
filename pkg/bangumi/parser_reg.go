@@ -1,4 +1,4 @@
-package name_parser
+package bangumi
 
 import (
 	"github.com/dlclark/regexp2"
