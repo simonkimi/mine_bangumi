@@ -6,10 +6,9 @@ type parserRawData struct {
 }
 
 type ParserResult struct {
-	RawTitle     string
-	Files        []string
-	Season       int
-	StableSeason bool
+	RawTitle string
+	Files    []string
+	Season   int
 }
 
 type ScraperResult struct {

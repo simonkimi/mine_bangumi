@@ -7,9 +7,6 @@ import (
 	"github.com/simonkimi/minebangumi/pkg/errno"
 	"github.com/simonkimi/minebangumi/pkg/magnet"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
-	"github.com/simonkimi/minebangumi/tools/stringt"
-	"regexp"
-	"strings"
 )
 
 const (
@@ -21,21 +18,7 @@ type RssModel struct {
 	RssTitle string
 }
 
-func guestParser(targetUrl string) string {
-	mikanReg := regexp.MustCompile("^https?://mikanani\\.(me|tv)")
-	if mikanReg.MatchString(targetUrl) {
-		return ParserMikan
-	}
-	if strings.HasPrefix(targetUrl, "magnet:") {
-		return ParserMagnet
-	}
-	return ""
-}
-
-func ParseUrl(ctx context.Context, targetUrl string, parser string) (*ParserResult, error) {
-	if stringt.IsEmptyOrWhitespace(parser) {
-		parser = guestParser(targetUrl)
-	}
+func ParseSource(ctx context.Context, targetUrl string, parser string) (*ParserResult, error) {
 	// 解析原始数据
 	rawData := &parserRawData{}
 	switch parser {
@@ -62,18 +45,11 @@ func ParseUrl(ctx context.Context, targetUrl string, parser string) (*ParserResu
 			season = bf.Season
 		}
 	}
-	stableSeason := true
-	if season == -1 {
-		stableSeason = false
-		season = 1
-	}
-
-	// 刮削数据
 
 	return &ParserResult{
-		RawTitle:     bangumiTitle,
-		Season:       season,
-		StableSeason: stableSeason,
+		RawTitle: bangumiTitle,
+		Season:   season,
+		Files:    rawData.Files,
 	}, nil
 }
 

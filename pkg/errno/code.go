@@ -36,6 +36,8 @@ func getErrorMessage(code int) string {
 		return "TOTP incorrect"
 	case ErrorCancel:
 		return "Operation canceled"
+	case ErrorTimeout:
+		return "Operation timeout"
 	case ErrorApiNetwork:
 		return "Third-party API network error"
 	case ErrorApiParse:

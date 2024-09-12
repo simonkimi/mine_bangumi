@@ -34,6 +34,14 @@ func ErrMsg(err error) string {
 	return err.Error()
 }
 
+func NewFormError(err error) *ApiError {
+	return &ApiError{
+		Code:          BadRequest,
+		Message:       "Invalid form",
+		internalError: err,
+	}
+}
+
 func NewApiError(code int) *ApiError {
 	errMsg := getErrorMessage(code)
 	return &ApiError{

@@ -5,6 +5,7 @@ import (
 	"github.com/anacrolix/torrent"
 	"github.com/simonkimi/minebangumi/pkg/errno"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -44,6 +45,9 @@ func ParseMagnet(ctx context.Context, magnet string) (*FileInfo, error) {
 		fileInfo := &FileInfo{Name: info.Name}
 		for _, file := range info.UpvertedFiles() {
 			for _, path := range file.Path {
+				if strings.Contains(path, "_____padding_file_0_") {
+					continue
+				}
 				fileInfo.Files = append(fileInfo.Files, path)
 			}
 		}
