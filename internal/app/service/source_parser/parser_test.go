@@ -2,22 +2,24 @@ package source_parser
 
 import (
 	"context"
-	"github.com/simonkimi/minebangumi/internal/pkg/setup"
-	"github.com/simonkimi/minebangumi/test"
+	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/pkg/tests"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
 func init() {
-	err := test.LoadTestEnv()
-	if err != nil {
-		panic(err)
-	}
-	setup.SetupTest()
+	tests.LoadTestEnv()
 }
 
 func TestParseMikanUrl(t *testing.T) {
-	url := `https://mikanani.me/RSS/Bangumi?bangumiId=3373&subgroupid=583`
-	parseResult, err := ParseSource(context.Background(), url, "")
+	tests.WorkOnTempDir(t, true)
+	config.Setup()
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/atri_bangumi.xml")
+	}))
+	parseResult, err := ParseSource(context.Background(), server.URL, ParserMikan)
 	if err != nil {
 		t.Fatal(err)
 	}

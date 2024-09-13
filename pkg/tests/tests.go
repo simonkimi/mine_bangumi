@@ -2,6 +2,7 @@ package tests
 
 import (
 	"github.com/joho/godotenv"
+	"github.com/otiai10/copy"
 	"os"
 	"path/filepath"
 	"testing"
@@ -16,6 +17,15 @@ func WorkOnTempDir(t *testing.T, cleanup bool) string {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	testDataDir := filepath.Join(wd, "testdata")
+	if _, err := os.Stat(testDataDir); err == nil {
+		err = copy.Copy(testDataDir, filepath.Join(td, "testdata"))
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
 	err = os.Chdir(td)
 	if err != nil {
 		t.Fatal(err)
