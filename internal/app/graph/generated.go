@@ -38,17 +38,13 @@ type Config struct {
 }
 
 type ResolverRoot interface {
-	Mutation() MutationResolver
+	Query() QueryResolver
 }
 
 type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	Mutation struct {
-		ParseSource func(childComplexity int, input *grmodel.ParseSourceInput) int
-	}
-
 	ParseSourceResponse struct {
 		Files  func(childComplexity int) int
 		Season func(childComplexity int) int
@@ -56,11 +52,12 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		ParseSource func(childComplexity int, source *grmodel.ParseSourceInput) int
 	}
 }
 
-type MutationResolver interface {
-	ParseSource(ctx context.Context, input *grmodel.ParseSourceInput) (*grmodel.ParseSourceResponse, error)
+type QueryResolver interface {
+	ParseSource(ctx context.Context, source *grmodel.ParseSourceInput) (*grmodel.ParseSourceResponse, error)
 }
 
 type executableSchema struct {
@@ -82,18 +79,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Mutation.parseSource":
-		if e.complexity.Mutation.ParseSource == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_parseSource_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ParseSource(childComplexity, args["input"].(*grmodel.ParseSourceInput)), true
-
 	case "ParseSourceResponse.files":
 		if e.complexity.ParseSourceResponse.Files == nil {
 			break
@@ -114,6 +99,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ParseSourceResponse.Title(childComplexity), true
+
+	case "Query.parseSource":
+		if e.complexity.Query.ParseSource == nil {
+			break
+		}
+
+		args, err := ec.field_Query_parseSource_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ParseSource(childComplexity, args["source"].(*grmodel.ParseSourceInput)), true
 
 	}
 	return 0, false
@@ -157,21 +154,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 
 			return &response
-		}
-	case ast.Mutation:
-		return func(ctx context.Context) *graphql.Response {
-			if !first {
-				return nil
-			}
-			first = false
-			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
-			var buf bytes.Buffer
-			data.MarshalGQL(&buf)
-
-			return &graphql.Response{
-				Data: buf.Bytes(),
-			}
 		}
 
 	default:
@@ -232,8 +214,8 @@ type ParseSourceResponse {
     season: Int
 }
 
-type Mutation {
-    parseSource(input: ParseSourceInput): ParseSourceResponse
+type Query {
+    parseSource(source: ParseSourceInput): ParseSourceResponse
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -241,21 +223,6 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
-
-func (ec *executionContext) field_Mutation_parseSource_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *grmodel.ParseSourceInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOParseSourceInput2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋgraphᚋgrmodelᚐParseSourceInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -269,6 +236,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_parseSource_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *grmodel.ParseSourceInput
+	if tmp, ok := rawArgs["source"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
+		arg0, err = ec.unmarshalOParseSourceInput2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋgraphᚋgrmodelᚐParseSourceInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["source"] = arg0
 	return args, nil
 }
 
@@ -309,66 +291,6 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
-
-func (ec *executionContext) _Mutation_parseSource(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_parseSource(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ParseSource(rctx, fc.Args["input"].(*grmodel.ParseSourceInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*grmodel.ParseSourceResponse)
-	fc.Result = res
-	return ec.marshalOParseSourceResponse2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋgraphᚋgrmodelᚐParseSourceResponse(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_parseSource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "title":
-				return ec.fieldContext_ParseSourceResponse_title(ctx, field)
-			case "files":
-				return ec.fieldContext_ParseSourceResponse_files(ctx, field)
-			case "season":
-				return ec.fieldContext_ParseSourceResponse_season(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ParseSourceResponse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_parseSource_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
 
 func (ec *executionContext) _ParseSourceResponse_title(ctx context.Context, field graphql.CollectedField, obj *grmodel.ParseSourceResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ParseSourceResponse_title(ctx, field)
@@ -489,6 +411,66 @@ func (ec *executionContext) fieldContext_ParseSourceResponse_season(_ context.Co
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_parseSource(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_parseSource(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ParseSource(rctx, fc.Args["source"].(*grmodel.ParseSourceInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*grmodel.ParseSourceResponse)
+	fc.Result = res
+	return ec.marshalOParseSourceResponse2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋgraphᚋgrmodelᚐParseSourceResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_parseSource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_ParseSourceResponse_title(ctx, field)
+			case "files":
+				return ec.fieldContext_ParseSourceResponse_files(ctx, field)
+			case "season":
+				return ec.fieldContext_ParseSourceResponse_season(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ParseSourceResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_parseSource_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -2437,52 +2419,6 @@ func (ec *executionContext) unmarshalInputParseSourceInput(ctx context.Context, 
 
 // region    **************************** object.gotpl ****************************
 
-var mutationImplementors = []string{"Mutation"}
-
-func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
-	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
-		Object: "Mutation",
-	})
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
-			Object: field.Name,
-			Field:  field,
-		})
-
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Mutation")
-		case "parseSource":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_parseSource(ctx, field)
-			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var parseSourceResponseImplementors = []string{"ParseSourceResponse"}
 
 func (ec *executionContext) _ParseSourceResponse(ctx context.Context, sel ast.SelectionSet, obj *grmodel.ParseSourceResponse) graphql.Marshaler {
@@ -2542,6 +2478,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "parseSource":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_parseSource(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)

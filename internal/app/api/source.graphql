@@ -9,6 +9,6 @@ type ParseSourceResponse {
     season: Int
 }
 
-type Mutation {
-    parseSource(input: ParseSourceInput): ParseSourceResponse
+type Query {
+    parseSource(source: ParseSourceInput): ParseSourceResponse
 }

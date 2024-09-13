@@ -2,9 +2,6 @@
 
 package grmodel
 
-type Mutation struct {
-}
-
 type ParseSourceInput struct {
 	Source string `json:"source"`
 	Parser string `json:"parser"`

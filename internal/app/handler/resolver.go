@@ -8,20 +8,20 @@ import (
 
 type Resolver struct{}
 
-func (r *Resolver) ParseSource(ctx context.Context, input *grmodel.ParseSourceInput) (*grmodel.ParseSourceResponse, error) {
-	source, err := source_parser.ParseSource(ctx, input.Source, input.Parser)
+func (r *Resolver) ParseSource(ctx context.Context, source *grmodel.ParseSourceInput) (*grmodel.ParseSourceResponse, error) {
+	result, err := source_parser.ParseSource(ctx, source.Source, source.Parser)
 	if err != nil {
 		return nil, err
 	}
 
 	var files []*string
-	for _, file := range source.Files {
+	for _, file := range result.Files {
 		files = append(files, &file)
 	}
 
 	return &grmodel.ParseSourceResponse{
-		Title:  &source.RawTitle,
+		Title:  &result.RawTitle,
 		Files:  files,
-		Season: &source.Season,
+		Season: &result.Season,
 	}, nil
 }

@@ -13,11 +13,11 @@ import (
 )
 
 // ParseSource is the resolver for the parseSource field.
-func (r *mutationResolver) ParseSource(ctx context.Context, input *grmodel.ParseSourceInput) (*grmodel.ParseSourceResponse, error) {
+func (r *queryResolver) ParseSource(ctx context.Context, source *grmodel.ParseSourceInput) (*grmodel.ParseSourceResponse, error) {
 	panic(fmt.Errorf("not implemented: ParseSource - parseSource"))
 }
 
-// Mutation returns graph.MutationResolver implementation.
-func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
+// Query returns graph.QueryResolver implementation.
+func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 
-type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
