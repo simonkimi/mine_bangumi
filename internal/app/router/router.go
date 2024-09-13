@@ -13,6 +13,7 @@ import (
 func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gzip.Gzip(gzip.DefaultCompression))
+	r.Use(middleware.JwtAuthMiddleware())
 	r.Use(middleware.ResponseWrapperMiddleware())
 	r.Use(middleware.LogrusMiddleware())
 
@@ -29,6 +30,10 @@ func InitRouter() *gin.Engine {
 		graphqlGroup.GET("/", func(c *gin.Context) {
 			playground.Handler("GraphQL playground", "/graphql/query").ServeHTTP(c.Writer, c.Request)
 		})
+	}
+	userGroup := v1.Group("/user")
+	{
+		userGroup.POST("/login", handler.Login)
 	}
 	sourceGroup := v1.Group("/source")
 	{

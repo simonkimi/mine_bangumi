@@ -9,7 +9,7 @@ import (
 )
 
 type AppConfigModel struct {
-	IsFirstRun  bool               `toml:"is_first_run" default:"true"`
+	System      SystemConfig       `toml:"system"`
 	User        UserConfig         `toml:"user"`
 	Server      ServerConfig       `toml:"server"`
 	Downloader  DownloaderConfig   `toml:"downloader"`
@@ -58,6 +58,11 @@ type Aria2Config struct {
 
 type TmdbConfig struct {
 	ApiKey string `toml:"api_key" env:"MBG_TMDB_API_KEY"`
+}
+
+type SystemConfig struct {
+	SecretKey  string `toml:"secret"`
+	IsFirstRun bool   `toml:"is_first_run"`
 }
 
 func initConfigStruct(model any) {

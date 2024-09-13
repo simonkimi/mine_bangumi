@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/pelletier/go-toml/v2"
+	"github.com/simonkimi/minebangumi/pkg/secret"
 	"github.com/sirupsen/logrus"
 	"os"
 )
@@ -17,6 +18,8 @@ func Setup() {
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		logrus.Warn("Config file not found, use default values")
 		initConfigStruct(&config)
+		config.System.IsFirstRun = true
+		config.System.SecretKey = secret.GenerateRandomKey(32)
 		AppConfig = config
 		SaveConfig()
 		return
