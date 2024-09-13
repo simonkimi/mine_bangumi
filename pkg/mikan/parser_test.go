@@ -2,41 +2,37 @@ package mikan
 
 import (
 	"context"
-	"github.com/joho/godotenv"
-	"github.com/simonkimi/minebangumi/internal/app/config"
-	"github.com/simonkimi/minebangumi/internal/pkg/setup"
-	"os"
+	"github.com/stretchr/testify/assert"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
-func init() {
-	err := godotenv.Load()
-	if err != nil {
-		panic(err)
-	}
-	setup.SetupTest()
-	config.AppConfig.ProxyConfig.Enable = os.Getenv("PROXY_ENABLED") == "1"
-	config.AppConfig.ProxyConfig.Scheme = os.Getenv("PROXY_SCHEME")
-	config.AppConfig.ProxyConfig.Host = os.Getenv("PROXY_HOST")
-	config.AppConfig.ProxyConfig.Port = os.Getenv("PROXY_PORT")
-	config.AppConfig.ProxyConfig.UseAuth = os.Getenv("PROXY_USE_AUTH") == "1"
-	config.AppConfig.ProxyConfig.Username = os.Getenv("PROXY_USERNAME")
-	config.AppConfig.ProxyConfig.Password = os.Getenv("PROXY_PASSWORD")
-}
-
 func TestParseBangumi(t *testing.T) {
-	result, err := ParseBangumiByUrl(context.Background(), "https://mikanani.me/RSS/Bangumi?bangumiId=3386&subgroupid=615")
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/atri_bangumi.xml")
+	}))
+	defer mockServer.Close()
+
+	result, err := ParseBangumiByUrl(context.Background(), mockServer.URL)
 	if err != nil {
 		t.Error(err)
 	}
-	t.Log(result)
+	assert.Equal(t, "亚托莉 -我挚爱的时光-", result.Title)
 }
 
 func TestParserMyBangumi(t *testing.T) {
-	result, err := ParseBangumiByUrl(context.Background(), "https://mikanani.me/RSS/MyBangumi?token=b99ffHuTfy1nTftJ9H9DK0Kz6jyN18DgL6JhmSvtjXQ%3d")
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/MyBangumi.xml")
+	}))
+	defer mockServer.Close()
+
+	result, err := ParseBangumiByUrl(context.Background(), mockServer.URL)
 	if err != nil {
 		t.Error(err)
 	}
+	assert.Equal(t, "我的番组", result.Title)
+	assert.Equal(t, 9, len(result.Episodes))
+	assert.Equal(t, "[SweetSub][鹿乃子大摇大摆虎视眈眈][Shikanoko Nokonoko Koshitantan][11][WebRip][1080P][AVC 8bit][简日双语]", result.Episodes[0].Title)
 	t.Log(result)
-
 }

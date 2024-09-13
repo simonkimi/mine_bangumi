@@ -1,4 +1,4 @@
-package dto
+package api
 
 type ParseSourceForm struct {
 	Source string `json:"source" binding:"required"`

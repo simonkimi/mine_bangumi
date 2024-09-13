@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/simonkimi/minebangumi/internal/app/config"
-	"github.com/simonkimi/minebangumi/internal/router"
+	"github.com/simonkimi/minebangumi/internal/app/router"
 	"github.com/simonkimi/minebangumi/tools/stringt"
 	"github.com/sirupsen/logrus"
 	"net/http"

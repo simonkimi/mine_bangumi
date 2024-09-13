@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/simonkimi/minebangumi/internal/app/dto"
+	"github.com/simonkimi/minebangumi/internal/app/api"
 	"github.com/simonkimi/minebangumi/internal/app/service/source_parser"
 	"github.com/simonkimi/minebangumi/pkg/errno"
 	"net/http"
@@ -19,7 +19,7 @@ import (
 // @Success 200 {object} dto.ParseSourceResponse
 // @Router /parse [post]
 func ParseSource(c *gin.Context) {
-	var form *dto.ParseSourceForm
+	var form *api.ParseSourceForm
 	if err := c.ShouldBindJSON(&form); err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, errno.NewFormError(err))
 		return
@@ -29,7 +29,7 @@ func ParseSource(c *gin.Context) {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, &dto.ParseSourceResponse{
+	c.JSON(http.StatusOK, &api.ParseSourceResponse{
 		Title:  source.RawTitle,
 		Files:  source.Files,
 		Season: source.Season,

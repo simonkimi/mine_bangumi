@@ -6,7 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type QBittorrentDl struct {
+type QBittorrentClient struct {
 	IDownloader
 	url      string
 	username string
@@ -14,8 +14,8 @@ type QBittorrentDl struct {
 	client   *resty.Client
 }
 
-func NewQBittorrentDl(url string, username string, password string) *QBittorrentDl {
-	return &QBittorrentDl{
+func NewQBittorrentDl(url string, username string, password string) *QBittorrentClient {
+	return &QBittorrentClient{
 		url:      url,
 		username: username,
 		password: password,
@@ -24,7 +24,7 @@ func NewQBittorrentDl(url string, username string, password string) *QBittorrent
 	}
 }
 
-func (d *QBittorrentDl) Login() error {
+func (d *QBittorrentClient) Login() error {
 	rsp, err := d.client.R().
 		SetHeader("Content-Type", "application/x-www-form-urlencoded").
 		SetFormData(map[string]string{
@@ -37,25 +37,30 @@ func (d *QBittorrentDl) Login() error {
 		return err
 	}
 
-	if rsp.StatusCode() != 200 {
-		return fmt.Errorf("qb login failed: %s", rsp.Status())
+	if rsp.IsError() {
+		return fmt.Errorf("qBittorrentDl login failed: %s", rsp.Status())
 	}
-	logrus.Debugf("qb login success: %s", rsp.Header().Get("Set-Cookie"))
+	cookie := rsp.Header().Get("Set-Cookie")
+	if cookie == "" {
+		return fmt.Errorf("qBittorrentDl login failed: no cookie")
+	}
+	logrus.Debugf("qBittorrentDl login success: %s", cookie)
 	return nil
 }
 
-func (d *QBittorrentDl) RecordClientInfo() (string, error) {
+func (d *QBittorrentClient) RecordClientInfo() (string, error) {
 	rsp, err := d.client.R().Get("/api/v2/app/version")
 	if err != nil {
 		return "", fmt.Errorf("get qb version failed: %s", err)
 	}
 	appVersion := rsp.String()
-	logrus.Infof("qb version: %s", rsp.String())
 	rsp, err = d.client.R().Get("/api/v2/app/webapiVersion")
 	if err != nil {
 		return "", fmt.Errorf("get qb webapi version failed: %s", err)
 	}
 	webApiVersion := rsp.String()
-	logrus.Infof("qb webapi version: %s", rsp.String())
-	return fmt.Sprintf("qb version: %s, webapi version: %s", appVersion, webApiVersion), nil
+	version := fmt.Sprintf("qBittorrent version: %s, webapi version: %s", appVersion, webApiVersion)
+	logrus.Debugf("qBittorrent version: %s", version)
+	return version, nil
+
 }
