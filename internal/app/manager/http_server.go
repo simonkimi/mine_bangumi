@@ -24,8 +24,10 @@ func StartHttpService(ctx context.Context, wg *sync.WaitGroup) {
 	var ipv6Server *http.Server
 
 	if !stringt.IsEmptyOrWhitespace(config.AppConfig.Server.Ipv4Host) {
+		ipv4 := fmt.Sprintf("%s:%d", config.AppConfig.Server.Ipv4Host, config.AppConfig.Server.Ipv4Port)
+		logrus.Infof("Starting server on %s", ipv4)
 		ipv4Server = &http.Server{
-			Addr:    fmt.Sprintf("%s:%s", config.AppConfig.Server.Ipv4Port, config.AppConfig.Server.Ipv4Port),
+			Addr:    ipv4,
 			Handler: handler,
 		}
 		go func() {
@@ -37,8 +39,10 @@ func StartHttpService(ctx context.Context, wg *sync.WaitGroup) {
 	}
 
 	if !stringt.IsEmptyOrWhitespace(config.AppConfig.Server.Ipv6Host) {
+		ipv6 := fmt.Sprintf("%s:%d", config.AppConfig.Server.Ipv6Host, config.AppConfig.Server.Ipv6Port)
+		logrus.Infof("Starting server on %s", ipv6)
 		ipv6Server = &http.Server{
-			Addr:    fmt.Sprintf("%s:%s", config.AppConfig.Server.Ipv6Host, config.AppConfig.Server.Ipv6Port),
+			Addr:    ipv6,
 			Handler: handler,
 		}
 		go func() {

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/simonkimi/minebangumi/internal/app/manager"
+	"github.com/simonkimi/minebangumi/internal/pkg/database"
 	"github.com/simonkimi/minebangumi/pkg/logger"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -11,6 +13,8 @@ import (
 
 func init() {
 	logger.Setup()
+	config.Setup()
+	database.Setup()
 }
 
 func main() {

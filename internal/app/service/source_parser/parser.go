@@ -5,7 +5,6 @@ import (
 	"github.com/simonkimi/minebangumi/internal/pkg/cache"
 	"github.com/simonkimi/minebangumi/pkg/bangumi"
 	"github.com/simonkimi/minebangumi/pkg/errno"
-	"github.com/simonkimi/minebangumi/pkg/magnet"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
 )
 
@@ -71,16 +70,16 @@ func mikanParse(ctx context.Context, targetUrl string, rawData *parserRawData) e
 }
 
 func magnetParse(ctx context.Context, targetUrl string, rawData *parserRawData) error {
-	magnetData, exist := cache.Get[magnet.FileInfo](ParserMagnet, targetUrl)
-	if !exist {
-		newMagnetData, err := magnet.ParseMagnet(ctx, targetUrl)
-		if err != nil {
-			return err
-		}
-		cache.Add(ParserMagnet, targetUrl, newMagnetData)
-		magnetData = newMagnetData
-	}
-	rawData.Title = magnetData.Name
-	rawData.Files = magnetData.Files
+	//magnetData, exist := cache.Get[magnet.FileInfo](ParserMagnet, targetUrl)
+	//if !exist {
+	//	newMagnetData, err := magnet.ParseMagnet(ctx, targetUrl)
+	//	if err != nil {
+	//		return err
+	//	}
+	//	cache.Add(ParserMagnet, targetUrl, newMagnetData)
+	//	magnetData = newMagnetData
+	//}
+	//rawData.Title = magnetData.Name
+	//rawData.Files = magnetData.Files
 	return nil
 }
