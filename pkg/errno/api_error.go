@@ -43,7 +43,7 @@ func NewFormError(err error) *ApiError {
 }
 
 func NewApiError(code int) *ApiError {
-	errMsg := getErrorMessage(code)
+	errMsg := GetErrorMessage(code)
 	return &ApiError{
 		Code:          code,
 		Message:       errMsg,
@@ -54,13 +54,13 @@ func NewApiError(code int) *ApiError {
 func NewApiErrorf(code int, format string, args ...any) *ApiError {
 	return &ApiError{
 		Code:          code,
-		Message:       getErrorMessage(code),
+		Message:       GetErrorMessage(code),
 		internalError: errors.NewWithDepthf(1, format, args...),
 	}
 }
 
 func NewApiErrorWithCause(code int, cause error) *ApiError {
-	errMsg := getErrorMessage(code)
+	errMsg := GetErrorMessage(code)
 	return &ApiError{
 		Code:          code,
 		Message:       errMsg,
@@ -71,7 +71,7 @@ func NewApiErrorWithCause(code int, cause error) *ApiError {
 func NewApiErrorWithCausef(code int, cause error, format string, args ...any) *ApiError {
 	return &ApiError{
 		Code:          code,
-		Message:       getErrorMessage(code),
+		Message:       GetErrorMessage(code),
 		internalError: errors.WrapWithDepthf(1, cause, format, args...),
 	}
 }

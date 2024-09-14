@@ -33,3 +33,11 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func GetClaims(c *gin.Context) *api.UserClaims {
+	claims, exist := c.Get("claims")
+	if !exist {
+		return nil
+	}
+	return claims.(*api.UserClaims)
+}

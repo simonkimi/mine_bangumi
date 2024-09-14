@@ -3,6 +3,7 @@ package tests
 import (
 	"github.com/joho/godotenv"
 	"github.com/otiai10/copy"
+	"log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -44,6 +45,41 @@ func WorkOnTempDir(t *testing.T, cleanup bool) string {
 		}
 	})
 	return td
+}
+
+func MainOnTempDir() func() {
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	td, err := os.MkdirTemp("", "test")
+	if err != nil {
+		panic(err)
+	}
+
+	testDataDir := filepath.Join(wd, "testdata")
+	if _, err := os.Stat(testDataDir); err == nil {
+		err = copy.Copy(testDataDir, filepath.Join(td, "testdata"))
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	err = os.Chdir(td)
+	if err != nil {
+		panic(err)
+	}
+	log.Printf("Working on temp dir: %s", td)
+	return func() {
+		err := os.Chdir(wd)
+		if err != nil {
+			panic(err)
+		}
+		err = os.RemoveAll(td)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
 func LoadTestEnv() {

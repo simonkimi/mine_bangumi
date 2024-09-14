@@ -5,7 +5,6 @@ import (
 	"github.com/simonkimi/minebangumi/internal/app/api"
 	"github.com/simonkimi/minebangumi/internal/app/service/source_parser"
 	"github.com/simonkimi/minebangumi/pkg/errno"
-	"net/http"
 )
 
 // ParseSource godoc
@@ -21,15 +20,15 @@ func ParseSource(c *gin.Context) {
 	ctx := c.Request.Context()
 	var form *api.ParseSourceForm
 	if err := c.ShouldBindJSON(&form); err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, errno.NewFormError(err))
+		_ = c.Error(errno.NewFormError(err))
 		return
 	}
 	source, err := source_parser.ParseSource(ctx, form.Source, form.Parser)
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		_ = c.Error(err)
 		return
 	}
-	c.JSON(http.StatusOK, &api.ParseSourceResponse{
+	api.OkResponse(c, &api.ParseSourceResponse{
 		Title:  source.RawTitle,
 		Files:  source.Files,
 		Season: source.Season,

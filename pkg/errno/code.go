@@ -1,5 +1,7 @@
 package errno
 
+import "net/http"
+
 const (
 	Success             = 200
 	BadRequest          = 400
@@ -22,7 +24,25 @@ const (
 	ErrorApiParse   = 50001
 )
 
-func getErrorMessage(code int) string {
+func GetErrorMessage(code int) string {
+	// 400 http错误
+	switch code {
+	case http.StatusBadRequest:
+		return "Bad request"
+	case http.StatusUnauthorized:
+		return "Unauthorized"
+	case http.StatusForbidden:
+		return "Forbidden"
+	case http.StatusNotFound:
+		return "Not found"
+	case http.StatusMethodNotAllowed:
+		return "Method not allowed"
+	case http.StatusNotAcceptable:
+		return "Not acceptable"
+	case http.StatusRequestTimeout:
+		return "Request timeout"
+	}
+
 	switch code {
 	case Success:
 		return "ok"

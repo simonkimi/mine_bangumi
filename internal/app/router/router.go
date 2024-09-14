@@ -3,7 +3,6 @@ package router
 import (
 	graphHandler "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/simonkimi/minebangumi/internal/app/graph"
 	"github.com/simonkimi/minebangumi/internal/app/handler"
@@ -12,10 +11,7 @@ import (
 
 func InitRouter() *gin.Engine {
 	r := gin.New()
-	r.Use(gzip.Gzip(gzip.DefaultCompression))
-	r.Use(middleware.JwtAuthMiddleware())
-	r.Use(middleware.ResponseWrapperMiddleware())
-	r.Use(middleware.LogrusMiddleware())
+	middleware.Setup(r)
 
 	graphSrv := graphHandler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
 		Resolvers: &handler.Resolver{},
