@@ -23,6 +23,7 @@ type ScrapeResponse struct {
 	OriginalTitle string                  `json:"original_title"`
 	FirstAirYear  string                  `json:"first_air_year"`
 	Overview      string                  `json:"overview"`
+	Background    string                  `json:"background"`
 	PosterPath    string                  `json:"poster_path"`
 	Seasons       []*ScrapeSeasonResponse `json:"seasons"`
 }

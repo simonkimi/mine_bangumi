@@ -40,5 +40,9 @@ func InitRouter() *gin.Engine {
 		sourceGroup.POST("/parse", handler.Source)
 		sourceGroup.POST("/scrape", handler.Scrape)
 	}
+	proxyGroup := v1.Group("/proxy")
+	{
+		proxyGroup.GET("/poster", handler.Poster)
+	}
 	return r
 }

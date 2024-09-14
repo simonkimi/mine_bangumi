@@ -51,6 +51,7 @@ func scrapeTmDb(ctx context.Context, form *api.ScrapeForm) ([]*api.ScrapeRespons
 			OriginalTitle: detail.OriginalName,
 			FirstAirYear:  detail.FirstAirDate,
 			Overview:      detail.Overview,
+			Background:    detail.BackdropPath,
 			PosterPath:    detail.PosterPath,
 			Seasons:       seasons,
 		})
