@@ -3,10 +3,13 @@ package middleware
 import (
 	"github.com/gavv/httpexpect/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/simonkimi/minebangumi/internal/app/api"
 	"github.com/simonkimi/minebangumi/internal/app/config"
-	"github.com/simonkimi/minebangumi/internal/app/service/user_service"
+	"github.com/simonkimi/minebangumi/internal/app/service"
+	"github.com/simonkimi/minebangumi/pkg/errno"
 	"github.com/simonkimi/minebangumi/pkg/tests"
 	"github.com/stretchr/testify/require"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 )
@@ -18,19 +21,14 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
-func initAuthGin() *gin.Engine {
+func TestJwtAuthMiddleware_Ok(t *testing.T) {
+	username := "admin"
+	token, err := service.GenerateUserJwt(username)
+	require.Nil(t, err)
+
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	r.Use(JwtAuthMiddleware())
-	return r
-}
-
-func TestJwtAuthMiddleware_Ok(t *testing.T) {
-	username := "admin"
-	token, err := user_service.GenerateJwt(username)
-	require.Nil(t, err)
-
-	r := initAuthGin()
 	r.GET("/test", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"claims": GetClaims(c),
@@ -51,7 +49,9 @@ func TestJwtAuthMiddleware_Ok(t *testing.T) {
 }
 
 func TestJwtAuthMiddleware_NoToken(t *testing.T) {
-	r := initAuthGin()
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	r.Use(JwtAuthMiddleware())
 	r.GET("/test", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"claims": GetClaims(c),
@@ -70,7 +70,9 @@ func TestJwtAuthMiddleware_NoToken(t *testing.T) {
 }
 
 func TestJwtAuthMiddleware_TokenError(t *testing.T) {
-	r := initAuthGin()
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	r.Use(JwtAuthMiddleware())
 	r.GET("/test", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"claims": GetClaims(c),
@@ -87,4 +89,57 @@ func TestJwtAuthMiddleware_TokenError(t *testing.T) {
 		Status(200).
 		JSON().Object().
 		Value("claims").IsNull()
+}
+
+func TestRequireAuthMiddleware_Ok(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	Setup(r)
+	group := r.Group("/api")
+	group.Use(RequireAuthMiddleware())
+	group.GET("/test", func(c *gin.Context) {
+		api.OkResponse(c, &gin.H{
+			"key": "value",
+		})
+	})
+
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	username := "admin"
+	token, err := service.GenerateUserJwt(username)
+	require.Nil(t, err)
+
+	httpexpect.Default(t, server.URL).
+		GET("/api/test").
+		WithHeader("Authorization", "Bearer "+token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().
+		HasValue("code", errno.Success).
+		Value("data").Object().HasValue("key", "value")
+}
+
+func TestRequireAuthMiddleware_Error(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	Setup(r)
+	group := r.Group("/api")
+	group.Use(RequireAuthMiddleware())
+	group.GET("/test", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"data": "ok",
+		})
+	})
+
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	httpexpect.Default(t, server.URL).
+		GET("/api/test").
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().
+		HasValue("code", errno.Unauthorized).
+		HasValue("message", "Unauthorized")
 }

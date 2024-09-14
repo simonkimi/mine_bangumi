@@ -12,9 +12,9 @@ import (
 	"github.com/simonkimi/minebangumi/internal/app/graph/grmodel"
 )
 
-// ParseSource is the resolver for the parseSource field.
+// Source is the resolver for the parseSource field.
 func (r *queryResolver) ParseSource(ctx context.Context, source *grmodel.ParseSourceInput) (*grmodel.ParseSourceResponse, error) {
-	panic(fmt.Errorf("not implemented: ParseSource - parseSource"))
+	panic(fmt.Errorf("not implemented: Source - parseSource"))
 }
 
 // Query returns graph.QueryResolver implementation.

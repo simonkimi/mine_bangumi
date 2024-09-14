@@ -26,5 +26,12 @@ func ResponseWrapperMiddleware() gin.HandlerFunc {
 			}
 			return
 		}
+		if c.Writer.Status() == http.StatusNotFound {
+			c.JSON(http.StatusOK, gin.H{
+				"code":    http.StatusNotFound,
+				"message": "404 Not Found",
+			})
+			return
+		}
 	}
 }

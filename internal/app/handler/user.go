@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/simonkimi/minebangumi/internal/app/api"
 	"github.com/simonkimi/minebangumi/internal/app/config"
-	"github.com/simonkimi/minebangumi/internal/app/service/user_service"
+	"github.com/simonkimi/minebangumi/internal/app/service"
 	"github.com/simonkimi/minebangumi/pkg/errno"
 )
 
@@ -18,7 +18,7 @@ func Login(c *gin.Context) {
 		_ = c.Error(errno.NewApiError(errno.ErrorUserPasswordWrong))
 		return
 	}
-	token, err := user_service.GenerateJwt(form.Username)
+	token, err := service.GenerateUserJwt(form.Username)
 	if err != nil {
 		_ = c.Error(err)
 		return

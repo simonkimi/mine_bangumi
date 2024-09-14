@@ -3,34 +3,54 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/simonkimi/minebangumi/internal/app/api"
-	"github.com/simonkimi/minebangumi/internal/app/service/source_parser"
+	"github.com/simonkimi/minebangumi/internal/app/service"
 	"github.com/simonkimi/minebangumi/pkg/errno"
 )
 
-// ParseSource godoc
+// Source godoc
 // @Summary Parse source
 // @Description Parse the source using the specified parser
 // @Tags parser
 // @Accept json
 // @Produce json
-// @Param form body dto.ParseSourceForm true "Parse Source Form"
-// @Success 200 {object} dto.ParseSourceResponse
+// @Param form body api.ParseSourceForm true "Parse Source Form"
+// @Success 200 {object} api.ParseSourceResponse
 // @Router /parse [post]
-func ParseSource(c *gin.Context) {
+func Source(c *gin.Context) {
 	ctx := c.Request.Context()
 	var form *api.ParseSourceForm
 	if err := c.ShouldBindJSON(&form); err != nil {
 		_ = c.Error(errno.NewFormError(err))
 		return
 	}
-	source, err := source_parser.ParseSource(ctx, form.Source, form.Parser)
+	source, err := service.ParseSource(ctx, form.Source, form.Parser)
 	if err != nil {
 		_ = c.Error(err)
 		return
 	}
-	api.OkResponse(c, &api.ParseSourceResponse{
-		Title:  source.RawTitle,
-		Files:  source.Files,
-		Season: source.Season,
-	})
+	api.OkResponse(c, source)
+}
+
+// Scrape godoc
+// @Summary Scrape source
+// @Description Scrape the source using the specified scraper
+// @Tags scraper
+// @Accept json
+// @Produce json
+// @Param form body api.ScrapeForm true "Scrape Form"
+// @Success 200 {object} api.ScrapeResponse
+// @Router /scrape [post]
+func Scrape(c *gin.Context) {
+	ctx := c.Request.Context()
+	var form *api.ScrapeForm
+	if err := c.ShouldBindJSON(&form); err != nil {
+		_ = c.Error(errno.NewFormError(err))
+		return
+	}
+	info, err := service.ScrapeService(ctx, form)
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+	api.OkResponse(c, info)
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/simonkimi/minebangumi/internal/app/api"
 	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/pkg/errno"
 	"strings"
 )
 import "github.com/golang-jwt/jwt/v5"
@@ -30,6 +31,17 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		c.Set("claims", claims)
+		c.Next()
+	}
+}
+
+func RequireAuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if GetClaims(c) == nil {
+			_ = c.Error(errno.NewApiError(errno.Unauthorized))
+			c.Abort()
+			return
+		}
 		c.Next()
 	}
 }

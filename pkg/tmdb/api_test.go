@@ -1,12 +1,13 @@
 package tmdb
 
 import (
+	"context"
 	"github.com/simonkimi/minebangumi/domain"
 	"testing"
 )
 
 func TestSearch(t *testing.T) {
-	result, err := Search("魔法禁书目录")
+	result, err := Search(context.Background(), "魔法禁书目录")
 	if err != nil {
 		t.Error(err)
 	}
@@ -14,7 +15,7 @@ func TestSearch(t *testing.T) {
 }
 
 func TestDetail(t *testing.T) {
-	result, err := QueryForDetail(30980, domain.LanguageZhHans)
+	result, err := QueryForDetail(context.Background(), 30980, domain.LanguageZhHans)
 	if err != nil {
 		t.Error(err)
 	}

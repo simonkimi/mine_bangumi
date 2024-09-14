@@ -5,11 +5,11 @@ import "net/http"
 const (
 	Success             = 200
 	BadRequest          = 400
+	Unauthorized        = 401
 	InternalServerError = 500
 
 	// 10000 - 19999 用户相关错误
 
-	ErrorUserUnauthorized  = 10000
 	ErrorUserPasswordWrong = 10001
 	ErrorUserTotpWrong     = 10002
 
@@ -48,8 +48,6 @@ func GetErrorMessage(code int) string {
 		return "ok"
 	case InternalServerError:
 		return "Internal server error"
-	case ErrorUserUnauthorized:
-		return "User unauthorized"
 	case ErrorUserPasswordWrong:
 		return "Password incorrect"
 	case ErrorUserTotpWrong:

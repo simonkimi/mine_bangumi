@@ -1,7 +1,8 @@
-package source_parser
+package service
 
 import (
 	"context"
+	"github.com/simonkimi/minebangumi/internal/app/api"
 	"github.com/simonkimi/minebangumi/internal/pkg/cache"
 	"github.com/simonkimi/minebangumi/pkg/bangumi"
 	"github.com/simonkimi/minebangumi/pkg/errno"
@@ -17,7 +18,12 @@ type RssModel struct {
 	RssTitle string
 }
 
-func ParseSource(ctx context.Context, targetUrl string, parser string) (*ParserResult, error) {
+type parserRawData struct {
+	Title string
+	Files []string
+}
+
+func ParseSource(ctx context.Context, targetUrl string, parser string) (*api.ParseSourceResponse, error) {
 	// 解析原始数据
 	rawData := &parserRawData{}
 	switch parser {
@@ -45,10 +51,10 @@ func ParseSource(ctx context.Context, targetUrl string, parser string) (*ParserR
 		}
 	}
 
-	return &ParserResult{
-		RawTitle: bangumiTitle,
-		Season:   season,
-		Files:    rawData.Files,
+	return &api.ParseSourceResponse{
+		Title:  bangumiTitle,
+		Season: season,
+		Files:  rawData.Files,
 	}, nil
 }
 

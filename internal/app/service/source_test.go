@@ -1,4 +1,4 @@
-package source_parser
+package service
 
 import (
 	"context"

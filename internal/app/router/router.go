@@ -4,9 +4,12 @@ import (
 	graphHandler "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
+	_ "github.com/simonkimi/minebangumi/docs"
 	"github.com/simonkimi/minebangumi/internal/app/graph"
 	"github.com/simonkimi/minebangumi/internal/app/handler"
 	"github.com/simonkimi/minebangumi/internal/pkg/middleware"
+	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
 )
 
 func InitRouter() *gin.Engine {
@@ -18,6 +21,7 @@ func InitRouter() *gin.Engine {
 	}))
 
 	v1 := r.Group("/v1")
+	v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	graphqlGroup := v1.Group("/graphql")
 	{
 		graphqlGroup.POST("/query", func(c *gin.Context) {
@@ -33,7 +37,8 @@ func InitRouter() *gin.Engine {
 	}
 	sourceGroup := v1.Group("/source")
 	{
-		sourceGroup.POST("/parse", handler.ParseSource)
+		sourceGroup.POST("/parse", handler.Source)
+		sourceGroup.POST("/scrape", handler.Scrape)
 	}
 	return r
 }

@@ -1,4 +1,4 @@
-package user_service
+package service
 
 import (
 	"encoding/base64"
@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func GenerateJwt(username string) (string, error) {
+func GenerateUserJwt(username string) (string, error) {
 	expireTime := time.Now().Add(30 * 24 * time.Hour)
 	claims := &api.UserClaims{
 		Username: username,

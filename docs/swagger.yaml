@@ -1,0 +1,112 @@
+definitions:
+  api.ParseSourceForm:
+    properties:
+      parser:
+        type: string
+      source:
+        type: string
+    required:
+    - parser
+    - source
+    type: object
+  api.ParseSourceResponse:
+    properties:
+      files:
+        items:
+          type: string
+        type: array
+      season:
+        type: integer
+      title:
+        type: string
+    type: object
+  api.ScrapeForm:
+    properties:
+      language:
+        type: string
+      scraper:
+        type: string
+      title:
+        type: string
+    required:
+    - scraper
+    - title
+    type: object
+  api.ScrapeResponse:
+    properties:
+      first_air_year:
+        type: string
+      original_title:
+        type: string
+      overview:
+        type: string
+      poster_path:
+        type: string
+      scraper:
+        type: string
+      seasons:
+        items:
+          $ref: '#/definitions/api.ScrapeSeasonResponse'
+        type: array
+      title:
+        type: string
+    type: object
+  api.ScrapeSeasonResponse:
+    properties:
+      overview:
+        type: string
+      poster:
+        type: string
+      season_id:
+        type: integer
+      title:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /parse:
+    post:
+      consumes:
+      - application/json
+      description: Parse the source using the specified parser
+      parameters:
+      - description: Parse Source Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/api.ParseSourceForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.ParseSourceResponse'
+      summary: Parse source
+      tags:
+      - parser
+  /scrape:
+    post:
+      consumes:
+      - application/json
+      description: Scrape the source using the specified scraper
+      parameters:
+      - description: Scrape Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/api.ScrapeForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.ScrapeResponse'
+      summary: Scrape source
+      tags:
+      - scraper
+swagger: "2.0"

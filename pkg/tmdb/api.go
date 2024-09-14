@@ -1,6 +1,7 @@
 package tmdb
 
 import (
+	"context"
 	"github.com/cockroachdb/errors"
 	"github.com/simonkimi/minebangumi/domain"
 	"github.com/simonkimi/minebangumi/internal/app/config"
@@ -10,7 +11,7 @@ import (
 	"strconv"
 )
 
-func getTmdbLanguage(language string) (string, error) {
+func GetTmdbLanguage(language string) (string, error) {
 	switch language {
 	case domain.LanguageEn:
 		return "en-US", nil
@@ -31,13 +32,14 @@ func getApiKey() string {
 	return config.AppConfig.Tmdb.ApiKey
 }
 
-func Search(title string) ([]*SearchResultItem, error) {
+func Search(ctx context.Context, title string) ([]*SearchResultItem, error) {
 	client := http_client.GetClient(domain.TmdbHost)
 	page := 1
 	results := make([]*SearchResultItem, 0)
 	for {
 		var result rawSearchResult
 		req, err := client.R().
+			SetContext(ctx).
 			SetQueryParams(map[string]string{
 				"api_key":       getApiKey(),
 				"page":          strconv.Itoa(page),
@@ -62,14 +64,11 @@ func Search(title string) ([]*SearchResultItem, error) {
 	return results, nil
 }
 
-func QueryForDetail(id int, language string) (*DetailData, error) {
+func QueryForDetail(ctx context.Context, id int, language string) (*DetailData, error) {
 	client := http_client.GetClient(domain.TmdbHost)
-	language, err := getTmdbLanguage(language)
-	if err != nil {
-		return nil, errors.Wrapf(err, "GetDetail")
-	}
 	var detail DetailData
 	req, err := client.R().
+		SetContext(ctx).
 		SetQueryParams(map[string]string{
 			"api_key":  getApiKey(),
 			"language": language,
