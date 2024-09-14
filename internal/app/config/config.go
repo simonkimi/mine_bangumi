@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/pelletier/go-toml/v2"
-	"github.com/simonkimi/minebangumi/pkg/secret"
+	"github.com/cockroachdb/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"os"
+	"path/filepath"
 )
 
 var AppConfig AppConfigModel
@@ -12,38 +13,41 @@ var AppConfig AppConfigModel
 var configPath = ""
 
 func Setup() {
-	configPath = "config.toml"
+	wd, err := os.Getwd()
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to get working directory")
+	}
+	configPath = filepath.Join(wd, "config.toml")
+
+	viper.SetConfigName("config")
+	viper.AddConfigPath(wd)
+	viper.SetConfigType("toml")
+
+	initConfig := false
 	var config AppConfigModel
+	setViperDefault(&config, []string{})
 
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+	err = viper.ReadInConfig()
+	var configFileNotFound viper.ConfigFileNotFoundError
+	if errors.As(err, &configFileNotFound) {
 		logrus.Warn("Config file not found, use default values")
-		initConfigStruct(&config)
-		config.System.IsFirstRun = true
-		config.System.SecretKey = secret.GenerateRandomKey(32)
-		AppConfig = config
-		SaveConfig()
-		return
+		initConfig = true
 	}
 
-	fileData, err := os.ReadFile(configPath)
-	if err != nil {
-		logrus.WithError(err).Fatal("Failed to read config file")
-	}
-	err = toml.Unmarshal(fileData, &config)
-	if err != nil {
+	if err := viper.Unmarshal(&config); err != nil {
 		logrus.WithError(err).Fatal("Failed to unmarshal config")
 	}
-
+	if initConfig {
+		if err := viper.WriteConfigAs(configPath); err != nil {
+			logrus.WithError(err).Fatal("Failed to write config file")
+		}
+		logrus.Info("Config file created")
+	}
 	AppConfig = config
 }
 
-func SaveConfig() {
-	config, err := toml.Marshal(AppConfig)
-	if err != nil {
-		logrus.WithError(err).Fatal("Failed to marshal config")
-	}
-	err = os.WriteFile(configPath, config, 0644)
-	if err != nil {
+func saveConfig() {
+	if err := viper.WriteConfigAs(configPath); err != nil {
 		logrus.WithError(err).Fatal("Failed to write config file")
 	}
 }
