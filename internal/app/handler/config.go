@@ -11,6 +11,14 @@ import (
 	"net/http"
 )
 
+// System godoc
+// @Summary Get system information
+// @Description Get the current system version, first run status, and login status
+// @Tags system
+// @Accept json
+// @Produce json
+// @Success 200 {object} api.SystemInfo
+// @Router /api/v1/config/system [get]
 func System(c *gin.Context) {
 	user := middleware.GetClaims(c)
 	api.OkResponse(c, &api.SystemInfo{
@@ -20,6 +28,18 @@ func System(c *gin.Context) {
 	})
 }
 
+// InitUser godoc
+// @Summary Initialize the first user
+// @Description Initialize the first user with a username and password
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param InitUserForm body api.InitUserForm true "User initialization form"
+// @Success 200 {object} api.TokenResponse
+// @Failure 400 {object} errno.ApiError "Invalid form data"
+// @Failure 403 {object} errno.ApiError "Forbidden"
+// @Failure 500 {object} errno.ApiError "Internal server error"
+// @Router /api/v1/config/init_user [post]
 func InitUser(c *gin.Context) {
 	if !config.AppConfig.System.IsFirstRun {
 		_ = c.Error(errno.NewApiError(http.StatusForbidden))

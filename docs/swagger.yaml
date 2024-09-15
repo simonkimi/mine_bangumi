@@ -1,4 +1,24 @@
 definitions:
+  api.InitUserForm:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  api.LoginForm:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
   api.ParseSourceForm:
     properties:
       parser:
@@ -64,10 +84,112 @@ definitions:
       title:
         type: string
     type: object
+  api.SystemInfo:
+    properties:
+      is_first_run:
+        type: boolean
+      is_login:
+        type: boolean
+      version:
+        type: string
+    type: object
+  api.TokenResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  errno.ApiError:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
-  /parse:
+  /api/v1/config/init_user:
+    post:
+      consumes:
+      - application/json
+      description: Initialize the first user with a username and password
+      parameters:
+      - description: User initialization form
+        in: body
+        name: InitUserForm
+        required: true
+        schema:
+          $ref: '#/definitions/api.InitUserForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.TokenResponse'
+        "400":
+          description: Invalid form data
+          schema:
+            $ref: '#/definitions/errno.ApiError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/errno.ApiError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/errno.ApiError'
+      summary: Initialize the first user
+      tags:
+      - user
+  /api/v1/config/system:
+    get:
+      consumes:
+      - application/json
+      description: Get the current system version, first run status, and login status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SystemInfo'
+      summary: Get system information
+      tags:
+      - system
+  /api/v1/proxy/poster:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a poster image based on the target type and target
+      parameters:
+      - description: Target type
+        in: query
+        name: target_type
+        required: true
+        type: string
+      - description: Target
+        in: query
+        name: target
+        required: true
+        type: string
+      produces:
+      - image/jpeg
+      - ' image/png'
+      - ' image/gif'
+      - ' image/webp'
+      - ' image/bmp'
+      - ' image/svg+xml'
+      - ' image/jp2'
+      responses:
+        "200":
+          description: Poster image
+          schema:
+            type: file
+      summary: Get poster image
+      tags:
+      - proxy
+  /api/v1/source/parse:
     post:
       consumes:
       - application/json
@@ -89,7 +211,7 @@ paths:
       summary: Parse source
       tags:
       - parser
-  /scrape:
+  /api/v1/source/scrape:
     post:
       consumes:
       - application/json
@@ -111,4 +233,26 @@ paths:
       summary: Scrape source
       tags:
       - scraper
+  /api/v1/user/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token
+      parameters:
+      - description: Login Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/api.LoginForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: JWT Token
+          schema:
+            $ref: '#/definitions/api.TokenResponse'
+      summary: User login
+      tags:
+      - user
 swagger: "2.0"

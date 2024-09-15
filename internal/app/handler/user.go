@@ -8,6 +8,15 @@ import (
 	"github.com/simonkimi/minebangumi/pkg/errno"
 )
 
+// Login godoc
+// @Summary User login
+// @Description Authenticate user and return JWT token
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param form body api.LoginForm true "Login Form"
+// @Success 200 {object} api.TokenResponse "JWT Token"
+// @Router /api/v1/user/login [post]
 func Login(c *gin.Context) {
 	var form api.LoginForm
 	if err := c.ShouldBindJSON(&form); err != nil {

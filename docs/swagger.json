@@ -4,7 +4,127 @@
         "contact": {}
     },
     "paths": {
-        "/parse": {
+        "/api/v1/config/init_user": {
+            "post": {
+                "description": "Initialize the first user with a username and password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Initialize the first user",
+                "parameters": [
+                    {
+                        "description": "User initialization form",
+                        "name": "InitUserForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.InitUserForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.TokenResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid form data",
+                        "schema": {
+                            "$ref": "#/definitions/errno.ApiError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/errno.ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/errno.ApiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/config/system": {
+            "get": {
+                "description": "Get the current system version, first run status, and login status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "Get system information",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SystemInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/proxy/poster": {
+            "get": {
+                "description": "Retrieve a poster image based on the target type and target",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "image/jpeg",
+                    " image/png",
+                    " image/gif",
+                    " image/webp",
+                    " image/bmp",
+                    " image/svg+xml",
+                    " image/jp2"
+                ],
+                "tags": [
+                    "proxy"
+                ],
+                "summary": "Get poster image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Target type",
+                        "name": "target_type",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Target",
+                        "name": "target",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Poster image",
+                        "schema": {
+                            "type": "file"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/source/parse": {
             "post": {
                 "description": "Parse the source using the specified parser",
                 "consumes": [
@@ -38,7 +158,7 @@
                 }
             }
         },
-        "/scrape": {
+        "/api/v1/source/scrape": {
             "post": {
                 "description": "Scrape the source using the specified scraper",
                 "consumes": [
@@ -71,9 +191,73 @@
                     }
                 }
             }
+        },
+        "/api/v1/user/login": {
+            "post": {
+                "description": "Authenticate user and return JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "description": "Login Form",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.LoginForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "JWT Token",
+                        "schema": {
+                            "$ref": "#/definitions/api.TokenResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "api.InitUserForm": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.LoginForm": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "api.ParseSourceForm": {
             "type": "object",
             "required": [
@@ -169,6 +353,39 @@
                     "type": "integer"
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.SystemInfo": {
+            "type": "object",
+            "properties": {
+                "is_first_run": {
+                    "type": "boolean"
+                },
+                "is_login": {
+                    "type": "boolean"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.TokenResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "errno.ApiError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
                     "type": "string"
                 }
             }

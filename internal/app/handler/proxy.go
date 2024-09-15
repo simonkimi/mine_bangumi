@@ -9,6 +9,16 @@ import (
 	"path/filepath"
 )
 
+// Poster godoc
+// @Summary Get poster image
+// @Description Retrieve a poster image based on the target type and target
+// @Tags proxy
+// @Accept json
+// @Produce image/jpeg, image/png, image/gif, image/webp, image/bmp, image/svg+xml, image/jp2
+// @Param target_type query string true "Target type"
+// @Param target query string true "Target"
+// @Success 200 {file} file "Poster image"
+// @Router /api/v1/proxy/poster [get]
 func Poster(c *gin.Context) {
 	ctx := c.Request.Context()
 

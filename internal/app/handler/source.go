@@ -15,7 +15,7 @@ import (
 // @Produce json
 // @Param form body api.ParseSourceForm true "Parse Source Form"
 // @Success 200 {object} api.ParseSourceResponse
-// @Router /parse [post]
+// @Router /api/v1/source/parse [post]
 func Source(c *gin.Context) {
 	ctx := c.Request.Context()
 	var form *api.ParseSourceForm
@@ -39,7 +39,7 @@ func Source(c *gin.Context) {
 // @Produce json
 // @Param form body api.ScrapeForm true "Scrape Form"
 // @Success 200 {object} api.ScrapeResponse
-// @Router /scrape [post]
+// @Router /api/v1/source/scrape [post]
 func Scrape(c *gin.Context) {
 	ctx := c.Request.Context()
 	var form *api.ScrapeForm
