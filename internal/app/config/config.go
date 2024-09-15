@@ -46,6 +46,14 @@ func Setup() {
 	AppConfig = config
 }
 
+func UpdateUser(username string, password string) {
+	viper.Set("user.username", username)
+	viper.Set("user.password", password)
+	AppConfig.User.Username = username
+	AppConfig.User.Password = password
+	saveConfig()
+}
+
 func saveConfig() {
 	if err := viper.WriteConfigAs(configPath); err != nil {
 		logrus.WithError(err).Fatal("Failed to write config file")

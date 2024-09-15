@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/simonkimi/minebangumi/internal/app/config"
-	"github.com/simonkimi/minebangumi/internal/app/router"
 	"github.com/simonkimi/minebangumi/tools/stringt"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -14,12 +13,11 @@ import (
 	"time"
 )
 
-func StartHttpService(ctx context.Context, wg *sync.WaitGroup) {
+func StartHttpService(ctx context.Context, wg *sync.WaitGroup, engine *gin.Engine) {
 	wg.Add(1)
 	defer wg.Done()
 	gin.SetMode(gin.DebugMode)
 
-	handler := router.InitRouter()
 	var ipv4Server *http.Server
 	var ipv6Server *http.Server
 
@@ -28,7 +26,7 @@ func StartHttpService(ctx context.Context, wg *sync.WaitGroup) {
 		logrus.Infof("Starting server on %s", ipv4)
 		ipv4Server = &http.Server{
 			Addr:    ipv4,
-			Handler: handler,
+			Handler: engine,
 		}
 		go func() {
 			err := ipv4Server.ListenAndServe()
@@ -43,7 +41,7 @@ func StartHttpService(ctx context.Context, wg *sync.WaitGroup) {
 		logrus.Infof("Starting server on %s", ipv6)
 		ipv6Server = &http.Server{
 			Addr:    ipv6,
-			Handler: handler,
+			Handler: engine,
 		}
 		go func() {
 			err := ipv6Server.ListenAndServe()

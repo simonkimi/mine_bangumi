@@ -127,6 +127,9 @@
         "api.ScrapeResponse": {
             "type": "object",
             "properties": {
+                "background": {
+                    "type": "string"
+                },
                 "first_air_year": {
                     "type": "string"
                 },

@@ -34,6 +34,8 @@ definitions:
     type: object
   api.ScrapeResponse:
     properties:
+      background:
+        type: string
       first_air_year:
         type: string
       original_title:

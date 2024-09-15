@@ -13,6 +13,7 @@
 
 <script setup lang="tsx">
 import type { MenuOption } from "naive-ui";
+import { NIcon } from "naive-ui";
 import { Home20Regular } from "@vicons/fluent";
 import { Settings20Regular } from "@vicons/fluent";
 
@@ -21,18 +22,18 @@ const menuOptions: MenuOption[] = [
     label: "首页",
     key: "home",
     icon: () => (
-      <n-icon>
+      <NIcon>
         <Home20Regular />
-      </n-icon>
+      </NIcon>
     ),
   },
   {
     label: "设置",
     key: "setting",
     icon: () => (
-      <n-icon>
+      <NIcon>
         <Settings20Regular />
-      </n-icon>
+      </NIcon>
     ),
   },
 ];

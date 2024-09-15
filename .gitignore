@@ -3,3 +3,4 @@ logs
 vendor
 .env
 bin
+cmd/server/dist

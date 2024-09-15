@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="tsx">
-import { type FormInst, type FormRules } from "naive-ui";
+import type { FormInst, FormRules } from "naive-ui";
 
 const userFormRef = ref<FormInst | null>(null);
 const downloaderFormRef = ref<FormInst | null>(null);
@@ -253,9 +253,9 @@ async function skipUser() {
     dialog.warning({
       title: "是否跳过配置",
       content: () => (
-        <div className="my-2">
+        <div class="my-2">
           <p>跳过用户配置将进行无密码登录</p>
-          <p className="text-red-500 text-sm">
+          <p class="text-red-500 text-sm">
             <strong>请确保在安全的环境下使用</strong>
           </p>
         </div>

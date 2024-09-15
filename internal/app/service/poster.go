@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"github.com/simonkimi/minebangumi/domain"
 	"github.com/simonkimi/minebangumi/pkg/errno"
 	"github.com/simonkimi/minebangumi/pkg/http_client"
 )
@@ -10,7 +12,7 @@ func GetPoster(ctx context.Context, targetType string, target string) ([]byte, e
 	client := http_client.GetTempClient()
 	switch targetType {
 	case ScrapeTmDb:
-		url := "https://image.tmdb.org/t/p/w780" + target
+		url := fmt.Sprintf("%s/t/p/w780%s", domain.TmdbImageHost, target)
 		rsp, err := client.R().SetContext(ctx).Get(url)
 		if err != nil {
 			return nil, errno.NewApiErrorWithCausef(errno.ErrorApiNetwork, err, "Failed to get poster: %s", target)

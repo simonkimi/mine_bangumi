@@ -23,3 +23,11 @@ func OkResponse[T any](context *gin.Context, response T) {
 		Message: "",
 	})
 }
+
+func OkResponseNil(c *gin.Context) {
+	c.JSON(http.StatusOK, &Response[any]{
+		Code:    errno.Success,
+		Data:    nil,
+		Message: "",
+	})
+}
