@@ -3,8 +3,8 @@ package main
 import (
 	"embed"
 	"github.com/simonkimi/minebangumi/internal/app/config"
-	"github.com/simonkimi/minebangumi/internal/app/manager"
 	"github.com/simonkimi/minebangumi/internal/app/router"
+	"github.com/simonkimi/minebangumi/internal/app/service"
 	"github.com/simonkimi/minebangumi/internal/pkg/database"
 	"github.com/simonkimi/minebangumi/pkg/logger"
 	"github.com/sirupsen/logrus"
@@ -23,17 +23,17 @@ func init() {
 }
 
 func main() {
-	server := manager.GetServerManager()
+	server := service.GetServerManager()
 	engine := router.InitRouter(&frontendFS)
 
 	server.RegisterGin(engine)
 
-	logrus.Warn("Starting server...")
+	logrus.Warn("Main Starting server...")
 	server.StartServer()
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	logrus.Warn("Shutting down server...")
+	logrus.Warn("Main Shutting down server...")
 	server.Shutdown()
 }

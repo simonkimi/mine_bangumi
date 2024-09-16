@@ -31,6 +31,13 @@ export default defineConfig({
   ],
   server: {
     port: 8000,
+    proxy: {
+      "/api": {
+        target: "http://localhost:7962",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
   },
   resolve: {
     alias: {

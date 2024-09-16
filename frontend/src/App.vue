@@ -15,4 +15,11 @@
 
 <script lang="ts" setup>
 import { darkTheme } from "naive-ui";
+import { useSystemStore } from "@/stores/system";
+
+const systemStore = useSystemStore();
+
+onMounted(async () => {
+  await systemStore.loadSystemData();
+});
 </script>

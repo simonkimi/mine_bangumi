@@ -30,8 +30,8 @@ type NetworkProxyConfig struct {
 type ServerConfig struct {
 	Ipv4Host string `mapstructure:"ipv4_host" env:"MBG_SERVER_IPV4_HOST" default:"0.0.0.0"`
 	Ipv4Port int    `mapstructure:"Ipv4_port" env:"MBG_SERVER_IPV4_PORT" default:"7962"`
-	Ipv6Host string `mapstructure:"ipv6_host" env:"MBG_SERVER_IPV6_HOST" default:"[::1]"`
-	Ipv6Port int    `mapstructure:"Ipv6_port" env:"MBG_SERVER_IPV6_PORT" default:"7962"`
+	Ipv6Host string `mapstructure:"ipv6_host" env:"MBG_SERVER_IPV6_HOST" default:""`
+	Ipv6Port int    `mapstructure:"Ipv6_port" env:"MBG_SERVER_IPV6_PORT" default:""`
 }
 
 type DownloaderConfig struct {

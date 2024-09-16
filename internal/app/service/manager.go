@@ -1,4 +1,4 @@
-package manager
+package service
 
 import (
 	"context"
@@ -12,6 +12,9 @@ type ServerManager struct {
 	cancel context.CancelFunc
 	wg     sync.WaitGroup
 	engine *gin.Engine
+
+	Ipv4Port int
+	Ipv6Port int
 }
 
 var serverManager *ServerManager
@@ -30,7 +33,19 @@ func GetServerManager() *ServerManager {
 
 func (s *ServerManager) StartServer() {
 	logrus.Warnf("Starting server...")
-	go StartHttpService(s.ctx, &s.wg, s.engine)
+	s.StartHttpServer()
+}
+
+func (s *ServerManager) StartHttpServer() {
+	ipv4PortChan := make(chan int)
+	ipv6PortChan := make(chan int)
+	go StartHttpService(s.ctx, &s.wg, s.engine, ipv4PortChan, ipv6PortChan)
+	select {
+	case port := <-ipv4PortChan:
+		s.Ipv4Port = port
+	case port := <-ipv6PortChan:
+		s.Ipv4Port = port
+	}
 }
 
 func (s *ServerManager) RegisterGin(engine *gin.Engine) {

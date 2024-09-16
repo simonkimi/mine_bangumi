@@ -23,12 +23,16 @@ var icon []byte
 
 func init() {
 	logger.Setup()
+	config.SetDefaultInit(map[string]any{
+		"server.ipv4_host": "127.0.0.1",
+		"server.ipv4_port": 0,
+	})
 	config.Setup()
 	database.Setup()
 }
 
 func main() {
-	app := gui.NewApp()
+	app := gui.NewApp(&assets)
 
 	err := wails.Run(&options.App{
 		Title:             "Mine Bangumi",
