@@ -20,7 +20,7 @@ func init() {
 
 func TestSystem(t *testing.T) {
 	r := gin.Default()
-	r.GET("/system", System)
+	r.GET("/system", GetSystem)
 	server := httptest.NewServer(r)
 	defer server.Close()
 
@@ -39,7 +39,7 @@ func TestSystem(t *testing.T) {
 
 func TestInitUser(t *testing.T) {
 	r := gin.Default()
-	r.POST("/init_user", InitUser)
+	r.POST("/init_user", PostInitUser)
 	server := httptest.NewServer(r)
 	defer server.Close()
 

@@ -11,27 +11,27 @@ import (
 	"net/http"
 )
 
-// System godoc
+// GetSystem godoc
 // @Summary Get system information
 // @Description Get the current system version, first run status, and login status
-// @Tags system
+// @Tags config
 // @Accept json
 // @Produce json
 // @Success 200 {object} api.SystemInfo
 // @Router /api/v1/config/system [get]
-func System(c *gin.Context) {
+func GetSystem(c *gin.Context) {
 	user := middleware.GetClaims(c)
 	api.OkResponse(c, &api.SystemInfo{
 		Version:    domain.Version,
-		IsFirstRun: config.AppConfig.System.IsFirstRun,
+		IsInitUser: config.AppConfig.User.IsInitUser,
 		IsLogin:    user != nil,
 	})
 }
 
-// InitUser godoc
+// PostInitUser godoc
 // @Summary Initialize the first user
 // @Description Initialize the first user with a username and password
-// @Tags user
+// @Tags config
 // @Accept json
 // @Produce json
 // @Param InitUserForm body api.InitUserForm true "User initialization form"
@@ -40,8 +40,8 @@ func System(c *gin.Context) {
 // @Failure 403 {object} errno.ApiError "Forbidden"
 // @Failure 500 {object} errno.ApiError "Internal server error"
 // @Router /api/v1/config/init_user [post]
-func InitUser(c *gin.Context) {
-	if !config.AppConfig.System.IsFirstRun {
+func PostInitUser(c *gin.Context) {
+	if config.AppConfig.User.IsInitUser {
 		_ = c.Error(errno.NewApiError(http.StatusForbidden))
 		return
 	}
@@ -49,7 +49,7 @@ func InitUser(c *gin.Context) {
 	if err := c.ShouldBindJSON(&form); err != nil {
 		_ = c.Error(errno.NewFormError(err))
 	}
-	config.UpdateUser(form.Username, form.Password)
+	config.InitUser(form.Username, form.Password)
 
 	token, err := service.GenerateUserJwt(form.Username)
 	if err != nil {
@@ -59,4 +59,27 @@ func InitUser(c *gin.Context) {
 	api.OkResponse(c, &api.TokenResponse{
 		Token: token,
 	})
+}
+
+// GetDownloader godoc
+// @Summary Get the downloader configuration
+// @Description Get the downloader configuration, including the type, API address, and token
+// @Tags config
+// @Accept json
+// @Produce json
+// @Success 200 {object} api.DownloaderForm
+// @Router /api/v1/config/downloader [get]
+func GetDownloader(c *gin.Context) {
+	form := &api.DownloaderForm{}
+	form.Type = config.AppConfig.Downloader.Client
+	switch form.Type {
+	case config.DownloaderTypeAria2:
+		form.Api = config.AppConfig.Downloader.Aria2.Api
+		form.Token = config.AppConfig.Downloader.Aria2.Token
+	case config.DownloaderTypeQBittorrent:
+		form.Api = config.AppConfig.Downloader.QBittorrent.Api
+		form.Username = config.AppConfig.Downloader.QBittorrent.Username
+		form.Token = config.AppConfig.Downloader.QBittorrent.Password
+	}
+	api.OkResponse(c, form)
 }

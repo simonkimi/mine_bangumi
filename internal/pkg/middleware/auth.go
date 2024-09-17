@@ -3,15 +3,21 @@ package middleware
 import (
 	"encoding/base64"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/simonkimi/minebangumi/internal/app/api"
 	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/simonkimi/minebangumi/pkg/errno"
 	"strings"
 )
-import "github.com/golang-jwt/jwt/v5"
 
 func JwtAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if config.AppConfig.User.Password == "" {
+			c.Set("claims", &api.UserClaims{Username: config.AppConfig.User.Username})
+			c.Next()
+			return
+		}
+
 		tokenStr := c.GetHeader("Authorization")
 		if tokenStr == "" {
 			c.Next()

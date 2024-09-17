@@ -8,6 +8,9 @@ import (
 	"strings"
 )
 
+const DownloaderTypeAria2 = "aria2"
+const DownloaderTypeQBittorrent = "qbittorrent"
+
 type AppConfigModel struct {
 	System      SystemConfig       `mapstructure:"system"`
 	User        UserConfig         `mapstructure:"user"`
@@ -41,18 +44,19 @@ type DownloaderConfig struct {
 }
 
 type UserConfig struct {
-	Username string `mapstructure:"username" env:"MBG_USERNAME" default:"admin"`
-	Password string `mapstructure:"password" env:"MBG_PASSWORD" default:"admin"`
+	IsInitUser bool   `mapstructure:"init_user" default:"false"`
+	Username   string `mapstructure:"username" env:"MBG_USERNAME" default:"admin"`
+	Password   string `mapstructure:"password" env:"MBG_PASSWORD" default:"admin"`
 }
 
 type QBittorrentConfig struct {
-	Host     string `mapstructure:"host" env:"MBG_QBITTORRENT_HOST" default:"http://127.0.0.1:8080"`
+	Api      string `mapstructure:"api" env:"MBG_QBITTORRENT_API" default:"http://127.0.0.1:8080"`
 	Username string `mapstructure:"username" env:"MBG_QBITTORRENT_USERNAME" default:""`
 	Password string `mapstructure:"password" env:"MBG_QBITTORRENT_PASSWORD" default:""`
 }
 
 type Aria2Config struct {
-	Host  string `mapstructure:"host"  env:"MBG_ARIA2_HOST" default:"http://localhost:6800/jsonrpc"`
+	Api   string `mapstructure:"api"  env:"MBG_ARIA2_API" default:"http://localhost:6800/jsonrpc"`
 	Token string `mapstructure:"token" env:"MBG_ARIA2_TOKEN" default:""`
 }
 
@@ -61,8 +65,7 @@ type TmdbConfig struct {
 }
 
 type SystemConfig struct {
-	SecretKey  string `mapstructure:"secret" default:""`
-	IsFirstRun bool   `mapstructure:"is_first_run" default:"true"`
+	SecretKey string `mapstructure:"secret" default:""`
 }
 
 func setViperDefault(model any, path []string) {

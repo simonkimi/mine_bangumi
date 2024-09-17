@@ -59,11 +59,13 @@ func Setup() {
 	AppConfig = config
 }
 
-func UpdateUser(username string, password string) {
+func InitUser(username string, password string) {
 	viper.Set("user.username", username)
 	viper.Set("user.password", password)
+	viper.Set("user.init_user", false)
 	AppConfig.User.Username = username
 	AppConfig.User.Password = password
+	AppConfig.User.IsInitUser = true
 	saveConfig()
 }
 
