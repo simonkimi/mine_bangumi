@@ -39,6 +39,7 @@ func InitRouter(frontendFs *embed.FS) *gin.Engine {
 
 func apiV1Group(r *gin.Engine) {
 	apiV1 := r.Group("/api/v1")
+
 	apiV1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	graphSrv := graphHandler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
@@ -55,8 +56,9 @@ func apiV1Group(r *gin.Engine) {
 	}
 	configGroup := apiV1.Group("/config")
 	{
-		configGroup.GET("/system", handler.System)
-		configGroup.POST("/init_user", handler.InitUser)
+		configGroup.GET("/system", handler.GetSystem)
+		configGroup.POST("/init_user", handler.PostInitUser)
+		configGroup.GET("/downloader", handler.GetDownloader)
 	}
 	userGroup := apiV1.Group("/user")
 	{
