@@ -2,11 +2,8 @@ package router
 
 import (
 	"embed"
-	graphHandler "github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
 	_ "github.com/simonkimi/minebangumi/docs"
-	"github.com/simonkimi/minebangumi/internal/app/graph"
 	"github.com/simonkimi/minebangumi/internal/app/handler"
 	"github.com/simonkimi/minebangumi/internal/pkg/middleware"
 	swaggerFiles "github.com/swaggo/files"
@@ -41,19 +38,6 @@ func apiV1Group(r *gin.Engine) {
 	apiV1 := r.Group("/api/v1")
 
 	apiV1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	graphSrv := graphHandler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
-		Resolvers: &handler.Resolver{},
-	}))
-	graphqlGroup := apiV1.Group("/graphql")
-	{
-		graphqlGroup.POST("/query", func(c *gin.Context) {
-			graphSrv.ServeHTTP(c.Writer, c.Request)
-		})
-		graphqlGroup.GET("/", func(c *gin.Context) {
-			playground.Handler("GraphQL playground", "/graphql/query").ServeHTTP(c.Writer, c.Request)
-		})
-	}
 	configGroup := apiV1.Group("/config")
 	{
 		configGroup.GET("/system", handler.GetSystem)
