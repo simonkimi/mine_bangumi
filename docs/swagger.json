@@ -4,6 +4,29 @@
         "contact": {}
     },
     "paths": {
+        "/api/v1/config/downloader": {
+            "get": {
+                "description": "Get the downloader configuration, including the type, API address, and token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "config"
+                ],
+                "summary": "Get the downloader configuration",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.DownloaderForm"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/config/init_user": {
             "post": {
                 "description": "Initialize the first user with a username and password",
@@ -14,7 +37,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "config"
                 ],
                 "summary": "Initialize the first user",
                 "parameters": [
@@ -66,7 +89,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "system"
+                    "config"
                 ],
                 "summary": "Get system information",
                 "responses": {
@@ -228,6 +251,27 @@
         }
     },
     "definitions": {
+        "api.DownloaderForm": {
+            "type": "object",
+            "required": [
+                "api",
+                "type"
+            ],
+            "properties": {
+                "api": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "api.InitUserForm": {
             "type": "object",
             "required": [
@@ -360,7 +404,7 @@
         "api.SystemInfo": {
             "type": "object",
             "properties": {
-                "is_first_run": {
+                "is_init_user": {
                     "type": "boolean"
                 },
                 "is_login": {

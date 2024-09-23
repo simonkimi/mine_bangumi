@@ -17,7 +17,7 @@ func TestMain(m *testing.M) {
 
 func TestSetup(t *testing.T) {
 	Setup()
-	assert.Equal(t, AppConfig.User.Username, "admin")
-	assert.Equal(t, AppConfig.User.Password, "admin")
+	assert.Equal(t, appConfig.User.Username, "admin")
+	assert.Equal(t, appConfig.User.Password, "admin")
 	viper.Debug()
 }

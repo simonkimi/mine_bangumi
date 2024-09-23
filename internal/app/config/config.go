@@ -2,14 +2,14 @@ package config
 
 import (
 	"github.com/cockroachdb/errors"
-	"github.com/simonkimi/minebangumi/pkg/secret"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
+	"reflect"
 )
 
-var AppConfig AppConfigModel
+var config *appConfig
 
 var configPath = ""
 
@@ -30,9 +30,11 @@ func Setup() {
 	viper.AddConfigPath(wd)
 	viper.SetConfigType("toml")
 
-	initConfig := false
-	var config AppConfigModel
-	setViperDefault(&config, []string{})
+	config = &appConfig{
+		IsNewSystem: false,
+		keys:        newConfigKeys(),
+	}
+
 	if defaultInit != nil {
 		for k, v := range defaultInit {
 			viper.SetDefault(k, v)
@@ -42,31 +44,54 @@ func Setup() {
 	err = viper.ReadInConfig()
 	var configFileNotFound viper.ConfigFileNotFoundError
 	if errors.As(err, &configFileNotFound) {
+		config.IsNewSystem = true
 		logrus.Warn("Config file not found, use default values")
-		initConfig = true
-		config.System.SecretKey = secret.GenerateRandomKey(50)
 	}
-
-	if err := viper.Unmarshal(&config); err != nil {
-		logrus.WithError(err).Fatal("Failed to unmarshal config")
-	}
-	if initConfig {
-		if err := viper.WriteConfigAs(configPath); err != nil {
-			logrus.WithError(err).Fatal("Failed to write config file")
-		}
-		logrus.Info("Config file created")
-	}
-	AppConfig = config
 }
 
-func InitUser(username string, password string) {
-	viper.Set("user.username", username)
-	viper.Set("user.password", password)
-	viper.Set("user.init_user", false)
-	AppConfig.User.Username = username
-	AppConfig.User.Password = password
-	AppConfig.User.IsInitUser = true
-	saveConfig()
+type configKeys struct {
+	userUsername *configItem
+	userPassword *configItem
+
+	serverIpv4Host *configItem
+	serverIpv4Port *configItem
+	serverIpv6Host *configItem
+	serverIpv6Port *configItem
+
+	downloaderClient *configItem
+
+	qBittorrentApi      *configItem
+	qBittorrentUser     *configItem
+	qBittorrentPassword *configItem
+
+	aria2Api   *configItem
+	aria2Token *configItem
+
+	tmdbApiKey *configItem
+}
+
+func newConfigKeys() *configKeys {
+	model := &configKeys{
+		userUsername:        newConfigItem("user.username", "MBG_USERNAME", "admin"),
+		userPassword:        newConfigItem("user.password", "MBG_PASSWORD", "admin"),
+		serverIpv4Host:      newConfigItem("server.ipv4_host", "MBG_IPV4_HOST", "0.0.0.0"),
+		serverIpv4Port:      newConfigItem("server.ipv4_port", "MBG_IPV4_PORT", "7962"),
+		serverIpv6Host:      newConfigItem("server.ipv6_host", "MBG_IPV6_HOST", ""),
+		serverIpv6Port:      newConfigItem("server.ipv6_port", "MBG_IPV6_PORT", ""),
+		downloaderClient:    newConfigItem("downloader.client", "MBG_DOWNLOADER_CLIENT", ""),
+		qBittorrentApi:      newConfigItem("downloader.qBittorrent.api", "MBG_QBITTORRENT_API", "http://127:0.0.1:28080"),
+		qBittorrentUser:     newConfigItem("downloader.qBittorrent.username", "MBG_QBITTORRENT_USERNAME", ""),
+		qBittorrentPassword: newConfigItem("downloader.qBittorrent.password", "MBG_QBITTORRENT_PASSWORD", ""),
+		aria2Api:            newConfigItem("downloader.aria2.api", "MBG_ARIA2_API", "http://localhost:6800/jsonrpc"),
+		aria2Token:          newConfigItem("downloader.aria2.token", "MBG_ARIA2_TOKEN", ""),
+		tmdbApiKey:          newConfigItem("tmdb.api_key", "MBG_TMDB_API_KEY", ""),
+	}
+	v := reflect.ValueOf(config).Elem()
+	for i := 0; i < v.NumField(); i++ {
+		item := v.Field(i).Interface().(*configItem)
+		item.register()
+	}
+	return model
 }
 
 func saveConfig() {

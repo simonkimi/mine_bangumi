@@ -22,8 +22,8 @@ func StartHttpService(ctx context.Context, wg *sync.WaitGroup, engine *gin.Engin
 	var ipv6Listener net.Listener
 	var lock sync.Mutex
 
-	if !stringt.IsEmptyOrWhitespace(config.AppConfig.Server.Ipv4Host) {
-		ipv4 := fmt.Sprintf("%s:%d", config.AppConfig.Server.Ipv4Host, config.AppConfig.Server.Ipv4Port)
+	if !stringt.IsEmptyOrWhitespace(config.appConfig.Server.Ipv4Host) {
+		ipv4 := fmt.Sprintf("%s:%d", config.appConfig.Server.Ipv4Host, config.appConfig.Server.Ipv4Port)
 		go func() {
 			wg.Add(1)
 			defer wg.Done()
@@ -36,7 +36,7 @@ func StartHttpService(ctx context.Context, wg *sync.WaitGroup, engine *gin.Engin
 			lock.Unlock()
 			port := listener.Addr().(*net.TCPAddr).Port
 			ipv4PortChan <- port
-			logrus.Infof("Starting server on %s:%d", config.AppConfig.Server.Ipv4Host, port)
+			logrus.Infof("Starting server on %s:%d", config.appConfig.Server.Ipv4Host, port)
 
 			err = http.Serve(listener, engine)
 			if err != nil && !errors.Is(err, net.ErrClosed) {
@@ -45,8 +45,8 @@ func StartHttpService(ctx context.Context, wg *sync.WaitGroup, engine *gin.Engin
 		}()
 	}
 
-	if !stringt.IsEmptyOrWhitespace(config.AppConfig.Server.Ipv6Host) {
-		ipv6 := fmt.Sprintf("%s:%d", config.AppConfig.Server.Ipv6Host, config.AppConfig.Server.Ipv6Port)
+	if !stringt.IsEmptyOrWhitespace(config.appConfig.Server.Ipv6Host) {
+		ipv6 := fmt.Sprintf("%s:%d", config.appConfig.Server.Ipv6Host, config.appConfig.Server.Ipv6Port)
 		go func() {
 			wg.Add(1)
 			defer wg.Done()
@@ -59,7 +59,7 @@ func StartHttpService(ctx context.Context, wg *sync.WaitGroup, engine *gin.Engin
 			lock.Unlock()
 			port := listener.Addr().(*net.TCPAddr).Port
 			ipv6PortChan <- port
-			logrus.Infof("Starting server on %s:%d", config.AppConfig.Server.Ipv6Host, port)
+			logrus.Infof("Starting server on %s:%d", config.appConfig.Server.Ipv6Host, port)
 			err = http.Serve(listener, engine)
 			if err != nil && !errors.Is(err, net.ErrClosed) {
 				logrus.Errorf("listen: %s\n", err)

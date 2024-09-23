@@ -26,10 +26,10 @@ func GetTmdbLanguage(language string) (string, error) {
 }
 
 func getApiKey() string {
-	if stringt.IsEmptyOrWhitespace(config.AppConfig.Tmdb.ApiKey) {
+	if stringt.IsEmptyOrWhitespace(config.appConfig.Tmdb.ApiKey) {
 		return domain.TmdbDefaultApikey
 	}
-	return config.AppConfig.Tmdb.ApiKey
+	return config.appConfig.Tmdb.ApiKey
 }
 
 func Search(ctx context.Context, title string) ([]*SearchResultItem, error) {

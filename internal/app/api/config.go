@@ -6,7 +6,7 @@ type SystemInfo struct {
 	IsLogin    bool   `json:"is_login"`
 }
 
-type InitUserForm struct {
+type UserCredentialForm struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }

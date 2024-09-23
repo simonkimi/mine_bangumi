@@ -17,14 +17,14 @@ type httpClientManager struct {
 }
 
 func setClientProxy(client *resty.Client) {
-	if config.AppConfig.ProxyConfig.Enable {
+	if config.appConfig.ProxyConfig.Enable {
 		client.SetProxy(nett.GetProxyUrl(
-			config.AppConfig.ProxyConfig.Scheme,
-			config.AppConfig.ProxyConfig.Host,
-			config.AppConfig.ProxyConfig.Port,
-			config.AppConfig.ProxyConfig.UseAuth,
-			config.AppConfig.ProxyConfig.Username,
-			config.AppConfig.ProxyConfig.Password,
+			config.appConfig.ProxyConfig.Scheme,
+			config.appConfig.ProxyConfig.Host,
+			config.appConfig.ProxyConfig.Port,
+			config.appConfig.ProxyConfig.UseAuth,
+			config.appConfig.ProxyConfig.Username,
+			config.appConfig.ProxyConfig.Password,
 		))
 	}
 }
@@ -32,7 +32,7 @@ func setClientProxy(client *resty.Client) {
 func newHttpClient(baseUrl string) *resty.Client {
 	client := resty.New()
 	client.BaseURL = baseUrl
-	if config.AppConfig.ProxyConfig.Enable {
+	if config.appConfig.ProxyConfig.Enable {
 		setClientProxy(client)
 	}
 	return client
@@ -44,7 +44,7 @@ func ReloadConfig() {
 	}
 	clientContainer.clients.Range(func(key, value any) bool {
 		client := value.(*resty.Client)
-		if config.AppConfig.ProxyConfig.Enable {
+		if config.appConfig.ProxyConfig.Enable {
 			setClientProxy(client)
 		} else {
 			client.RemoveProxy()

@@ -60,6 +60,6 @@ func TestInitUser(t *testing.T) {
 		Value("data").Object().
 		Value("token").String().NotEmpty()
 
-	assert.Equal(t, config.AppConfig.User.Username, username)
-	assert.Equal(t, config.AppConfig.User.Password, password)
+	assert.Equal(t, config.appConfig.User.Username, username)
+	assert.Equal(t, config.appConfig.User.Password, password)
 }

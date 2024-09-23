@@ -1,4 +1,18 @@
 definitions:
+  api.DownloaderForm:
+    properties:
+      api:
+        type: string
+      token:
+        type: string
+      type:
+        type: string
+      username:
+        type: string
+    required:
+    - api
+    - type
+    type: object
   api.InitUserForm:
     properties:
       password:
@@ -86,7 +100,7 @@ definitions:
     type: object
   api.SystemInfo:
     properties:
-      is_first_run:
+      is_init_user:
         type: boolean
       is_login:
         type: boolean
@@ -108,6 +122,22 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/v1/config/downloader:
+    get:
+      consumes:
+      - application/json
+      description: Get the downloader configuration, including the type, API address,
+        and token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.DownloaderForm'
+      summary: Get the downloader configuration
+      tags:
+      - config
   /api/v1/config/init_user:
     post:
       consumes:
@@ -141,7 +171,7 @@ paths:
             $ref: '#/definitions/errno.ApiError'
       summary: Initialize the first user
       tags:
-      - user
+      - config
   /api/v1/config/system:
     get:
       consumes:
@@ -156,7 +186,7 @@ paths:
             $ref: '#/definitions/api.SystemInfo'
       summary: Get system information
       tags:
-      - system
+      - config
   /api/v1/proxy/poster:
     get:
       consumes:

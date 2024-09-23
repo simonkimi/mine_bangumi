@@ -12,8 +12,8 @@ import (
 
 func JwtAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if config.AppConfig.User.Password == "" {
-			c.Set("claims", &api.UserClaims{Username: config.AppConfig.User.Username})
+		if config.appConfig.User.Password == "" {
+			c.Set("claims", &api.UserClaims{Username: config.appConfig.User.Username})
 			c.Next()
 			return
 		}
@@ -30,7 +30,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, jwt.ErrSignatureInvalid
 			}
-			return base64.URLEncoding.DecodeString(config.AppConfig.System.SecretKey)
+			return base64.URLEncoding.DecodeString(config.appConfig.System.SecretKey)
 		})
 		if err != nil || !token.Valid {
 			c.Next()

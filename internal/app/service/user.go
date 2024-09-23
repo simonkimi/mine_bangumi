@@ -10,7 +10,7 @@ import (
 )
 
 func GenerateUserJwt(username string) (string, error) {
-	expireTime := time.Now().Add(30 * 24 * time.Hour)
+	expireTime := time.Now().Add(24 * time.Hour)
 	claims := &api.UserClaims{
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -18,7 +18,7 @@ func GenerateUserJwt(username string) (string, error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	secret, err := base64.URLEncoding.DecodeString(config.AppConfig.System.SecretKey)
+	secret, err := base64.URLEncoding.DecodeString(config.appConfig.System.SecretKey)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to decode secret key")
 	}

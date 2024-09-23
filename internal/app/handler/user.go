@@ -23,7 +23,7 @@ func Login(c *gin.Context) {
 		_ = c.Error(errno.NewFormError(err))
 		return
 	}
-	if form.Username != config.AppConfig.User.Username || form.Password != config.AppConfig.User.Password {
+	if form.Username != config.appConfig.User.Username || form.Password != config.appConfig.User.Password {
 		_ = c.Error(errno.NewApiError(errno.ErrorUserPasswordWrong))
 		return
 	}

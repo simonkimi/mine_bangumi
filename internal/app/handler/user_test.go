@@ -36,8 +36,8 @@ func TestLogin_Success(t *testing.T) {
 	e := httpexpect.Default(t, server.URL)
 	e.POST("/login").
 		WithJSON(&api.LoginForm{
-			Username: config.AppConfig.User.Username,
-			Password: config.AppConfig.User.Password,
+			Username: config.appConfig.User.Username,
+			Password: config.appConfig.User.Password,
 		}).
 		Expect().
 		Status(http.StatusOK).
@@ -57,8 +57,8 @@ func TestLogin_InvalidCredentials(t *testing.T) {
 	e := httpexpect.Default(t, server.URL)
 	e.POST("/login").
 		WithJSON(&api.LoginForm{
-			Username: config.AppConfig.User.Username + "invalid",
-			Password: config.AppConfig.User.Password + "invalid",
+			Username: config.appConfig.User.Username + "invalid",
+			Password: config.appConfig.User.Password + "invalid",
 		}).
 		Expect().
 		Status(http.StatusOK).
