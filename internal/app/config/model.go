@@ -8,11 +8,6 @@ import (
 const DownloaderTypeAria2 = "aria2"
 const DownloaderTypeQBittorrent = "qbittorrent"
 
-type appConfig struct {
-	IsNewSystem bool
-	keys        *configKeys
-}
-
 type configItem struct {
 	key          string
 	env          string
@@ -51,6 +46,6 @@ func (c *configItem) getFloat64() float64 {
 	return viper.GetFloat64(c.key)
 }
 
-func (c *configItem) setValue(value any) {
+func (c *configItem) set(value any) {
 	viper.Set(c.key, value)
 }

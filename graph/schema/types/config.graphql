@@ -1,0 +1,13 @@
+input UserConfigInput {
+    username: String
+    password: String
+}
+
+
+type ConfigResult {
+    user: UserConfigResult!
+}
+
+type UserConfigResult {
+    username: String!
+}

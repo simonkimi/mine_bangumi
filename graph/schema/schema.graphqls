@@ -1,0 +1,6 @@
+type Query {
+    configUser(input: UserConfigInput!): ConfigResult!
+
+    sourceAcg(input: ParseAcgSourceInput!): ParseAcgSourceResult!
+    scraperAcg(input: ScrapeAcgSourceInput!): ScrapeAcgResult!
+}
