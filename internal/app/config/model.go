@@ -5,24 +5,24 @@ import (
 	"github.com/spf13/viper"
 )
 
-const DownloaderTypeAria2 = "aria2"
-const DownloaderTypeQBittorrent = "qbittorrent"
+type Config struct {
+}
 
-type configItem struct {
+type configItem[T any] struct {
 	key          string
 	env          string
-	defaultValue any
+	defaultValue T
 }
 
-func newConfigItem(key string, env string, defaultValue any) *configItem {
-	return &configItem{key: key, env: env, defaultValue: defaultValue}
+func newConfigItem[T any](key string, env string, defaultValue T) *configItem[T] {
+	return &configItem[T]{key: key, env: env, defaultValue: defaultValue}
 }
 
-func (c *configItem) getString() string {
+func (c *configItem[T]) getString() string {
 	return viper.GetString(c.key)
 }
 
-func (c *configItem) register() {
+func (c *configItem[T]) register() {
 	if c.env != "" {
 		err := viper.BindEnv(c.key, c.env)
 		if err != nil {
@@ -34,18 +34,10 @@ func (c *configItem) register() {
 	}
 }
 
-func (c *configItem) getInt() int {
-	return viper.GetInt(c.key)
+func (c *configItem[T]) Get() T {
+	return viper.Get(c.key).(T)
 }
 
-func (c *configItem) getBool() bool {
-	return viper.GetBool(c.key)
-}
-
-func (c *configItem) getFloat64() float64 {
-	return viper.GetFloat64(c.key)
-}
-
-func (c *configItem) set(value any) {
+func (c *configItem[T]) Set(value T) {
 	viper.Set(c.key, value)
 }

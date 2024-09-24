@@ -12,6 +12,9 @@ type ConfigResult struct {
 	User *UserConfigResult `json:"user"`
 }
 
+type Mutation struct {
+}
+
 type ParseAcgSourceInput struct {
 	Source string           `json:"source"`
 	Parser SourceParserEnum `json:"parser"`
@@ -29,8 +32,8 @@ type Query struct {
 type ScrapeAcgResult struct {
 	Scraper       ScraperEnum              `json:"scraper"`
 	Title         string                   `json:"title"`
-	OriginalTitle string                   `json:"OriginalTitle"`
-	Year          int                      `json:"year"`
+	OriginalTitle string                   `json:"originalTitle"`
+	FirstAirDate  string                   `json:"firstAirDate"`
 	Overview      string                   `json:"overview"`
 	Poster        string                   `json:"poster"`
 	Backdrop      string                   `json:"backdrop"`
@@ -101,10 +104,10 @@ func (e ScraperEnum) MarshalGQL(w io.Writer) {
 type ScraperLanguage string
 
 const (
-	ScraperLanguageZhHans ScraperLanguage = "ZhHans"
-	ScraperLanguageZhHant ScraperLanguage = "ZhHant"
-	ScraperLanguageJa     ScraperLanguage = "Ja"
-	ScraperLanguageEn     ScraperLanguage = "En"
+	ScraperLanguageZhHans ScraperLanguage = "Zh_HANS"
+	ScraperLanguageZhHant ScraperLanguage = "Zh_HANT"
+	ScraperLanguageJa     ScraperLanguage = "JA"
+	ScraperLanguageEn     ScraperLanguage = "EN"
 )
 
 var AllScraperLanguage = []ScraperLanguage{

@@ -3,15 +3,14 @@ schema:
   - graph/schema/types/*.graphql
 
 exec:
-  filename: internal/app/api/generated_exec.go
+  filename: internal/app/handler/generated_exec.go
 
 model:
   filename: internal/app/api/generated_models.go
 
 resolver:
-  layout: follow-schema
-  dir: internal/app/api
-  filename_template: "{name}.resolvers.go"
+  filename: internal/app/handler/resolver.go
+  type: Resolver
 
 struct_tag: json
 

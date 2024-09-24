@@ -1,0 +1,10 @@
+type Query {
+    "Scraper for acg source"
+    scraperSource(input: ParseAcgSourceInput!): ParseAcgSourceResult!
+    "Scraper for acg source"
+    scraperDb(input: ScrapeAcgSourceInput!): [ScrapeAcgResult!]!
+}
+
+type Mutation {
+    configUser(input: UserConfigInput!): ConfigResult!
+}

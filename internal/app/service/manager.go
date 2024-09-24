@@ -38,14 +38,9 @@ func (s *ServerManager) StartServer() {
 
 func (s *ServerManager) StartHttpServer() {
 	ipv4PortChan := make(chan int)
-	ipv6PortChan := make(chan int)
-	go StartHttpService(s.ctx, &s.wg, s.engine, ipv4PortChan, ipv6PortChan)
-	select {
-	case port := <-ipv4PortChan:
-		s.Ipv4Port = port
-	case port := <-ipv6PortChan:
-		s.Ipv4Port = port
-	}
+	go StartHttpService(s.ctx, &s.wg, s.engine, ipv4PortChan)
+	port := <-ipv4PortChan
+	s.Ipv4Port = port
 }
 
 func (s *ServerManager) RegisterGin(engine *gin.Engine) {

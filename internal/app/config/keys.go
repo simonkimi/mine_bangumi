@@ -4,7 +4,7 @@ var UserUsername = newConfigItem("user.username", "MBG_USER_USERNAME", "admin")
 var UserPassword = newConfigItem("user.password", "MBG_USER_PASSWORD", "admin")
 
 var ServerIpv4Host = newConfigItem("server.host", "MBG_SERVER_HOST", "0.0.0.0")
-var ServerIpv4Port = newConfigItem("server.port", "MBG_SERVER_PORT", "8080")
+var ServerIpv4Port = newConfigItem("server.port", "MBG_SERVER_PORT", 8080)
 
 var DownloaderClient = newConfigItem("downloader.client", "MBG_DOWNLOADER_CLIENT", "")
 

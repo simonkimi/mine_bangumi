@@ -23,11 +23,11 @@ type parserRawData struct {
 	Files []string
 }
 
-func ParseSource(ctx context.Context, targetUrl string, parser string) (*api.ParseSourceResponse, error) {
+func ParseSource(ctx context.Context, targetUrl string, parser api.SourceParserEnum) (*api.ParseAcgSourceResult, error) {
 	// 解析原始数据
 	rawData := &parserRawData{}
 	switch parser {
-	case ParserMikan:
+	case api.SourceParserEnumBangumi:
 		err := mikanParse(ctx, targetUrl, rawData)
 		if err != nil {
 			return nil, err
@@ -51,7 +51,7 @@ func ParseSource(ctx context.Context, targetUrl string, parser string) (*api.Par
 		}
 	}
 
-	return &api.ParseSourceResponse{
+	return &api.ParseAcgSourceResult{
 		Title:  bangumiTitle,
 		Season: season,
 		Files:  rawData.Files,

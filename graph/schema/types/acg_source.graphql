@@ -14,10 +14,10 @@ type ParseAcgSourceResult {
 }
 
 enum ScraperLanguage {
-    ZhHans
-    ZhHant
-    Ja
-    En
+    Zh_HANS
+    Zh_HANT
+    JA
+    EN
 }
 
 enum ScraperEnum {
@@ -40,8 +40,8 @@ type ScrapeAcgSeasonResult {
 type ScrapeAcgResult {
     scraper: ScraperEnum!
     title: String!
-    OriginalTitle: String!
-    year: Int!
+    originalTitle: String!
+    firstAirDate: String!
     overview: String!
     poster: String!
     backdrop: String!

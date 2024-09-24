@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cockroachdb/errors"
 	"github.com/simonkimi/minebangumi/domain"
+	"github.com/simonkimi/minebangumi/internal/app/api"
 	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/simonkimi/minebangumi/pkg/errno"
 	"github.com/simonkimi/minebangumi/pkg/http_client"
@@ -11,25 +12,25 @@ import (
 	"strconv"
 )
 
-func GetTmdbLanguage(language string) (string, error) {
+func GetTmdbLanguage(language api.ScraperLanguage) (string, error) {
 	switch language {
-	case domain.LanguageEn:
+	case api.ScraperLanguageEn:
 		return "en-US", nil
-	case domain.LanguageZhHans:
+	case api.ScraperLanguageZhHans:
 		return "zh-CN", nil
-	case domain.LanguageZhHant:
+	case api.ScraperLanguageZhHant:
 		return "zh-TW", nil
-	case domain.LanguageJa:
+	case api.ScraperLanguageJa:
 		return "ja-JP", nil
 	}
 	return "", errors.Newf("Unsupported language: %s", language)
 }
 
 func getApiKey() string {
-	if stringt.IsEmptyOrWhitespace(config.appConfig.Tmdb.ApiKey) {
+	if stringt.IsEmptyOrWhitespace(config.TmdbApiKey.Get()) {
 		return domain.TmdbDefaultApikey
 	}
-	return config.appConfig.Tmdb.ApiKey
+	return config.TmdbApiKey.Get()
 }
 
 func Search(ctx context.Context, title string) ([]*SearchResultItem, error) {
