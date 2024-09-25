@@ -11,17 +11,17 @@ import (
 )
 
 type Client struct {
-	client *resty.Client
+	getClient func() *resty.Client
 }
 
-func NewClient(c *resty.Client) *Client {
+func NewClient(c func() *resty.Client) *Client {
 	return &Client{
-		client: c,
+		getClient: c,
 	}
 }
 
 func (c *Client) ParseBangumiByUrl(ctx context.Context, url string) (*Bangumi, error) {
-	resp, err := c.client.R().SetContext(ctx).Get(url)
+	resp, err := c.getClient().R().SetContext(ctx).Get(url)
 	if err != nil || resp.IsError() {
 		if errors.As(err, context.Canceled) {
 			return nil, api.NewCancelErrorf("Mikan feed request canceled: %s", url)

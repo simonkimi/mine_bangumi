@@ -3,14 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	"github.com/simonkimi/minebangumi/api"
-	"github.com/simonkimi/minebangumi/internal/app/manager"
 )
 
-func GetPoster(ctx context.Context, targetType string, target string) ([]byte, error) {
-	mgr := manager.GetInstance()
-	client := mgr.HttpX.GetTempClient()
+func GetPoster(ctx context.Context, client *resty.Client, targetType string, target string) ([]byte, error) {
 	switch targetType {
 	case ScrapeTmDb:
 		url := fmt.Sprintf("%s/t/p/w780%s", api.TmdbImageHost, target)

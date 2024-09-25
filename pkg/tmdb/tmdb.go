@@ -12,10 +12,10 @@ import (
 
 type Tmdb struct {
 	apiKey string
-	client *resty.Client
+	client func() *resty.Client
 }
 
-func NewTmdb(apiKey string, client *resty.Client) *Tmdb {
+func NewTmdb(apiKey string, client func() *resty.Client) *Tmdb {
 	return &Tmdb{apiKey: apiKey, client: client}
 }
 
@@ -45,7 +45,7 @@ func (t *Tmdb) Search(ctx context.Context, title string) ([]*SearchResultItem, e
 	results := make([]*SearchResultItem, 0)
 	for {
 		var result rawSearchResult
-		req, err := t.client.R().
+		req, err := t.client().R().
 			SetContext(ctx).
 			SetQueryParams(map[string]string{
 				"api_key":       t.getApiKey(),
@@ -77,7 +77,7 @@ func (t *Tmdb) Search(ctx context.Context, title string) ([]*SearchResultItem, e
 
 func (t *Tmdb) QueryForDetail(ctx context.Context, id int, language string) (*DetailData, error) {
 	var detail DetailData
-	req, err := t.client.R().
+	req, err := t.client().R().
 		SetContext(ctx).
 		SetQueryParams(map[string]string{
 			"api_key":  t.getApiKey(),

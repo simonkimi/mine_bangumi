@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/simonkimi/minebangumi/api"
 	"github.com/simonkimi/minebangumi/internal/app/service"
-	"github.com/simonkimi/minebangumi/pkg/errno"
 	"net/http"
 	"path/filepath"
 )
@@ -19,16 +18,17 @@ import (
 // @Param target query string true "Target"
 // @Success 200 {file} file "Poster image"
 // @Router /api/v1/proxy/poster [get]
-func Poster(c *gin.Context) {
+func (h *HttpHandler) Poster(c *gin.Context) {
+	client := h.getTmpClient()
 	ctx := c.Request.Context()
 
 	var query api.PosterQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
-		_ = c.Error(errno.NewApiError(errno.BadRequest))
+		_ = c.Error(api.NewBadRequestErrorf("invalid query: %s", err))
 		return
 	}
 
-	data, err := service.GetPoster(ctx, query.TargetType, query.Target)
+	data, err := service.GetPoster(ctx, client, query.TargetType, query.Target)
 	if err != nil {
 		_ = c.Error(err)
 		return
@@ -60,6 +60,6 @@ func getMime(path string) (string, error) {
 	case ".jp2", ".j2k", ".jpf", ".jpx", ".jpm", ".mj2":
 		return "image/jp2", nil
 	default:
-		return "", errno.NewApiErrorf(errno.BadRequest, "unsupported image type: %s", ext)
+		return "", api.NewBadRequestErrorf("unsupported image type: %s", ext)
 	}
 }

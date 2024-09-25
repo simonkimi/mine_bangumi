@@ -16,6 +16,17 @@ type HttpX struct {
 	proxyPassword string
 }
 
+func NewHttpX(proxyEnabled bool, proxyScheme, proxyHost, proxyPort, proxyUsername, proxyPassword string) *HttpX {
+	return &HttpX{
+		proxyEnabled:  proxyEnabled,
+		proxyScheme:   proxyScheme,
+		proxyHost:     proxyHost,
+		proxyPort:     proxyPort,
+		proxyUsername: proxyUsername,
+		proxyPassword: proxyPassword,
+	}
+}
+
 func (h *HttpX) setClientProxy(client *resty.Client) {
 	if h.proxyEnabled {
 		client.SetProxy(xnet.GetProxyUrl(

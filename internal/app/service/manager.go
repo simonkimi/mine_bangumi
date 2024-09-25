@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-type ServerManager struct {
+type ApiService struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 	wg     sync.WaitGroup
@@ -17,37 +17,31 @@ type ServerManager struct {
 	Ipv6Port int
 }
 
-var serverManager *ServerManager
-var once sync.Once
-
-func GetServerManager() *ServerManager {
-	once.Do(func() {
-		ctx, cancel := context.WithCancel(context.Background())
-		serverManager = &ServerManager{
-			ctx:    ctx,
-			cancel: cancel,
-		}
-	})
-	return serverManager
+func NewApiService() *ApiService {
+	ctx, cancel := context.WithCancel(context.Background())
+	return &ApiService{
+		ctx:    ctx,
+		cancel: cancel,
+	}
 }
 
-func (s *ServerManager) StartServer() {
+func (s *ApiService) StartServer() {
 	logrus.Warnf("Starting server...")
 	s.StartHttpServer()
 }
 
-func (s *ServerManager) StartHttpServer() {
+func (s *ApiService) StartHttpServer() {
 	ipv4PortChan := make(chan int)
 	go StartHttpService(s.ctx, &s.wg, s.engine, ipv4PortChan)
 	port := <-ipv4PortChan
 	s.Ipv4Port = port
 }
 
-func (s *ServerManager) RegisterGin(engine *gin.Engine) {
+func (s *ApiService) RegisterGin(engine *gin.Engine) {
 	s.engine = engine
 }
 
-func (s *ServerManager) RestartServer() {
+func (s *ApiService) RestartServer() {
 	logrus.Warnf("Restarting server...")
 	s.cancel()
 	s.wg.Wait()
@@ -55,7 +49,7 @@ func (s *ServerManager) RestartServer() {
 	s.StartServer()
 }
 
-func (s *ServerManager) Shutdown() {
+func (s *ApiService) Shutdown() {
 	logrus.Warnf("Shutting down server...")
 	s.cancel()
 	s.wg.Wait()
