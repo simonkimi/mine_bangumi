@@ -2,9 +2,9 @@ package service
 
 import (
 	"encoding/base64"
-	"github.com/cockroachdb/errors"
+
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/simonkimi/minebangumi/internal/app/api"
+	"github.com/simonkimi/minebangumi/api"
 	"github.com/simonkimi/minebangumi/internal/app/config"
 	"time"
 )

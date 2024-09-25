@@ -19,8 +19,7 @@ func NewQBittorrentDl(url string, username string, password string) *QBittorrent
 		url:      url,
 		username: username,
 		password: password,
-		client: resty.New().
-			SetBaseURL(url),
+		client:   resty.New().SetBaseURL(url),
 	}
 }
 

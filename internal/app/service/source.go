@@ -2,17 +2,25 @@ package service
 
 import (
 	"context"
-	"github.com/simonkimi/minebangumi/internal/app/api"
+	"github.com/simonkimi/minebangumi/api"
+	"github.com/simonkimi/minebangumi/internal/app/manager"
 	"github.com/simonkimi/minebangumi/internal/pkg/cache"
 	"github.com/simonkimi/minebangumi/pkg/bangumi"
-	"github.com/simonkimi/minebangumi/pkg/errno"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
 )
 
 const (
-	ParserMikan  = "mikan"
-	ParserMagnet = "magnet"
+	ParserMikan = "mikan"
 )
+
+type SourceService struct {
+	mikan *mikan.Client
+	cache *cache.Cache
+}
+
+func NewSourceService(mikan *mikan.Client) *SourceService {
+	return &SourceService{mikan: mikan}
+}
 
 type RssModel struct {
 	RssTitle string
@@ -23,24 +31,17 @@ type parserRawData struct {
 	Files []string
 }
 
-func ParseSource(ctx context.Context, targetUrl string, parser api.SourceParserEnum) (*api.ParseAcgSourceResult, error) {
-	// 解析原始数据
+func (c *SourceService) ParseSource(ctx context.Context, targetUrl string, parser api.SourceParserEnum) (*api.ParseAcgSourceResult, error) {
 	rawData := &parserRawData{}
 	switch parser {
 	case api.SourceParserEnumBangumi:
-		err := mikanParse(ctx, targetUrl, rawData)
-		if err != nil {
-			return nil, err
-		}
-	case ParserMagnet:
-		err := magnetParse(ctx, targetUrl, rawData)
+		err := c.mikanParse(ctx, targetUrl, rawData)
 		if err != nil {
 			return nil, err
 		}
 	default:
-		return nil, errno.NewApiErrorf(errno.BadRequest, "Unknown parser: %s", parser)
+		return nil, api.NewBadRequestErrorf("Unknown parser: %s", parser.String())
 	}
-	// 解析原始数据, 准备刮削
 	bangumiTitle := rawData.Title
 	season := -1
 	if len(rawData.Files) != 0 {
@@ -58,15 +59,19 @@ func ParseSource(ctx context.Context, targetUrl string, parser api.SourceParserE
 	}, nil
 }
 
-func mikanParse(ctx context.Context, targetUrl string, rawData *parserRawData) error {
-	mikanData, exist := cache.Get[mikan.Bangumi](ParserMikan, targetUrl)
+func (c *SourceService) mikanParse(ctx context.Context, targetUrl string, rawData *parserRawData) error {
+	mgr := manager.GetInstance()
+	var mikanData *mikan.Bangumi
+	data, exist := c.cache.Get(ParserMikan, targetUrl)
 	if !exist {
-		newMikanData, err := mikan.ParseBangumiByUrl(ctx, targetUrl)
+		newMikanData, err := mgr.Mikan.ParseBangumiByUrl(ctx, targetUrl)
 		if err != nil {
 			return err
 		}
-		cache.Add(ParserMikan, targetUrl, newMikanData)
+		c.cache.Add(ParserMikan, targetUrl, newMikanData)
 		mikanData = newMikanData
+	} else {
+		mikanData = data.(*mikan.Bangumi)
 	}
 	rawData.Title = mikanData.Title
 	for _, episode := range mikanData.Episodes {
@@ -75,17 +80,17 @@ func mikanParse(ctx context.Context, targetUrl string, rawData *parserRawData) e
 	return nil
 }
 
-func magnetParse(ctx context.Context, targetUrl string, rawData *parserRawData) error {
-	//magnetData, exist := cache.Get[magnet.FileInfo](ParserMagnet, targetUrl)
-	//if !exist {
-	//	newMagnetData, err := magnet.ParseMagnet(ctx, targetUrl)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	cache.Add(ParserMagnet, targetUrl, newMagnetData)
-	//	magnetData = newMagnetData
-	//}
-	//rawData.Title = magnetData.Name
-	//rawData.Files = magnetData.Files
-	return nil
-}
+//func magnetParse(ctx context.Context, targetUrl string, rawData *parserRawData) error {
+//	magnetData, exist := cache.Get[magnet.FileInfo](ParserMagnet, targetUrl)
+//	if !exist {
+//		newMagnetData, err := magnet.ParseMagnet(ctx, targetUrl)
+//		if err != nil {
+//			return err
+//		}
+//		cache.Add(ParserMagnet, targetUrl, newMagnetData)
+//		magnetData = newMagnetData
+//	}
+//	rawData.Title = magnetData.Name
+//	rawData.Files = magnetData.Files
+//	return nil
+//}

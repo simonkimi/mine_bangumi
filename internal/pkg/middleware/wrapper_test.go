@@ -1,10 +1,9 @@
 package middleware
 
 import (
-	"github.com/cockroachdb/errors"
 	"github.com/gavv/httpexpect/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/simonkimi/minebangumi/internal/app/api"
+	"github.com/simonkimi/minebangumi/api"
 	"github.com/simonkimi/minebangumi/pkg/errno"
 	"net/http"
 	"net/http/httptest"

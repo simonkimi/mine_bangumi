@@ -62,6 +62,55 @@ type UserConfigResult struct {
 	Username string `json:"username"`
 }
 
+type APIStatusEnum string
+
+const (
+	APIStatusEnumSuccess            APIStatusEnum = "SUCCESS"
+	APIStatusEnumUnauthorized       APIStatusEnum = "UNAUTHORIZED"
+	APIStatusEnumCancel             APIStatusEnum = "CANCEL"
+	APIStatusEnumTimeout            APIStatusEnum = "TIMEOUT"
+	APIStatusEnumThirdPartyAPIError APIStatusEnum = "THIRD_PARTY_API_ERROR"
+	APIStatusEnumBadRequest         APIStatusEnum = "BAD_REQUEST"
+)
+
+var AllAPIStatusEnum = []APIStatusEnum{
+	APIStatusEnumSuccess,
+	APIStatusEnumUnauthorized,
+	APIStatusEnumCancel,
+	APIStatusEnumTimeout,
+	APIStatusEnumThirdPartyAPIError,
+	APIStatusEnumBadRequest,
+}
+
+func (e APIStatusEnum) IsValid() bool {
+	switch e {
+	case APIStatusEnumSuccess, APIStatusEnumUnauthorized, APIStatusEnumCancel, APIStatusEnumTimeout, APIStatusEnumThirdPartyAPIError, APIStatusEnumBadRequest:
+		return true
+	}
+	return false
+}
+
+func (e APIStatusEnum) String() string {
+	return string(e)
+}
+
+func (e *APIStatusEnum) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = APIStatusEnum(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ApiStatusEnum", str)
+	}
+	return nil
+}
+
+func (e APIStatusEnum) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type ScraperEnum string
 
 const (

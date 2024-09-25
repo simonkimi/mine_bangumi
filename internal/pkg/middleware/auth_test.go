@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gavv/httpexpect/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/simonkimi/minebangumi/internal/app/api"
+	"github.com/simonkimi/minebangumi/api"
 	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/simonkimi/minebangumi/internal/app/service"
 	"github.com/simonkimi/minebangumi/pkg/errno"

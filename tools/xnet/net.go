@@ -1,4 +1,4 @@
-package nett
+package xnet
 
 import "fmt"
 

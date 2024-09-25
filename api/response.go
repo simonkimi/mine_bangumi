@@ -2,23 +2,22 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/simonkimi/minebangumi/pkg/errno"
 	"net/http"
 )
 
 type Response[T any] struct {
-	Code    int    `json:"code"`
-	Data    T      `json:"data"`
-	Message string `json:"message"`
+	Code    APIStatusEnum `json:"code"`
+	Data    T             `json:"data"`
+	Message string        `json:"message"`
 }
 
 func (r *Response[T]) IsError() bool {
-	return r.Code != errno.Success
+	return r.Code != APIStatusEnumSuccess
 }
 
 func OkResponse[T any](context *gin.Context, response T) {
 	context.JSON(http.StatusOK, &Response[T]{
-		Code:    errno.Success,
+		Code:    APIStatusEnumSuccess,
 		Data:    response,
 		Message: "",
 	})
@@ -26,7 +25,7 @@ func OkResponse[T any](context *gin.Context, response T) {
 
 func OkResponseNil(c *gin.Context) {
 	c.JSON(http.StatusOK, &Response[any]{
-		Code:    errno.Success,
+		Code:    APIStatusEnumSuccess,
 		Data:    nil,
 		Message: "",
 	})

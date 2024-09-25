@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/simonkimi/minebangumi/internal/app/api"
+	"github.com/simonkimi/minebangumi/api"
 	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/simonkimi/minebangumi/pkg/errno"
 	"strings"

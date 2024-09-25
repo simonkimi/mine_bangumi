@@ -3,25 +3,32 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/simonkimi/minebangumi/domain"
-	"github.com/simonkimi/minebangumi/pkg/errno"
-	"github.com/simonkimi/minebangumi/pkg/http_client"
+	"github.com/pkg/errors"
+	"github.com/simonkimi/minebangumi/api"
+	"github.com/simonkimi/minebangumi/internal/app/manager"
 )
 
 func GetPoster(ctx context.Context, targetType string, target string) ([]byte, error) {
-	client := http_client.GetTempClient()
+	mgr := manager.GetInstance()
+	client := mgr.HttpX.GetTempClient()
 	switch targetType {
 	case ScrapeTmDb:
-		url := fmt.Sprintf("%s/t/p/w780%s", domain.TmdbImageHost, target)
+		url := fmt.Sprintf("%s/t/p/w780%s", api.TmdbImageHost, target)
 		rsp, err := client.R().SetContext(ctx).Get(url)
 		if err != nil {
-			return nil, errno.NewApiErrorWithCausef(errno.ErrorApiNetwork, err, "Failed to get poster: %s", target)
+			if errors.As(err, context.Canceled) {
+				return nil, api.NewCancelError()
+			}
+			if errors.Is(err, context.DeadlineExceeded) {
+				return nil, api.NewTimeoutErrorf("Failed to get poster: %s", target)
+			}
+			return nil, api.NewThirdPartyErrorf(err, url, "Failed to get poster: %s", target)
 		}
 		if rsp.IsError() {
-			return nil, errno.NewApiErrorf(errno.ErrorApiParse, "Failed to get poster: %s, status code: %d", target, rsp.StatusCode())
+			return nil, api.NewBadRequestErrorf("Failed to get poster: %s, status code: %d", target, rsp.StatusCode())
 		}
 		return rsp.Body(), nil
 	default:
-		return nil, errno.NewApiErrorf(errno.BadRequest, "Unsupported scraper: %s", targetType)
+		return nil, api.NewBadRequestErrorf("Unsupported scraper: %s", targetType)
 	}
 }

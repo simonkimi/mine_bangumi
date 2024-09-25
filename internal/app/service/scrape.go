@@ -2,35 +2,43 @@ package service
 
 import (
 	"context"
-	"github.com/cockroachdb/errors"
-	"github.com/simonkimi/minebangumi/internal/app/api"
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
+
+	"github.com/simonkimi/minebangumi/api"
 )
 
 const ScrapeTmDb = "tmdb"
 
-func ScrapeService(ctx context.Context, input *api.ScrapeAcgSourceInput) ([]*api.ScrapeAcgResult, error) {
+type ScraperService struct {
+	tmdb *tmdb.Tmdb
+}
+
+func NewScraperService(tmdb *tmdb.Tmdb) *ScraperService {
+	return &ScraperService{tmdb: tmdb}
+}
+
+func (s *ScraperService) ScrapeService(ctx context.Context, input *api.ScrapeAcgSourceInput) ([]*api.ScrapeAcgResult, error) {
 	switch input.Scraper {
 	case api.ScraperEnumTmdb:
-		return scrapeTmDb(ctx, input)
+		return s.scrapeTmDb(ctx, input)
 	default:
-		return nil, errors.Newf("Unsupported scraper: %s", input.Scraper)
+		return nil, api.NewBadRequestErrorf("Unsupported scraper: %s", input.Scraper)
 	}
 }
 
-func scrapeTmDb(ctx context.Context, form *api.ScrapeAcgSourceInput) ([]*api.ScrapeAcgResult, error) {
-	language, err := tmdb.GetTmdbLanguage(form.Language)
+func (s *ScraperService) scrapeTmDb(ctx context.Context, form *api.ScrapeAcgSourceInput) ([]*api.ScrapeAcgResult, error) {
+	language, err := s.tmdb.GetTmdbLanguage(form.Language)
 	if err != nil {
 		return nil, err
 	}
 
 	var result []*api.ScrapeAcgResult
-	tmdbSearch, err := tmdb.Search(ctx, form.Title)
+	tmdbSearch, err := s.tmdb.Search(ctx, form.Title)
 	if err != nil {
 		return nil, err
 	}
 	for _, item := range tmdbSearch {
-		detail, err := tmdb.QueryForDetail(ctx, item.ID, language)
+		detail, err := s.tmdb.QueryForDetail(ctx, item.ID, language)
 		if err != nil {
 			return nil, err
 		}

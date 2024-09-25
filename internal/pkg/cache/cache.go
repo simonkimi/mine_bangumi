@@ -2,35 +2,34 @@ package cache
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
+	"github.com/patrickmn/go-cache"
 	"time"
 )
-import "github.com/patrickmn/go-cache"
 
-var instance *cache.Cache
-
-func init() {
-	instance = cache.New(5*time.Minute, 5*time.Minute)
+type Cache struct {
+	instance *cache.Cache
 }
 
-func Add(tag string, key string, value interface{}) {
-	k := fmt.Sprintf("%s:%s", tag, key)
-	instance.Set(k, value, cache.DefaultExpiration)
+func NewCache() *Cache {
+	return &Cache{
+		instance: cache.New(5*time.Minute, 5*time.Minute),
+	}
 }
 
-func Get[T any](tag string, key string) (*T, bool) {
+func (c *Cache) Add(tag string, key string, value interface{}) {
 	k := fmt.Sprintf("%s:%s", tag, key)
-	if value, exist := instance.Get(k); exist {
-		if v, ok := value.(T); ok {
-			return &v, true
-		} else {
-			logrus.Warnf("Cache value type error, key: %s, expected type: %T, actual type: %T", k, new(T), value)
-		}
+	c.instance.Set(k, value, cache.DefaultExpiration)
+}
+
+func (c *Cache) Get(tag string, key string) (any, bool) {
+	k := fmt.Sprintf("%s:%s", tag, key)
+	if value, exist := c.instance.Get(k); exist {
+		return value, true
 	}
 	return nil, false
 }
 
-func Delete(tag string, key string) {
+func (c *Cache) Delete(tag string, key string) {
 	k := fmt.Sprintf("%s:%s", tag, key)
-	instance.Delete(k)
+	c.instance.Delete(k)
 }

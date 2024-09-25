@@ -5,9 +5,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
-}
-
 type configItem[T any] struct {
 	key          string
 	env          string
@@ -22,22 +19,14 @@ func (c *configItem[T]) getString() string {
 	return viper.GetString(c.key)
 }
 
-func (c *configItem[T]) register() {
+func (c *configItem[T]) register(v *viper.Viper) {
 	if c.env != "" {
-		err := viper.BindEnv(c.key, c.env)
+		err := v.BindEnv(c.key, c.env)
 		if err != nil {
 			logrus.Errorf("Config init bind env error: %s", err)
 		}
 	}
 	if c.defaultValue != nil {
-		viper.SetDefault(c.key, c.defaultValue)
+		v.SetDefault(c.key, c.defaultValue)
 	}
-}
-
-func (c *configItem[T]) Get() T {
-	return viper.Get(c.key).(T)
-}
-
-func (c *configItem[T]) Set(value T) {
-	viper.Set(c.key, value)
 }

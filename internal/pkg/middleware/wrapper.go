@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/simonkimi/minebangumi/pkg/errno"
 	"net/http"

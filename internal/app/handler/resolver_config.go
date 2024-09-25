@@ -2,24 +2,28 @@ package handler
 
 import (
 	"context"
-	"github.com/simonkimi/minebangumi/internal/app/api"
+	"github.com/simonkimi/minebangumi/api"
 	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/internal/app/manager"
 )
 
 // ConfigUser is the resolver for the configUser field.
 func (r *mutationResolver) ConfigUser(_ context.Context, input api.UserConfigInput) (*api.ConfigResult, error) {
+	mgr := manager.GetInstance()
 	if input.Username != nil {
-		config.UserUsername.Set(*input.Username)
+		mgr.Config.SetString(config.UserUsername, *input.Username)
 	}
 	if input.Password != nil {
-		config.UserPassword.Set(*input.Password)
+		mgr.Config.SetString(config.UserPassword, *input.Password)
 	}
+	mgr.Config.Save()
 	return getConfigResult(), nil
 }
 
 func getUserConfig() *api.UserConfigResult {
+	mgr := manager.GetInstance()
 	return &api.UserConfigResult{
-		Username: config.UserUsername.Get(),
+		Username: mgr.Config.GetString(config.UserUsername),
 	}
 }
 

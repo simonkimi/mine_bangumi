@@ -1,4 +1,4 @@
-package stringt
+package xstring
 
 import "strings"
 

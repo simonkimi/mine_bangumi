@@ -6,7 +6,7 @@ exec:
   filename: internal/app/handler/generated_exec.go
 
 model:
-  filename: internal/app/api/generated_models.go
+  filename: api/generated_models.go
 
 resolver:
   filename: internal/app/handler/resolver.go
@@ -15,7 +15,7 @@ resolver:
 struct_tag: json
 
 autobind:
-  - "github.com/simonkimi/minebangumi/internal/app/api"
+  - "github.com/simonkimi/minebangumi/api"
 
 models:
   ID:

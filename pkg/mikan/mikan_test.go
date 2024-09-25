@@ -2,6 +2,7 @@ package mikan
 
 import (
 	"context"
+	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -13,8 +14,8 @@ func TestParseBangumi(t *testing.T) {
 		http.ServeFile(w, r, "testdata/atri_bangumi.xml")
 	}))
 	defer mockServer.Close()
-
-	result, err := ParseBangumiByUrl(context.Background(), mockServer.URL)
+	client := NewClient(resty.New())
+	result, err := client.ParseBangumiByUrl(context.Background(), mockServer.URL)
 	if err != nil {
 		t.Error(err)
 	}
@@ -27,7 +28,9 @@ func TestParserMyBangumi(t *testing.T) {
 	}))
 	defer mockServer.Close()
 
-	result, err := ParseBangumiByUrl(context.Background(), mockServer.URL)
+	client := NewClient(resty.New())
+
+	result, err := client.ParseBangumiByUrl(context.Background(), mockServer.URL)
 	if err != nil {
 		t.Error(err)
 	}

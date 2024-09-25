@@ -2,7 +2,7 @@ package tmdb
 
 import (
 	"context"
-	"github.com/simonkimi/minebangumi/domain"
+	"github.com/simonkimi/minebangumi/api"
 	"testing"
 )
 
@@ -15,7 +15,7 @@ func TestSearch(t *testing.T) {
 }
 
 func TestDetail(t *testing.T) {
-	result, err := QueryForDetail(context.Background(), 30980, domain.LanguageZhHans)
+	result, err := QueryForDetail(context.Background(), 30980, api.LanguageZhHans)
 	if err != nil {
 		t.Error(err)
 	}

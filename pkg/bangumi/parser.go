@@ -4,7 +4,7 @@
 package bangumi
 
 import (
-	"github.com/simonkimi/minebangumi/tools/stringt"
+	"github.com/simonkimi/minebangumi/tools/xstring"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -45,7 +45,7 @@ func ParseBangumiSourceName(torrentPath string, torrentName string) *FilenamePar
 
 func getGroup(groupAndTitle string) (group string, title string) {
 	n := bracketMatcher.Split(groupAndTitle, -1)
-	n = stringt.RemoveEmpty(n)
+	n = xstring.RemoveEmpty(n)
 
 	if len(n) > 1 {
 		if matched, _ := regexp.MatchString(`^\d+`, n[1]); matched {

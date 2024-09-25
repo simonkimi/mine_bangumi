@@ -1,0 +1,8 @@
+enum ApiStatusEnum {
+    SUCCESS
+    UNAUTHORIZED
+    CANCEL
+    TIMEOUT
+    THIRD_PARTY_API_ERROR
+    BAD_REQUEST
+}

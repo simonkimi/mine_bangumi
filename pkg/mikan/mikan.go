@@ -2,33 +2,39 @@ package mikan
 
 import (
 	"context"
-	"github.com/cockroachdb/errors"
+	"github.com/go-resty/resty/v2"
 	"github.com/mmcdole/gofeed"
-	"github.com/simonkimi/minebangumi/pkg/errno"
-	"github.com/simonkimi/minebangumi/pkg/http_client"
+	"github.com/pkg/errors"
+	"github.com/simonkimi/minebangumi/api"
 	"strconv"
 	"strings"
 )
 
-func ParseBangumiByUrl(ctx context.Context, url string) (*Bangumi, error) {
-	client := http_client.GetTempClient()
-	resp, err := client.R().SetContext(ctx).Get(url)
-	if err != nil {
+type Client struct {
+	client *resty.Client
+}
+
+func NewClient(c *resty.Client) *Client {
+	return &Client{
+		client: c,
+	}
+}
+
+func (c *Client) ParseBangumiByUrl(ctx context.Context, url string) (*Bangumi, error) {
+	resp, err := c.client.R().SetContext(ctx).Get(url)
+	if err != nil || resp.IsError() {
 		if errors.As(err, context.Canceled) {
-			return nil, errno.NewApiError(errno.ErrorCancel)
+			return nil, api.NewCancelErrorf("Mikan feed request canceled: %s", url)
 		}
 		if errors.As(err, context.DeadlineExceeded) {
-			return nil, errno.NewApiError(errno.ErrorTimeout)
+			return nil, api.NewTimeoutErrorf("Mikan feed request timeout: %s", url)
 		}
-		return nil, errno.NewApiErrorWithCause(errno.ErrorApiNetwork, err)
-	}
-	if resp.StatusCode() != 200 {
-		return nil, errno.NewApiErrorf(errno.ErrorApiNetwork, "failed to fetch mikan feed, status code: %d", resp.StatusCode())
+		return nil, api.NewThirdPartyErrorf(err, url, "failed to fetch mikan feed")
 	}
 	feed := gofeed.NewParser()
 	feedData, err := feed.ParseString(string(resp.Body()))
 	if err != nil {
-		return nil, errno.NewApiErrorWithCausef(errno.ErrorApiParse, err, "failed to parse mikan feed: %s", url)
+		return nil, api.NewThirdPartyErrorf(err, url, "failed to parse mikan feed: %s", url)
 	}
 
 	bangumi := &Bangumi{

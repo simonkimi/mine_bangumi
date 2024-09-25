@@ -13,7 +13,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/simonkimi/minebangumi/internal/app/api"
+	"github.com/simonkimi/minebangumi/api"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -451,6 +451,14 @@ type UserConfigResult {
     username: String!
 }
 `, BuiltIn: false},
+	{Name: "../../../graph/schema/types/errors.graphql", Input: `enum ApiStatusEnum {
+    SUCCESS
+    UNAUTHORIZED
+    CANCEL
+    TIMEOUT
+    THIRD_PARTY_API_ERROR
+    BAD_REQUEST
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -464,7 +472,7 @@ func (ec *executionContext) field_Mutation_configUser_args(ctx context.Context, 
 	var arg0 api.UserConfigInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUserConfigInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐUserConfigInput(ctx, tmp)
+		arg0, err = ec.unmarshalNUserConfigInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐUserConfigInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -494,7 +502,7 @@ func (ec *executionContext) field_Query_scraperDb_args(ctx context.Context, rawA
 	var arg0 api.ScrapeAcgSourceInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNScrapeAcgSourceInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScrapeAcgSourceInput(ctx, tmp)
+		arg0, err = ec.unmarshalNScrapeAcgSourceInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgSourceInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -509,7 +517,7 @@ func (ec *executionContext) field_Query_scraperSource_args(ctx context.Context, 
 	var arg0 api.ParseAcgSourceInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNParseAcgSourceInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐParseAcgSourceInput(ctx, tmp)
+		arg0, err = ec.unmarshalNParseAcgSourceInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSourceInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -584,7 +592,7 @@ func (ec *executionContext) _ConfigResult_user(ctx context.Context, field graphq
 	}
 	res := resTmp.(*api.UserConfigResult)
 	fc.Result = res
-	return ec.marshalNUserConfigResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐUserConfigResult(ctx, field.Selections, res)
+	return ec.marshalNUserConfigResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐUserConfigResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigResult_user(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -632,7 +640,7 @@ func (ec *executionContext) _Mutation_configUser(ctx context.Context, field grap
 	}
 	res := resTmp.(*api.ConfigResult)
 	fc.Result = res
-	return ec.marshalNConfigResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐConfigResult(ctx, field.Selections, res)
+	return ec.marshalNConfigResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐConfigResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_configUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -823,7 +831,7 @@ func (ec *executionContext) _Query_scraperSource(ctx context.Context, field grap
 	}
 	res := resTmp.(*api.ParseAcgSourceResult)
 	fc.Result = res
-	return ec.marshalNParseAcgSourceResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐParseAcgSourceResult(ctx, field.Selections, res)
+	return ec.marshalNParseAcgSourceResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSourceResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_scraperSource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -886,7 +894,7 @@ func (ec *executionContext) _Query_scraperDb(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*api.ScrapeAcgResult)
 	fc.Result = res
-	return ec.marshalNScrapeAcgResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScrapeAcgResultᚄ(ctx, field.Selections, res)
+	return ec.marshalNScrapeAcgResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgResultᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_scraperDb(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1088,7 +1096,7 @@ func (ec *executionContext) _ScrapeAcgResult_scraper(ctx context.Context, field 
 	}
 	res := resTmp.(api.ScraperEnum)
 	fc.Result = res
-	return ec.marshalNScraperEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScraperEnum(ctx, field.Selections, res)
+	return ec.marshalNScraperEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScraperEnum(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ScrapeAcgResult_scraper(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1396,7 +1404,7 @@ func (ec *executionContext) _ScrapeAcgResult_seasons(ctx context.Context, field 
 	}
 	res := resTmp.([]*api.ScrapeAcgSeasonResult)
 	fc.Result = res
-	return ec.marshalNScrapeAcgSeasonResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScrapeAcgSeasonResultᚄ(ctx, field.Selections, res)
+	return ec.marshalNScrapeAcgSeasonResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgSeasonResultᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ScrapeAcgResult_seasons(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3438,7 +3446,7 @@ func (ec *executionContext) unmarshalInputParseAcgSourceInput(ctx context.Contex
 			it.Source = data
 		case "parser":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parser"))
-			data, err := ec.unmarshalNSourceParserEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐSourceParserEnum(ctx, v)
+			data, err := ec.unmarshalNSourceParserEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐSourceParserEnum(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3472,14 +3480,14 @@ func (ec *executionContext) unmarshalInputScrapeAcgSourceInput(ctx context.Conte
 			it.Title = data
 		case "scraper":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scraper"))
-			data, err := ec.unmarshalNScraperEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScraperEnum(ctx, v)
+			data, err := ec.unmarshalNScraperEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScraperEnum(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Scraper = data
 		case "language":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("language"))
-			data, err := ec.unmarshalNScraperLanguage2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScraperLanguage(ctx, v)
+			data, err := ec.unmarshalNScraperLanguage2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScraperLanguage(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4271,11 +4279,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNConfigResult2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐConfigResult(ctx context.Context, sel ast.SelectionSet, v api.ConfigResult) graphql.Marshaler {
+func (ec *executionContext) marshalNConfigResult2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐConfigResult(ctx context.Context, sel ast.SelectionSet, v api.ConfigResult) graphql.Marshaler {
 	return ec._ConfigResult(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐConfigResult(ctx context.Context, sel ast.SelectionSet, v *api.ConfigResult) graphql.Marshaler {
+func (ec *executionContext) marshalNConfigResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐConfigResult(ctx context.Context, sel ast.SelectionSet, v *api.ConfigResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -4300,16 +4308,16 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNParseAcgSourceInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐParseAcgSourceInput(ctx context.Context, v interface{}) (api.ParseAcgSourceInput, error) {
+func (ec *executionContext) unmarshalNParseAcgSourceInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSourceInput(ctx context.Context, v interface{}) (api.ParseAcgSourceInput, error) {
 	res, err := ec.unmarshalInputParseAcgSourceInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNParseAcgSourceResult2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐParseAcgSourceResult(ctx context.Context, sel ast.SelectionSet, v api.ParseAcgSourceResult) graphql.Marshaler {
+func (ec *executionContext) marshalNParseAcgSourceResult2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSourceResult(ctx context.Context, sel ast.SelectionSet, v api.ParseAcgSourceResult) graphql.Marshaler {
 	return ec._ParseAcgSourceResult(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNParseAcgSourceResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐParseAcgSourceResult(ctx context.Context, sel ast.SelectionSet, v *api.ParseAcgSourceResult) graphql.Marshaler {
+func (ec *executionContext) marshalNParseAcgSourceResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSourceResult(ctx context.Context, sel ast.SelectionSet, v *api.ParseAcgSourceResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -4319,7 +4327,7 @@ func (ec *executionContext) marshalNParseAcgSourceResult2ᚖgithubᚗcomᚋsimon
 	return ec._ParseAcgSourceResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNScrapeAcgResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScrapeAcgResultᚄ(ctx context.Context, sel ast.SelectionSet, v []*api.ScrapeAcgResult) graphql.Marshaler {
+func (ec *executionContext) marshalNScrapeAcgResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgResultᚄ(ctx context.Context, sel ast.SelectionSet, v []*api.ScrapeAcgResult) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4343,7 +4351,7 @@ func (ec *executionContext) marshalNScrapeAcgResult2ᚕᚖgithubᚗcomᚋsimonki
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNScrapeAcgResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScrapeAcgResult(ctx, sel, v[i])
+			ret[i] = ec.marshalNScrapeAcgResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgResult(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4363,7 +4371,7 @@ func (ec *executionContext) marshalNScrapeAcgResult2ᚕᚖgithubᚗcomᚋsimonki
 	return ret
 }
 
-func (ec *executionContext) marshalNScrapeAcgResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScrapeAcgResult(ctx context.Context, sel ast.SelectionSet, v *api.ScrapeAcgResult) graphql.Marshaler {
+func (ec *executionContext) marshalNScrapeAcgResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgResult(ctx context.Context, sel ast.SelectionSet, v *api.ScrapeAcgResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -4373,7 +4381,7 @@ func (ec *executionContext) marshalNScrapeAcgResult2ᚖgithubᚗcomᚋsimonkimi�
 	return ec._ScrapeAcgResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNScrapeAcgSeasonResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScrapeAcgSeasonResultᚄ(ctx context.Context, sel ast.SelectionSet, v []*api.ScrapeAcgSeasonResult) graphql.Marshaler {
+func (ec *executionContext) marshalNScrapeAcgSeasonResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgSeasonResultᚄ(ctx context.Context, sel ast.SelectionSet, v []*api.ScrapeAcgSeasonResult) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4397,7 +4405,7 @@ func (ec *executionContext) marshalNScrapeAcgSeasonResult2ᚕᚖgithubᚗcomᚋs
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNScrapeAcgSeasonResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScrapeAcgSeasonResult(ctx, sel, v[i])
+			ret[i] = ec.marshalNScrapeAcgSeasonResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgSeasonResult(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4417,7 +4425,7 @@ func (ec *executionContext) marshalNScrapeAcgSeasonResult2ᚕᚖgithubᚗcomᚋs
 	return ret
 }
 
-func (ec *executionContext) marshalNScrapeAcgSeasonResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScrapeAcgSeasonResult(ctx context.Context, sel ast.SelectionSet, v *api.ScrapeAcgSeasonResult) graphql.Marshaler {
+func (ec *executionContext) marshalNScrapeAcgSeasonResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgSeasonResult(ctx context.Context, sel ast.SelectionSet, v *api.ScrapeAcgSeasonResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -4427,38 +4435,38 @@ func (ec *executionContext) marshalNScrapeAcgSeasonResult2ᚖgithubᚗcomᚋsimo
 	return ec._ScrapeAcgSeasonResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNScrapeAcgSourceInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScrapeAcgSourceInput(ctx context.Context, v interface{}) (api.ScrapeAcgSourceInput, error) {
+func (ec *executionContext) unmarshalNScrapeAcgSourceInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgSourceInput(ctx context.Context, v interface{}) (api.ScrapeAcgSourceInput, error) {
 	res, err := ec.unmarshalInputScrapeAcgSourceInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNScraperEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScraperEnum(ctx context.Context, v interface{}) (api.ScraperEnum, error) {
+func (ec *executionContext) unmarshalNScraperEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScraperEnum(ctx context.Context, v interface{}) (api.ScraperEnum, error) {
 	var res api.ScraperEnum
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNScraperEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScraperEnum(ctx context.Context, sel ast.SelectionSet, v api.ScraperEnum) graphql.Marshaler {
+func (ec *executionContext) marshalNScraperEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScraperEnum(ctx context.Context, sel ast.SelectionSet, v api.ScraperEnum) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNScraperLanguage2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScraperLanguage(ctx context.Context, v interface{}) (api.ScraperLanguage, error) {
+func (ec *executionContext) unmarshalNScraperLanguage2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScraperLanguage(ctx context.Context, v interface{}) (api.ScraperLanguage, error) {
 	var res api.ScraperLanguage
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNScraperLanguage2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐScraperLanguage(ctx context.Context, sel ast.SelectionSet, v api.ScraperLanguage) graphql.Marshaler {
+func (ec *executionContext) marshalNScraperLanguage2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScraperLanguage(ctx context.Context, sel ast.SelectionSet, v api.ScraperLanguage) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNSourceParserEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐSourceParserEnum(ctx context.Context, v interface{}) (api.SourceParserEnum, error) {
+func (ec *executionContext) unmarshalNSourceParserEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐSourceParserEnum(ctx context.Context, v interface{}) (api.SourceParserEnum, error) {
 	var res api.SourceParserEnum
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNSourceParserEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐSourceParserEnum(ctx context.Context, sel ast.SelectionSet, v api.SourceParserEnum) graphql.Marshaler {
+func (ec *executionContext) marshalNSourceParserEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐSourceParserEnum(ctx context.Context, sel ast.SelectionSet, v api.SourceParserEnum) graphql.Marshaler {
 	return v
 }
 
@@ -4509,12 +4517,12 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 	return ret
 }
 
-func (ec *executionContext) unmarshalNUserConfigInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐUserConfigInput(ctx context.Context, v interface{}) (api.UserConfigInput, error) {
+func (ec *executionContext) unmarshalNUserConfigInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐUserConfigInput(ctx context.Context, v interface{}) (api.UserConfigInput, error) {
 	res, err := ec.unmarshalInputUserConfigInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUserConfigResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋinternalᚋappᚋapiᚐUserConfigResult(ctx context.Context, sel ast.SelectionSet, v *api.UserConfigResult) graphql.Marshaler {
+func (ec *executionContext) marshalNUserConfigResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐUserConfigResult(ctx context.Context, sel ast.SelectionSet, v *api.UserConfigResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
