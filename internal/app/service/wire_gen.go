@@ -4,15 +4,13 @@
 //go:build !wireinject
 // +build !wireinject
 
-package manager
+package service
 
 import (
 	"github.com/go-resty/resty/v2"
 	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/simonkimi/minebangumi/internal/app/repository"
-	"github.com/simonkimi/minebangumi/internal/app/service"
 	"github.com/simonkimi/minebangumi/internal/pkg/database"
-	"github.com/simonkimi/minebangumi/pkg/httpx"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
 )
@@ -20,31 +18,31 @@ import (
 // Injectors from wire.go:
 
 func InitializeManager() (*Manager, error) {
-	configConfig, err := config.NewConfig()
+	service, err := config.NewConfig()
 	if err != nil {
 		return nil, err
 	}
-	httpxConfig := ProvideHttpXConfig(configConfig)
-	httpX := httpx.NewHttpX(httpxConfig)
+	httpxConfig := ProvideHttpXConfig(service)
+	httpX := NewHttpX(httpxConfig)
 	v := ProvideTempClient(httpX)
 	client := mikan.NewClient(v)
-	tmdbConfig := ProvideTmdbConfig(configConfig, httpX)
+	tmdbConfig := ProvideTmdbConfig(service, httpX)
 	tmdbTmdb := tmdb.NewTmdb(tmdbConfig)
 	db, err := database.NewDb()
 	if err != nil {
 		return nil, err
 	}
 	repo := repository.NewRepo(db)
-	scraperService := service.NewScraperService(tmdbTmdb)
-	sourceService := service.NewSourceService(client)
-	manager := newManager(configConfig, httpX, client, tmdbTmdb, repo, scraperService, sourceService)
+	scraperService := newScraperService(tmdbTmdb)
+	sourceService := newSourceService(client)
+	manager := newManager(service, httpX, client, tmdbTmdb, repo, scraperService, sourceService)
 	return manager, nil
 }
 
 // wire.go:
 
-func ProvideHttpXConfig(conf *config.Config) *httpx.Config {
-	return &httpx.Config{
+func ProvideHttpXConfig(conf *config.Service) *HttpxConfig {
+	return &HttpxConfig{
 		ProxyEnabled:  conf.GetBool(config.ProxyEnabled),
 		ProxyScheme:   conf.GetString(config.ProxyScheme),
 		ProxyHost:     conf.GetString(config.ProxyHost),
@@ -54,10 +52,10 @@ func ProvideHttpXConfig(conf *config.Config) *httpx.Config {
 	}
 }
 
-func ProvideTempClient(hx *httpx.HttpX) func() *resty.Client {
+func ProvideTempClient(hx *HttpX) func() *resty.Client {
 	return hx.GetTempClient
 }
 
-func ProvideTmdbConfig(conf *config.Config, hx *httpx.HttpX) *tmdb.Config {
+func ProvideTmdbConfig(conf *config.Service, hx *HttpX) *tmdb.Config {
 	return tmdb.NewConfig(conf.GetString(config.TmdbApiKey), hx.GetTempClient)
 }

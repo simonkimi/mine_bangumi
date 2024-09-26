@@ -27,6 +27,7 @@ require (
 	github.com/vektah/dataloaden v0.3.0
 	github.com/vektah/gqlparser/v2 v2.5.16
 	github.com/vektra/mockery/v2 v2.46.0
+	go.uber.org/mock v0.4.0
 	gorm.io/driver/sqlite v1.5.6
 	gorm.io/gorm v1.25.11
 )

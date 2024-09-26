@@ -27,7 +27,7 @@ func (c *configItem[T]) register(v *viper.Viper) {
 	if c.env != "" {
 		err := v.BindEnv(c.key, c.env)
 		if err != nil {
-			logrus.Errorf("Config init bind env error: %s", err)
+			logrus.Errorf("ConfigService init bind env error: %s", err)
 		}
 	}
 

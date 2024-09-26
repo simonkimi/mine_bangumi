@@ -17,7 +17,7 @@ type SourceService struct {
 	cache *cache.Cache
 }
 
-func NewSourceService(mikan *mikan.Client) *SourceService {
+func newSourceService(mikan *mikan.Client) *SourceService {
 	return &SourceService{mikan: mikan}
 }
 

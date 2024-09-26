@@ -13,7 +13,7 @@ func newSource() *SourceService {
 	client := mikan.NewClient(func() *resty.Client {
 		return resty.New()
 	})
-	return NewSourceService(client)
+	return newSourceService(client)
 }
 
 func TestParseMikanUrl(t *testing.T) {

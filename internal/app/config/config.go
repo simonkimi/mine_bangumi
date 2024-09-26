@@ -9,13 +9,25 @@ import (
 	"sync"
 )
 
-type Config struct {
+//go:generate mockgen -package config -destination config_mock.go . Config
+type Config interface {
+	GetString(key *configItem[string]) string
+	GetInt(key *configItem[int]) int
+	GetBool(key *configItem[bool]) bool
+	GetFloat64(key *configItem[float64]) float64
+	SetString(key *configItem[string], value string)
+	SetInt(key *configItem[int], value int)
+	SetBool(key *configItem[bool], value bool)
+	Save()
+}
+
+type Service struct {
 	viper      *viper.Viper
 	configPath string
 	mu         sync.Locker
 }
 
-func NewConfig() (*Config, error) {
+func NewConfig() (*Service, error) {
 	v := viper.New()
 	path, err := getConfigPath()
 	if err != nil {
@@ -23,7 +35,7 @@ func NewConfig() (*Config, error) {
 	}
 	v.SetConfigFile(path)
 	registerKey(v)
-	config := &Config{
+	config := &Service{
 		viper:      v,
 		configPath: path,
 	}
@@ -44,41 +56,41 @@ func getConfigPath() (string, error) {
 	err := viper.ReadInConfig()
 	var configFileNotFound viper.ConfigFileNotFoundError
 	if errors.As(err, &configFileNotFound) {
-		fmt.Println("Config file not found, use default values")
+		fmt.Println("ConfigService file not found, use default values")
 	}
 
 	return path, nil
 }
 
-func (c *Config) GetString(key *configItem[string]) string {
+func (c *Service) GetString(key *configItem[string]) string {
 	return c.viper.GetString(key.key)
 }
 
-func (c *Config) GetInt(key *configItem[int]) int {
+func (c *Service) GetInt(key *configItem[int]) int {
 	return c.viper.GetInt(key.key)
 }
 
-func (c *Config) GetBool(key *configItem[bool]) bool {
+func (c *Service) GetBool(key *configItem[bool]) bool {
 	return c.viper.GetBool(key.key)
 }
 
-func (c *Config) GetFloat64(key *configItem[float64]) float64 {
+func (c *Service) GetFloat64(key *configItem[float64]) float64 {
 	return c.viper.GetFloat64(key.key)
 }
 
-func (c *Config) SetString(key *configItem[string], value string) {
+func (c *Service) SetString(key *configItem[string], value string) {
 	c.viper.Set(key.key, value)
 }
 
-func (c *Config) SetInt(key *configItem[int], value int) {
+func (c *Service) SetInt(key *configItem[int], value int) {
 	c.viper.Set(key.key, value)
 }
 
-func (c *Config) SetBool(key *configItem[bool], value bool) {
+func (c *Service) SetBool(key *configItem[bool], value bool) {
 	c.viper.Set(key.key, value)
 }
 
-func (c *Config) Save() {
+func (c *Service) Save() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if err := viper.WriteConfigAs(c.configPath); err != nil {

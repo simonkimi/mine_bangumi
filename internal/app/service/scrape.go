@@ -12,7 +12,7 @@ type ScraperService struct {
 	tmdb *tmdb.Tmdb
 }
 
-func NewScraperService(tmdb *tmdb.Tmdb) *ScraperService {
+func newScraperService(tmdb *tmdb.Tmdb) *ScraperService {
 	return &ScraperService{tmdb: tmdb}
 }
 

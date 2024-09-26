@@ -1,11 +1,15 @@
 package handler
 
-import "github.com/go-resty/resty/v2"
+import (
+	"github.com/simonkimi/minebangumi/internal/app/service"
+)
 
 type HttpHandler struct {
-	getTmpClient func() *resty.Client
+	httpx *service.HttpX
 }
 
-func NewHttpHandler(getTmpClient func() *resty.Client) *HttpHandler {
-	return &HttpHandler{getTmpClient}
+func NewHttpHandler(httpx *service.HttpX) *HttpHandler {
+	return &HttpHandler{
+		httpx: httpx,
+	}
 }

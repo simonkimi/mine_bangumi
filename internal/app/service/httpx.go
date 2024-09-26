@@ -1,4 +1,4 @@
-package httpx
+package service
 
 import (
 	"github.com/go-resty/resty/v2"
@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-type Config struct {
+type HttpxConfig struct {
 	ProxyEnabled  bool
 	ProxyScheme   string
 	ProxyHost     string
@@ -17,17 +17,17 @@ type Config struct {
 
 type HttpX struct {
 	clients sync.Map
-	config  *Config
+	config  *HttpxConfig
 }
 
-func NewHttpX(config *Config) *HttpX {
+func NewHttpX(config *HttpxConfig) *HttpX {
 	if config != nil {
 		return &HttpX{
 			config: config,
 		}
 	}
 	return &HttpX{
-		config: &Config{
+		config: &HttpxConfig{
 			ProxyEnabled: false,
 		},
 	}

@@ -19,7 +19,6 @@ import (
 // @Success 200 {file} file "Poster image"
 // @Router /api/v1/proxy/poster [get]
 func (h *HttpHandler) Poster(c *gin.Context) {
-	client := h.getTmpClient()
 	ctx := c.Request.Context()
 
 	var query api.PosterQuery
@@ -28,7 +27,7 @@ func (h *HttpHandler) Poster(c *gin.Context) {
 		return
 	}
 
-	data, err := service.GetPoster(ctx, client, query.TargetType, query.Target)
+	data, err := service.GetPoster(ctx, query.TargetType, query.Target)
 	if err != nil {
 		_ = c.Error(err)
 		return

@@ -1,44 +1,45 @@
-package manager
+package service
 
 import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/simonkimi/minebangumi/internal/app/repository"
-	"github.com/simonkimi/minebangumi/internal/app/service"
-	"github.com/simonkimi/minebangumi/pkg/httpx"
 	"github.com/simonkimi/minebangumi/pkg/logger"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
 )
 
 type Manager struct {
-	Config  *config.Config
-	Mikan   *mikan.Client
-	HttpX   *httpx.HttpX
-	Tmdb    *tmdb.Tmdb
-	Repo    *repository.Repo
-	Scraper *service.ScraperService
-	Source  *service.SourceService
+	Config   *config.Service
+	Mikan    *mikan.Client
+	HttpX    *HttpX
+	Tmdb     *tmdb.Tmdb
+	Repo     *repository.Repo
+	Scraper  *ScraperService
+	Source   *SourceService
+	ApiProxy *ApiProxyService
 }
 
 func newManager(
-	config *config.Config,
-	httpX *httpx.HttpX,
+	config *config.Service,
+	httpX *HttpX,
 	mikan *mikan.Client,
 	tmdb *tmdb.Tmdb,
 	repo *repository.Repo,
-	scraper *service.ScraperService,
-	source *service.SourceService,
+	scraper *ScraperService,
+	source *SourceService,
+	apiProxy *ApiProxyService,
 ) *Manager {
 	return &Manager{
-		Config:  config,
-		HttpX:   httpX,
-		Mikan:   mikan,
-		Tmdb:    tmdb,
-		Repo:    repo,
-		Scraper: scraper,
-		Source:  source,
+		Config:   config,
+		HttpX:    httpX,
+		Mikan:    mikan,
+		Tmdb:     tmdb,
+		Repo:     repo,
+		Scraper:  scraper,
+		Source:   source,
+		ApiProxy: apiProxy,
 	}
 }
 
