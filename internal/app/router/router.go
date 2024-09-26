@@ -5,6 +5,7 @@ import (
 	grhandler "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
+	"github.com/go-resty/resty/v2"
 	_ "github.com/simonkimi/minebangumi/docs"
 	"github.com/simonkimi/minebangumi/internal/app/handler"
 	"github.com/simonkimi/minebangumi/internal/pkg/middleware"
@@ -14,12 +15,31 @@ import (
 	"net/http"
 )
 
-func InitRouter(frontendFs *embed.FS) *gin.Engine {
-	r := gin.New()
-	middleware.Setup(r)
-	frontend(r, frontendFs)
+type Router struct {
+	Engine *gin.Engine
+}
 
-	apiV1Group(r)
+type Config struct {
+	frontendFs   *embed.FS
+	token        func() string
+	getTmpClient func() *resty.Client
+}
+
+func NewConfig(frontendFs *embed.FS, token func() string, getTmpClient func() *resty.Client) *Config {
+	return &Config{
+		frontendFs:   frontendFs,
+		token:        token,
+		getTmpClient: getTmpClient,
+	}
+}
+
+func NewRouter(config *Config) *gin.Engine {
+	r := gin.New()
+	middleware.Apply(r, config.token)
+	frontend(r, config.frontendFs)
+	h := handler.NewHttpHandler(config.getTmpClient)
+	apiV1Group(r, h)
+
 	return r
 }
 
@@ -37,7 +57,7 @@ func frontend(r *gin.Engine, frontendFs *embed.FS) {
 	})
 }
 
-func apiV1Group(r *gin.Engine) {
+func apiV1Group(r *gin.Engine, h *handler.HttpHandler) {
 	apiV1 := r.Group("/api/v1")
 	apiV1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -51,6 +71,6 @@ func apiV1Group(r *gin.Engine) {
 
 	proxyGroup := apiV1.Group("/proxy")
 	{
-		proxyGroup.GET("/poster", handler.Poster)
+		proxyGroup.GET("/poster", h.Poster)
 	}
 }

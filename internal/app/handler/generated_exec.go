@@ -453,6 +453,8 @@ type UserConfigResult {
 `, BuiltIn: false},
 	{Name: "../../../graph/schema/types/errors.graphql", Input: `enum ApiStatusEnum {
     SUCCESS
+    INTERNAL_SERVER_ERROR
+    NOT_FOUND
     UNAUTHORIZED
     CANCEL
     TIMEOUT

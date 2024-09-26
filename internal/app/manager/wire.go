@@ -6,7 +6,9 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/google/wire"
 	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/internal/app/repository"
 	"github.com/simonkimi/minebangumi/internal/app/service"
+	"github.com/simonkimi/minebangumi/internal/pkg/database"
 	"github.com/simonkimi/minebangumi/pkg/httpx"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
@@ -42,6 +44,8 @@ func InitializeManager() (*Manager, error) {
 		tmdb.NewTmdb,
 		service.NewScraperService,
 		service.NewSourceService,
+		database.NewDb,
+		repository.NewRepo,
 		newManager,
 	)
 	return nil, nil

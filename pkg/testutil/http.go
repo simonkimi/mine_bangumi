@@ -1,10 +1,12 @@
-package tests
+package testutil
 
 import (
 	"bytes"
 	"compress/gzip"
+	"github.com/gavv/httpexpect/v2"
 	"io"
 	"net/http/httptest"
+	"testing"
 )
 
 func DecompressResponse(w *httptest.ResponseRecorder) ([]byte, error) {
@@ -23,4 +25,13 @@ func DecompressResponse(w *httptest.ResponseRecorder) ([]byte, error) {
 		return decompressedBody, nil
 	}
 	return w.Body.Bytes(), nil
+}
+
+func NewDebugHttp(t *testing.T, url string) *httpexpect.Expect {
+	return httpexpect.WithConfig(httpexpect.Config{
+		TestName: t.Name(),
+		BaseURL:  url,
+		Printers: []httpexpect.Printer{httpexpect.NewDebugPrinter(t, true)},
+		Reporter: httpexpect.NewAssertReporter(t),
+	})
 }

@@ -1,12 +1,18 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"github.com/simonkimi/minebangumi/pkg/hash"
+	"github.com/spf13/viper"
+)
 
 var UserUsername = newConfigItem("user.username", "MBG_USER_USERNAME", "admin")
 var UserPassword = newConfigItem("user.password", "MBG_USER_PASSWORD", "admin")
+var UserApiToken = newConfigItemFunc("user.api_token", "MBG_USER_API_TOKEN", func() string {
+	return hash.GenerateRandomKey(40)
+})
 
-var ServerIpv4Host = newConfigItem("server.host", "MBG_SERVER_HOST", "0.0.0.0")
-var ServerIpv4Port = newConfigItem("server.port", "MBG_SERVER_PORT", 8080)
+var ServerHost = newConfigItem("server.host", "MBG_SERVER_HOST", "0.0.0.0")
+var ServerPort = newConfigItem("server.port", "MBG_SERVER_PORT", 8080)
 
 var DownloaderClient = newConfigItem("downloader.client", "MBG_DOWNLOADER_CLIENT", "")
 var QBittorrentApi = newConfigItem("downloader.qbittorrent.api", "MBG_QB_API", "")
@@ -28,8 +34,8 @@ var TmdbApiKey = newConfigItem("tmdb.api_key", "MBG_TMDB_KEY", "")
 func registerKey(v *viper.Viper) {
 	UserUsername.register(v)
 	UserPassword.register(v)
-	ServerIpv4Host.register(v)
-	ServerIpv4Port.register(v)
+	ServerHost.register(v)
+	ServerPort.register(v)
 	DownloaderClient.register(v)
 	QBittorrentApi.register(v)
 	QBittorrentUser.register(v)

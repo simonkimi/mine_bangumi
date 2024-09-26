@@ -1,39 +1,41 @@
 package main
 
 import (
+	"context"
 	"embed"
+	"github.com/go-resty/resty/v2"
 	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/internal/app/manager"
 	"github.com/simonkimi/minebangumi/internal/app/router"
 	"github.com/simonkimi/minebangumi/internal/app/service"
-	"github.com/simonkimi/minebangumi/internal/pkg/database"
-	"github.com/simonkimi/minebangumi/pkg/logger"
-	"github.com/sirupsen/logrus"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 //go:embed dist
 var frontendFS embed.FS
 
-func init() {
-	logger.Setup()
-	config.NewConfig()
-	database.Setup()
-}
-
 func main() {
-	server := service.GetServerManager()
-	engine := router.InitRouter(&frontendFS)
+	manager.Setup()
+	mgr := manager.GetInstance()
+	conf := mgr.Config
 
-	server.RegisterGin(engine)
+	engine := router.NewRouter(router.NewConfig(&frontendFS, func() string {
+		return conf.GetString(config.UserApiToken)
+	}, func() *resty.Client {
+		return mgr.HttpX.GetTempClient()
+	}))
 
-	logrus.Warn("Main Starting server...")
-	server.StartServer()
-	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
+	api := service.NewHttpService(service.NewHttpServiceConfig(
+		conf.GetString(config.ServerHost),
+		conf.GetInt(config.ServerPort),
+		engine,
+	))
 
-	logrus.Warn("Main Shutting down server...")
-	server.Shutdown()
+	exit := make(chan int)
+
+	go func() {
+		api.StartHttpService(context.TODO())
+		exit <- 1
+	}()
+
+	<-exit
 }

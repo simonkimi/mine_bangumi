@@ -3,54 +3,41 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/simonkimi/minebangumi/api"
+	"strings"
 )
 
-func JwtAuthMiddleware() gin.HandlerFunc {
+const IsLoginKey = "is_login"
+
+func TokenAuthMiddleware(apiToken func() string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		//if config.appConfig.User.Password == "" {
-		//	c.Set("claims", &api.UserClaims{Username: config.appConfig.User.Username})
-		//	c.Next()
-		//	return
-		//}
-		//
-		//tokenStr := c.GetHeader("Authorization")
-		//if tokenStr == "" {
-		//	c.Next()
-		//	return
-		//}
-		//tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
-		//
-		//claims := &api.UserClaims{}
-		//token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-		//	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-		//		return nil, jwt.ErrSignatureInvalid
-		//	}
-		//	return base64.URLEncoding.DecodeString(config.appConfig.System.SecretKey)
-		//})
-		//if err != nil || !token.Valid {
-		//	c.Next()
-		//	return
-		//}
-		//c.Set("claims", claims)
+		tokenStr := c.GetHeader("Authorization")
+		if tokenStr == "" {
+			c.Next()
+			return
+		}
+		tokenStr = strings.TrimPrefix(tokenStr, "Token ")
+		if apiToken() != tokenStr {
+			c.Next()
+			return
+		}
+
+		c.Set(IsLoginKey, true)
 		c.Next()
 	}
 }
 
 func RequireAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		//if GetClaims(c) == nil {
-		//	_ = c.Error(errno.NewApiError(errno.Unauthorized))
-		//	c.Abort()
-		//	return
-		//}
-		//c.Next()
+		if c.GetBool(IsLoginKey) {
+			c.Next()
+			return
+		}
+		_ = c.Error(api.NewUnAuthError())
+		c.Abort()
+		return
 	}
 }
 
-func GetClaims(c *gin.Context) *api.UserClaims {
-	claims, exist := c.Get("claims")
-	if !exist {
-		return nil
-	}
-	return claims.(*api.UserClaims)
+func IsLogin(c *gin.Context) bool {
+	return c.GetBool(IsLoginKey)
 }

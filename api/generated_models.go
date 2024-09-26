@@ -65,16 +65,20 @@ type UserConfigResult struct {
 type APIStatusEnum string
 
 const (
-	APIStatusEnumSuccess            APIStatusEnum = "SUCCESS"
-	APIStatusEnumUnauthorized       APIStatusEnum = "UNAUTHORIZED"
-	APIStatusEnumCancel             APIStatusEnum = "CANCEL"
-	APIStatusEnumTimeout            APIStatusEnum = "TIMEOUT"
-	APIStatusEnumThirdPartyAPIError APIStatusEnum = "THIRD_PARTY_API_ERROR"
-	APIStatusEnumBadRequest         APIStatusEnum = "BAD_REQUEST"
+	APIStatusEnumSuccess             APIStatusEnum = "SUCCESS"
+	APIStatusEnumInternalServerError APIStatusEnum = "INTERNAL_SERVER_ERROR"
+	APIStatusEnumNotFound            APIStatusEnum = "NOT_FOUND"
+	APIStatusEnumUnauthorized        APIStatusEnum = "UNAUTHORIZED"
+	APIStatusEnumCancel              APIStatusEnum = "CANCEL"
+	APIStatusEnumTimeout             APIStatusEnum = "TIMEOUT"
+	APIStatusEnumThirdPartyAPIError  APIStatusEnum = "THIRD_PARTY_API_ERROR"
+	APIStatusEnumBadRequest          APIStatusEnum = "BAD_REQUEST"
 )
 
 var AllAPIStatusEnum = []APIStatusEnum{
 	APIStatusEnumSuccess,
+	APIStatusEnumInternalServerError,
+	APIStatusEnumNotFound,
 	APIStatusEnumUnauthorized,
 	APIStatusEnumCancel,
 	APIStatusEnumTimeout,
@@ -84,7 +88,7 @@ var AllAPIStatusEnum = []APIStatusEnum{
 
 func (e APIStatusEnum) IsValid() bool {
 	switch e {
-	case APIStatusEnumSuccess, APIStatusEnumUnauthorized, APIStatusEnumCancel, APIStatusEnumTimeout, APIStatusEnumThirdPartyAPIError, APIStatusEnumBadRequest:
+	case APIStatusEnumSuccess, APIStatusEnumInternalServerError, APIStatusEnumNotFound, APIStatusEnumUnauthorized, APIStatusEnumCancel, APIStatusEnumTimeout, APIStatusEnumThirdPartyAPIError, APIStatusEnumBadRequest:
 		return true
 	}
 	return false

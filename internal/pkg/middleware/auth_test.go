@@ -3,32 +3,24 @@ package middleware
 import (
 	"github.com/gavv/httpexpect/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/simonkimi/minebangumi/internal/app/config"
-	"github.com/simonkimi/minebangumi/internal/app/service"
-	"github.com/simonkimi/minebangumi/pkg/tests"
-	"github.com/stretchr/testify/require"
+	"github.com/simonkimi/minebangumi/api"
+	"github.com/simonkimi/minebangumi/pkg/hash"
+	"github.com/simonkimi/minebangumi/pkg/testutil"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-func TestMain(m *testing.M) {
-	cleanUp := tests.MainOnTempDir()
-	defer cleanUp()
-	config.NewConfig()
-	m.Run()
-}
-
 func TestJwtAuthMiddleware_Ok(t *testing.T) {
-	username := "admin"
-	token, err := service.GenerateUserJwt(username)
-	require.Nil(t, err)
-
+	token := hash.GenerateRandomKey(40)
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
-	r.Use(JwtAuthMiddleware())
+	r.Use(TokenAuthMiddleware(func() string {
+		return token
+	}))
 	r.GET("/test", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"claims": GetClaims(c),
+			"is_login": IsLogin(c),
 		})
 	})
 
@@ -37,21 +29,22 @@ func TestJwtAuthMiddleware_Ok(t *testing.T) {
 
 	httpexpect.Default(t, server.URL).
 		GET("/test").
-		WithHeader("Authorization", "Bearer "+token).
+		WithHeader("Authorization", "Token "+token).
 		Expect().
 		Status(200).
 		JSON().Object().
-		Value("claims").Object().
-		HasValue("username", username)
+		HasValue("is_login", true)
 }
 
 func TestJwtAuthMiddleware_NoToken(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
-	r.Use(JwtAuthMiddleware())
+	r.Use(TokenAuthMiddleware(func() string {
+		return "token"
+	}))
 	r.GET("/test", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"claims": GetClaims(c),
+			"is_login": IsLogin(c),
 		})
 	})
 
@@ -63,16 +56,18 @@ func TestJwtAuthMiddleware_NoToken(t *testing.T) {
 		Expect().
 		Status(200).
 		JSON().Object().
-		Value("claims").IsNull()
+		HasValue("is_login", false)
 }
 
 func TestJwtAuthMiddleware_TokenError(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
-	r.Use(JwtAuthMiddleware())
+	r.Use(TokenAuthMiddleware(func() string {
+		return "token"
+	}))
 	r.GET("/test", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"claims": GetClaims(c),
+			"is_login": IsLogin(c),
 		})
 	})
 
@@ -81,62 +76,65 @@ func TestJwtAuthMiddleware_TokenError(t *testing.T) {
 
 	httpexpect.Default(t, server.URL).
 		GET("/test").
-		WithHeader("Authorization", "Bearer invalid-token").
+		WithHeader("Authorization", "Token invalid-token").
 		Expect().
 		Status(200).
 		JSON().Object().
-		Value("claims").IsNull()
+		HasValue("is_login", false)
 }
 
 func TestRequireAuthMiddleware_Ok(t *testing.T) {
-	//gin.SetMode(gin.TestMode)
-	//r := gin.Default()
-	//NewConfig(r)
-	//group := r.Group("/api")
-	//group.Use(RequireAuthMiddleware())
-	//group.GET("/test", func(c *gin.Context) {
-	//	api.OkResponse(c, &gin.H{
-	//		"key": "value",
-	//	})
-	//})
-	//
-	//server := httptest.NewServer(r)
-	//defer server.Close()
-	//
-	//username := "admin"
-	//token, err := service.GenerateUserJwt(username)
-	//require.Nil(t, err)
-	//
-	//httpexpect.Default(t, server.URL).
-	//	GET("/api/test").
-	//	WithHeader("Authorization", "Bearer "+token).
-	//	Expect().
-	//	Status(http.StatusOK).
-	//	JSON().Object().
-	//	HasValue("code", errno.Success).
-	//	Value("data").Object().HasValue("key", "value")
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+
+	token := hash.GenerateRandomKey(40)
+	group := r.Group("/api")
+	group.Use(TokenAuthMiddleware(func() string {
+		return token
+	}))
+	group.Use(RequireAuthMiddleware())
+	group.GET("/test", func(c *gin.Context) {
+		api.OkResponse(c, &gin.H{
+			"key": "value",
+		})
+	})
+
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	httpexpect.Default(t, server.URL).
+		GET("/api/test").
+		WithHeader("Authorization", "Token "+token).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().
+		HasValue("code", api.APIStatusEnumSuccess).
+		Value("data").Object().HasValue("key", "value")
 }
 
 func TestRequireAuthMiddleware_Error(t *testing.T) {
-	//gin.SetMode(gin.TestMode)
-	//r := gin.Default()
-	//NewConfig(r)
-	//group := r.Group("/api")
-	//group.Use(RequireAuthMiddleware())
-	//group.GET("/test", func(c *gin.Context) {
-	//	c.JSON(200, gin.H{
-	//		"data": "ok",
-	//	})
-	//})
-	//
-	//server := httptest.NewServer(r)
-	//defer server.Close()
-	//
-	//httpexpect.Default(t, server.URL).
-	//	GET("/api/test").
-	//	Expect().
-	//	Status(http.StatusOK).
-	//	JSON().Object().
-	//	HasValue("code", errno.Unauthorized).
-	//	HasValue("message", "Unauthorized")
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	group := r.Group("/api")
+	group.Use(TokenAuthMiddleware(func() string {
+		return "Token"
+	}))
+	group.Use(ResponseWrapperMiddleware())
+	group.Use(RequireAuthMiddleware())
+	group.GET("/test", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"data": "ok",
+		})
+	})
+
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	testutil.NewDebugHttp(t, server.URL).
+		GET("/api/test").
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().
+		HasValue("code", api.APIStatusEnumUnauthorized).
+		HasValue("message", "Unauthorized")
 }

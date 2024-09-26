@@ -1,17 +1,16 @@
 package downloader
 
 import (
-	"github.com/simonkimi/minebangumi/pkg/tests"
 	"os"
 	"testing"
 )
 
 func init() {
-	tests.LoadTestEnv()
+	testutil.LoadTestEnv()
 }
 
 func TestQbDownloader(t *testing.T) {
-	tests.WorkOnTempDir(t, true)
+	testutil.WorkOnTempDir(t, true)
 
 	host := os.Getenv("MBG_QBITTORRENT_HOST")
 	username := os.Getenv("MBG_QBITTORRENT_USERNAME")

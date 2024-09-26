@@ -6,9 +6,10 @@ import (
 )
 
 type Response[T any] struct {
-	Code    APIStatusEnum `json:"code"`
-	Data    T             `json:"data"`
-	Message string        `json:"message"`
+	Code      APIStatusEnum  `json:"code"`
+	Data      T              `json:"data"`
+	Message   string         `json:"message"`
+	Extension map[string]any `json:"extension"`
 }
 
 func (r *Response[T]) IsError() bool {

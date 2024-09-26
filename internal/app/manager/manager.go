@@ -2,7 +2,9 @@ package manager
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/internal/app/repository"
 	"github.com/simonkimi/minebangumi/internal/app/service"
 	"github.com/simonkimi/minebangumi/pkg/httpx"
 	"github.com/simonkimi/minebangumi/pkg/logger"
@@ -11,11 +13,11 @@ import (
 )
 
 type Manager struct {
-	Config *config.Config
-	Mikan  *mikan.Client
-	HttpX  *httpx.HttpX
-	Tmdb   *tmdb.Tmdb
-
+	Config  *config.Config
+	Mikan   *mikan.Client
+	HttpX   *httpx.HttpX
+	Tmdb    *tmdb.Tmdb
+	Repo    *repository.Repo
 	Scraper *service.ScraperService
 	Source  *service.SourceService
 }
@@ -25,6 +27,7 @@ func newManager(
 	httpX *httpx.HttpX,
 	mikan *mikan.Client,
 	tmdb *tmdb.Tmdb,
+	repo *repository.Repo,
 	scraper *service.ScraperService,
 	source *service.SourceService,
 ) *Manager {
@@ -33,6 +36,7 @@ func newManager(
 		HttpX:   httpX,
 		Mikan:   mikan,
 		Tmdb:    tmdb,
+		Repo:    repo,
 		Scraper: scraper,
 		Source:  source,
 	}
@@ -54,7 +58,7 @@ func Setup() {
 
 	i, err := InitializeManager()
 	if err != nil {
-		panic(err)
+		panic(errors.Wrap(err, "Manager setup failed"))
 	}
 	instance = i
 	logger.Setup()

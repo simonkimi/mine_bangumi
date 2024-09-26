@@ -9,7 +9,9 @@ package manager
 import (
 	"github.com/go-resty/resty/v2"
 	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/internal/app/repository"
 	"github.com/simonkimi/minebangumi/internal/app/service"
+	"github.com/simonkimi/minebangumi/internal/pkg/database"
 	"github.com/simonkimi/minebangumi/pkg/httpx"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
@@ -28,9 +30,14 @@ func InitializeManager() (*Manager, error) {
 	client := mikan.NewClient(v)
 	tmdbConfig := ProvideTmdbConfig(configConfig, httpX)
 	tmdbTmdb := tmdb.NewTmdb(tmdbConfig)
+	db, err := database.NewDb()
+	if err != nil {
+		return nil, err
+	}
+	repo := repository.NewRepo(db)
 	scraperService := service.NewScraperService(tmdbTmdb)
 	sourceService := service.NewSourceService(client)
-	manager := newManager(configConfig, httpX, client, tmdbTmdb, scraperService, sourceService)
+	manager := newManager(configConfig, httpX, client, tmdbTmdb, repo, scraperService, sourceService)
 	return manager, nil
 }
 

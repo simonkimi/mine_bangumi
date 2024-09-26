@@ -5,19 +5,19 @@ import (
 	"fmt"
 )
 
-type GqlError struct {
+type Error struct {
 	Message       string
 	Code          APIStatusEnum
 	internalError error
 	Extensions    map[string]any
 }
 
-func (g *GqlError) Error() string {
+func (g *Error) Error() string {
 	return g.Message
 }
 
 func NewCancelError() error {
-	return &GqlError{
+	return &Error{
 		Message:       "Request canceled",
 		Code:          APIStatusEnumCancel,
 		internalError: context.Canceled,
@@ -25,7 +25,7 @@ func NewCancelError() error {
 }
 
 func NewCancelErrorf(format string, args ...any) error {
-	return &GqlError{
+	return &Error{
 		Message:       fmt.Sprintf(format, args...),
 		Code:          APIStatusEnumCancel,
 		internalError: context.Canceled,
@@ -33,7 +33,7 @@ func NewCancelErrorf(format string, args ...any) error {
 }
 
 func NewTimeoutErrorf(format string, args ...any) error {
-	return &GqlError{
+	return &Error{
 		Message:       fmt.Sprintf(format, args...),
 		Code:          APIStatusEnumTimeout,
 		internalError: context.DeadlineExceeded,
@@ -41,7 +41,7 @@ func NewTimeoutErrorf(format string, args ...any) error {
 }
 
 func NewThirdPartyErrorf(err error, url string, format string, args ...any) error {
-	return &GqlError{
+	return &Error{
 		Message:       fmt.Sprintf(format, args...),
 		Code:          APIStatusEnumThirdPartyAPIError,
 		internalError: err,
@@ -52,8 +52,16 @@ func NewThirdPartyErrorf(err error, url string, format string, args ...any) erro
 }
 
 func NewBadRequestErrorf(format string, args ...any) error {
-	return &GqlError{
+	return &Error{
 		Message: fmt.Sprintf(format, args...),
 		Code:    APIStatusEnumBadRequest,
+	}
+}
+
+func NewUnAuthError() error {
+	return &Error{
+		Message:    "Unauthorized",
+		Code:       APIStatusEnumUnauthorized,
+		Extensions: nil,
 	}
 }
