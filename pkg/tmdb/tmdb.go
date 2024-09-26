@@ -10,13 +10,21 @@ import (
 	"strconv"
 )
 
-type Tmdb struct {
+type Config struct {
 	apiKey string
 	client func() *resty.Client
 }
 
-func NewTmdb(apiKey string, client func() *resty.Client) *Tmdb {
-	return &Tmdb{apiKey: apiKey, client: client}
+func NewConfig(apiKey string, client func() *resty.Client) *Config {
+	return &Config{apiKey: apiKey, client: client}
+}
+
+type Tmdb struct {
+	config *Config
+}
+
+func NewTmdb(config *Config) *Tmdb {
+	return &Tmdb{config: config}
 }
 
 func (t *Tmdb) GetTmdbLanguage(language api.ScraperLanguage) (string, error) {
@@ -34,10 +42,10 @@ func (t *Tmdb) GetTmdbLanguage(language api.ScraperLanguage) (string, error) {
 }
 
 func (t *Tmdb) getApiKey() string {
-	if xstring.IsEmptyOrWhitespace(t.apiKey) {
+	if xstring.IsEmptyOrWhitespace(t.config.apiKey) {
 		return api.TmdbDefaultApikey
 	}
-	return t.apiKey
+	return t.config.apiKey
 }
 
 func (t *Tmdb) Search(ctx context.Context, title string) ([]*SearchResultItem, error) {
@@ -45,7 +53,7 @@ func (t *Tmdb) Search(ctx context.Context, title string) ([]*SearchResultItem, e
 	results := make([]*SearchResultItem, 0)
 	for {
 		var result rawSearchResult
-		req, err := t.client().R().
+		req, err := t.config.client().R().
 			SetContext(ctx).
 			SetQueryParams(map[string]string{
 				"api_key":       t.getApiKey(),
@@ -77,7 +85,7 @@ func (t *Tmdb) Search(ctx context.Context, title string) ([]*SearchResultItem, e
 
 func (t *Tmdb) QueryForDetail(ctx context.Context, id int, language string) (*DetailData, error) {
 	var detail DetailData
-	req, err := t.client().R().
+	req, err := t.config.client().R().
 		SetContext(ctx).
 		SetQueryParams(map[string]string{
 			"api_key":  t.getApiKey(),

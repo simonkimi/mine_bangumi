@@ -15,7 +15,7 @@ type Config struct {
 	mu         sync.Locker
 }
 
-func Setup() (*Config, error) {
+func NewConfig() (*Config, error) {
 	v := viper.New()
 	path, err := getConfigPath()
 	if err != nil {

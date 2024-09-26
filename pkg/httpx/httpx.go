@@ -6,36 +6,41 @@ import (
 	"sync"
 )
 
-type HttpX struct {
-	clients       sync.Map
-	proxyEnabled  bool
-	proxyScheme   string
-	proxyHost     string
-	proxyPort     string
-	proxyUsername string
-	proxyPassword string
+type Config struct {
+	ProxyEnabled  bool
+	ProxyScheme   string
+	ProxyHost     string
+	ProxyPort     string
+	ProxyUsername string
+	ProxyPassword string
 }
 
-func NewHttpX(proxyEnabled bool, proxyScheme, proxyHost, proxyPort, proxyUsername, proxyPassword string) *HttpX {
+type HttpX struct {
+	clients sync.Map
+	config  *Config
+}
+
+func NewHttpX(config *Config) *HttpX {
+	if config != nil {
+		return &HttpX{
+			config: config,
+		}
+	}
 	return &HttpX{
-		proxyEnabled:  proxyEnabled,
-		proxyScheme:   proxyScheme,
-		proxyHost:     proxyHost,
-		proxyPort:     proxyPort,
-		proxyUsername: proxyUsername,
-		proxyPassword: proxyPassword,
+		config: &Config{
+			ProxyEnabled: false,
+		},
 	}
 }
 
 func (h *HttpX) setClientProxy(client *resty.Client) {
-	if h.proxyEnabled {
+	if h.config.ProxyEnabled {
 		client.SetProxy(xnet.GetProxyUrl(
-			h.proxyScheme,
-			h.proxyHost,
-			h.proxyPort,
-			true,
-			h.proxyUsername,
-			h.proxyPassword,
+			h.config.ProxyScheme,
+			h.config.ProxyHost,
+			h.config.ProxyPort,
+			h.config.ProxyUsername,
+			h.config.ProxyPassword,
 		))
 	}
 }
@@ -43,7 +48,7 @@ func (h *HttpX) setClientProxy(client *resty.Client) {
 func (h *HttpX) newHttpClient(baseUrl string) *resty.Client {
 	client := resty.New()
 	client.BaseURL = baseUrl
-	if h.proxyEnabled {
+	if h.config.ProxyEnabled {
 		h.setClientProxy(client)
 	}
 	return client

@@ -15,7 +15,7 @@ func init() {
 
 func TestParseMikanUrl(t *testing.T) {
 	tests.WorkOnTempDir(t, true)
-	config.Setup()
+	config.NewConfig()
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "testdata/atri_bangumi.xml")
 	}))

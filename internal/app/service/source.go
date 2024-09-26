@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"github.com/simonkimi/minebangumi/api"
-	"github.com/simonkimi/minebangumi/internal/app/manager"
 	"github.com/simonkimi/minebangumi/internal/pkg/cache"
 	"github.com/simonkimi/minebangumi/pkg/bangumi"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
@@ -60,11 +59,10 @@ func (c *SourceService) ParseSource(ctx context.Context, targetUrl string, parse
 }
 
 func (c *SourceService) mikanParse(ctx context.Context, targetUrl string, rawData *parserRawData) error {
-	mgr := manager.GetInstance()
 	var mikanData *mikan.Bangumi
 	data, exist := c.cache.Get(ParserMikan, targetUrl)
 	if !exist {
-		newMikanData, err := mgr.Mikan.ParseBangumiByUrl(ctx, targetUrl)
+		newMikanData, err := c.mikan.ParseBangumiByUrl(ctx, targetUrl)
 		if err != nil {
 			return err
 		}

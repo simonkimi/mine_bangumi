@@ -18,7 +18,7 @@ var frontendFS embed.FS
 
 func init() {
 	logger.Setup()
-	config.Setup()
+	config.NewConfig()
 	database.Setup()
 }
 

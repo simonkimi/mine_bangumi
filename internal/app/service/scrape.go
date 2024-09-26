@@ -2,9 +2,8 @@ package service
 
 import (
 	"context"
-	"github.com/simonkimi/minebangumi/pkg/tmdb"
-
 	"github.com/simonkimi/minebangumi/api"
+	"github.com/simonkimi/minebangumi/pkg/tmdb"
 )
 
 const ScrapeTmDb = "tmdb"

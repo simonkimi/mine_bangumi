@@ -8,7 +8,6 @@ import (
 	"github.com/simonkimi/minebangumi/pkg/logger"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
-	"github.com/sirupsen/logrus"
 )
 
 type Manager struct {
@@ -19,6 +18,24 @@ type Manager struct {
 
 	Scraper *service.ScraperService
 	Source  *service.SourceService
+}
+
+func newManager(
+	config *config.Config,
+	httpX *httpx.HttpX,
+	mikan *mikan.Client,
+	tmdb *tmdb.Tmdb,
+	scraper *service.ScraperService,
+	source *service.SourceService,
+) *Manager {
+	return &Manager{
+		Config:  config,
+		HttpX:   httpX,
+		Mikan:   mikan,
+		Tmdb:    tmdb,
+		Scraper: scraper,
+		Source:  source,
+	}
 }
 
 var instance *Manager
@@ -34,18 +51,11 @@ func Setup() {
 	if instance != nil {
 		panic(fmt.Errorf("manager is already setup"))
 	}
-	conf, err := config.Setup()
+
+	i, err := InitializeManager()
 	if err != nil {
 		panic(err)
 	}
+	instance = i
 	logger.Setup()
-
-	instance = &Manager{}
-	instance.Config = conf
-	instance.HttpX = httpx.NewHttpX(conf.GetBool(config.ProxyEnabled), conf.GetString(config.ProxyScheme), conf.GetString(config.ProxyHost), conf.GetString(config.ProxyPort), conf.GetString(config.ProxyUsername), conf.GetString(config.ProxyPassword))
-	instance.Mikan = mikan.NewClient(instance.HttpX.GetTempClient)
-	instance.Tmdb = tmdb.NewTmdb(conf.GetString(config.TmdbApiKey), instance.HttpX.GetTempClient)
-	instance.Scraper = service.NewScraperService(instance.Tmdb)
-	instance.Source = service.NewSourceService(instance.Mikan)
-	logrus.Debugf("Manager setup complete")
 }
