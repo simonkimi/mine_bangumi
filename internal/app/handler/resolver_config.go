@@ -4,31 +4,29 @@ import (
 	"context"
 	"github.com/simonkimi/minebangumi/api"
 	"github.com/simonkimi/minebangumi/internal/app/config"
-	"github.com/simonkimi/minebangumi/internal/app/manager"
 )
 
 // ConfigUser is the resolver for the configUser field.
 func (r *mutationResolver) ConfigUser(_ context.Context, input api.UserConfigInput) (*api.ConfigResult, error) {
-	mgr := manager.GetInstance()
+	conf := r.mgr.GetConfig()
 	if input.Username != nil {
-		mgr.Config.SetString(config.UserUsername, *input.Username)
+		conf.SetString(config.UserUsername, *input.Username)
 	}
 	if input.Password != nil {
-		mgr.Config.SetString(config.UserPassword, *input.Password)
+		conf.SetString(config.UserPassword, *input.Password)
 	}
-	mgr.Config.Save()
-	return getConfigResult(), nil
+	conf.Save()
+	return getConfigResult(conf), nil
 }
 
-func getUserConfig() *api.UserConfigResult {
-	mgr := manager.GetInstance()
+func getUserConfig(conf config.Config) *api.UserConfigResult {
 	return &api.UserConfigResult{
-		Username: mgr.Config.GetString(config.UserUsername),
+		Username: conf.GetString(config.UserUsername),
 	}
 }
 
-func getConfigResult() *api.ConfigResult {
+func getConfigResult(conf config.Config) *api.ConfigResult {
 	return &api.ConfigResult{
-		User: getUserConfig(),
+		User: getUserConfig(conf),
 	}
 }

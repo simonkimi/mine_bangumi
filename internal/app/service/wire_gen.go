@@ -17,16 +17,16 @@ import (
 
 // Injectors from wire.go:
 
-func InitializeManager() (*Manager, error) {
-	service, err := config.NewConfig()
+func InitializeManager() (Manager, error) {
+	configConfig, err := config.NewConfig()
 	if err != nil {
 		return nil, err
 	}
-	httpxConfig := ProvideHttpXConfig(service)
+	httpxConfig := provideHttpXConfig(configConfig)
 	httpX := NewHttpX(httpxConfig)
-	v := ProvideTempClient(httpX)
+	v := provideTempClient(httpX)
 	client := mikan.NewClient(v)
-	tmdbConfig := ProvideTmdbConfig(service, httpX)
+	tmdbConfig := provideTmdbConfig(configConfig, httpX)
 	tmdbTmdb := tmdb.NewTmdb(tmdbConfig)
 	db, err := database.NewDb()
 	if err != nil {
@@ -35,13 +35,16 @@ func InitializeManager() (*Manager, error) {
 	repo := repository.NewRepo(db)
 	scraperService := newScraperService(tmdbTmdb)
 	sourceService := newSourceService(client)
-	manager := newManager(service, httpX, client, tmdbTmdb, repo, scraperService, sourceService)
+	apiProxyService := newApiProxyService(httpX)
+	httpServiceConfig := provideHttpServiceConfig(configConfig)
+	httpService := newHttpService(httpServiceConfig)
+	manager := newManager(configConfig, httpX, client, tmdbTmdb, repo, scraperService, sourceService, apiProxyService, httpService)
 	return manager, nil
 }
 
 // wire.go:
 
-func ProvideHttpXConfig(conf *config.Service) *HttpxConfig {
+func provideHttpXConfig(conf config.Config) *HttpxConfig {
 	return &HttpxConfig{
 		ProxyEnabled:  conf.GetBool(config.ProxyEnabled),
 		ProxyScheme:   conf.GetString(config.ProxyScheme),
@@ -52,10 +55,17 @@ func ProvideHttpXConfig(conf *config.Service) *HttpxConfig {
 	}
 }
 
-func ProvideTempClient(hx *HttpX) func() *resty.Client {
+func provideTempClient(hx *HttpX) func() *resty.Client {
 	return hx.GetTempClient
 }
 
-func ProvideTmdbConfig(conf *config.Service, hx *HttpX) *tmdb.Config {
+func provideTmdbConfig(conf config.Config, hx *HttpX) *tmdb.Config {
 	return tmdb.NewConfig(conf.GetString(config.TmdbApiKey), hx.GetTempClient)
+}
+
+func provideHttpServiceConfig(conf config.Config) *HttpServiceConfig {
+	return &HttpServiceConfig{
+		Host: conf.GetString(config.ServerHost),
+		Port: conf.GetInt(config.ServerPort),
+	}
 }

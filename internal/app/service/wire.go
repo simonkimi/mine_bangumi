@@ -12,7 +12,7 @@ import (
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
 )
 
-func provideHttpXConfig(conf *config.Service) *HttpxConfig {
+func provideHttpXConfig(conf config.Config) *HttpxConfig {
 	return &HttpxConfig{
 		ProxyEnabled:  conf.GetBool(config.ProxyEnabled),
 		ProxyScheme:   conf.GetString(config.ProxyScheme),
@@ -27,11 +27,18 @@ func provideTempClient(hx *HttpX) func() *resty.Client {
 	return hx.GetTempClient
 }
 
-func provideTmdbConfig(conf *config.Service, hx *HttpX) *tmdb.Config {
+func provideTmdbConfig(conf config.Config, hx *HttpX) *tmdb.Config {
 	return tmdb.NewConfig(conf.GetString(config.TmdbApiKey), hx.GetTempClient)
 }
 
-func InitializeManager() (*Manager, error) {
+func provideHttpServiceConfig(conf config.Config) *HttpServiceConfig {
+	return &HttpServiceConfig{
+		Host: conf.GetString(config.ServerHost),
+		Port: conf.GetInt(config.ServerPort),
+	}
+}
+
+func InitializeManager() (Manager, error) {
 	wire.Build(
 		config.NewConfig,
 		provideHttpXConfig,
@@ -45,6 +52,8 @@ func InitializeManager() (*Manager, error) {
 		database.NewDb,
 		repository.NewRepo,
 		newApiProxyService,
+		provideHttpServiceConfig,
+		newHttpService,
 		newManager,
 	)
 	return nil, nil

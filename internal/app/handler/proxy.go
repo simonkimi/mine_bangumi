@@ -3,12 +3,11 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/simonkimi/minebangumi/api"
-	"github.com/simonkimi/minebangumi/internal/app/service"
 	"net/http"
 	"path/filepath"
 )
 
-// Poster godoc
+// poster godoc
 // @Summary Get poster image
 // @Description Retrieve a poster image based on the target type and target
 // @Tags proxy
@@ -16,9 +15,9 @@ import (
 // @Produce image/jpeg, image/png, image/gif, image/webp, image/bmp, image/svg+xml, image/jp2
 // @Param target_type query string true "Target type"
 // @Param target query string true "Target"
-// @Success 200 {file} file "Poster image"
+// @Success 200 {file} file "poster image"
 // @Router /api/v1/proxy/poster [get]
-func (h *HttpHandler) Poster(c *gin.Context) {
+func (w *WebApi) poster(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	var query api.PosterQuery
@@ -26,8 +25,7 @@ func (h *HttpHandler) Poster(c *gin.Context) {
 		_ = c.Error(api.NewBadRequestErrorf("invalid query: %s", err))
 		return
 	}
-
-	data, err := service.GetPoster(ctx, query.TargetType, query.Target)
+	data, err := w.mgr.GetApiProxy().GetPoster(ctx, query.TargetType, query.Target)
 	if err != nil {
 		_ = c.Error(err)
 		return

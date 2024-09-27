@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-//go:generate mockgen -package config -destination config_mock.go . Config
+//go:generate mockery --name Config
 type Config interface {
 	GetString(key *configItem[string]) string
 	GetInt(key *configItem[int]) int
@@ -27,7 +27,7 @@ type Service struct {
 	mu         sync.Locker
 }
 
-func NewConfig() (*Service, error) {
+func NewConfig() (Config, error) {
 	v := viper.New()
 	path, err := getConfigPath()
 	if err != nil {

@@ -150,7 +150,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Poster image",
+                        "description": "poster image",
                         "schema": {
                             "type": "file"
                         }

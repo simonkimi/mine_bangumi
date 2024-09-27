@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"github.com/pkg/errors"
 	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/simonkimi/minebangumi/internal/app/repository"
@@ -10,19 +9,33 @@ import (
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
 )
 
-type Manager struct {
-	Config   *config.Service
-	Mikan    *mikan.Client
-	HttpX    *HttpX
-	Tmdb     *tmdb.Tmdb
-	Repo     *repository.Repo
-	Scraper  *ScraperService
-	Source   *SourceService
-	ApiProxy *ApiProxyService
+//go:generate mockery --name=Manager
+type Manager interface {
+	GetConfig() config.Config
+	GetMikan() *mikan.Client
+	GetHttpX() *HttpX
+	GetTmdb() *tmdb.Tmdb
+	GetRepo() *repository.Repo
+	GetScraper() *ScraperService
+	GetSource() *SourceService
+	GetApiProxy() *ApiProxyService
+	GetHttpService() *HttpService
+}
+
+type ManagerImpl struct {
+	config      config.Config
+	mikan       *mikan.Client
+	httpX       *HttpX
+	tmdb        *tmdb.Tmdb
+	repo        *repository.Repo
+	scraper     *ScraperService
+	source      *SourceService
+	apiProxy    *ApiProxyService
+	httpService *HttpService
 }
 
 func newManager(
-	config *config.Service,
+	config config.Config,
 	httpX *HttpX,
 	mikan *mikan.Client,
 	tmdb *tmdb.Tmdb,
@@ -30,37 +43,62 @@ func newManager(
 	scraper *ScraperService,
 	source *SourceService,
 	apiProxy *ApiProxyService,
-) *Manager {
-	return &Manager{
-		Config:   config,
-		HttpX:    httpX,
-		Mikan:    mikan,
-		Tmdb:     tmdb,
-		Repo:     repo,
-		Scraper:  scraper,
-		Source:   source,
-		ApiProxy: apiProxy,
+	httpService *HttpService,
+) Manager {
+	return &ManagerImpl{
+		config:      config,
+		httpX:       httpX,
+		mikan:       mikan,
+		tmdb:        tmdb,
+		repo:        repo,
+		scraper:     scraper,
+		source:      source,
+		apiProxy:    apiProxy,
+		httpService: httpService,
 	}
 }
 
-var instance *Manager
-
-func GetInstance() *Manager {
-	if instance == nil {
-		panic(fmt.Errorf("manager is not setup"))
-	}
-	return instance
-}
-
-func Setup() {
-	if instance != nil {
-		panic(fmt.Errorf("manager is already setup"))
-	}
-
-	i, err := InitializeManager()
+func Initialize() Manager {
+	instance, err := InitializeManager()
 	if err != nil {
 		panic(errors.Wrap(err, "Manager setup failed"))
 	}
-	instance = i
 	logger.Setup()
+	return instance
+}
+
+func (m *ManagerImpl) GetConfig() config.Config {
+	return m.config
+}
+
+func (m *ManagerImpl) GetMikan() *mikan.Client {
+	return m.mikan
+}
+
+func (m *ManagerImpl) GetHttpX() *HttpX {
+	return m.httpX
+}
+
+func (m *ManagerImpl) GetTmdb() *tmdb.Tmdb {
+	return m.tmdb
+}
+
+func (m *ManagerImpl) GetRepo() *repository.Repo {
+	return m.repo
+}
+
+func (m *ManagerImpl) GetScraper() *ScraperService {
+	return m.scraper
+}
+
+func (m *ManagerImpl) GetSource() *SourceService {
+	return m.source
+}
+
+func (m *ManagerImpl) GetApiProxy() *ApiProxyService {
+	return m.apiProxy
+}
+
+func (m *ManagerImpl) GetHttpService() *HttpService {
+	return m.httpService
 }

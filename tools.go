@@ -8,5 +8,4 @@ import (
 	_ "github.com/99designs/gqlgen/graphql/introspection"
 	_ "github.com/vektah/dataloaden"
 	_ "github.com/vektra/mockery/v2"
-	_ "go.uber.org/mock/mockgen"
 )
