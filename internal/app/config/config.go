@@ -9,15 +9,14 @@ import (
 	"sync"
 )
 
-//go:generate mockery --name Config
 type Config interface {
-	GetString(key *configItem[string]) string
-	GetInt(key *configItem[int]) int
-	GetBool(key *configItem[bool]) bool
-	GetFloat64(key *configItem[float64]) float64
-	SetString(key *configItem[string], value string)
-	SetInt(key *configItem[int], value int)
-	SetBool(key *configItem[bool], value bool)
+	GetString(key *Item[string]) string
+	GetInt(key *Item[int]) int
+	GetBool(key *Item[bool]) bool
+	GetFloat64(key *Item[float64]) float64
+	SetString(key *Item[string], value string)
+	SetInt(key *Item[int], value int)
+	SetBool(key *Item[bool], value bool)
 	Save()
 }
 
@@ -62,31 +61,31 @@ func getConfigPath() (string, error) {
 	return path, nil
 }
 
-func (c *Service) GetString(key *configItem[string]) string {
+func (c *Service) GetString(key *Item[string]) string {
 	return c.viper.GetString(key.key)
 }
 
-func (c *Service) GetInt(key *configItem[int]) int {
+func (c *Service) GetInt(key *Item[int]) int {
 	return c.viper.GetInt(key.key)
 }
 
-func (c *Service) GetBool(key *configItem[bool]) bool {
+func (c *Service) GetBool(key *Item[bool]) bool {
 	return c.viper.GetBool(key.key)
 }
 
-func (c *Service) GetFloat64(key *configItem[float64]) float64 {
+func (c *Service) GetFloat64(key *Item[float64]) float64 {
 	return c.viper.GetFloat64(key.key)
 }
 
-func (c *Service) SetString(key *configItem[string], value string) {
+func (c *Service) SetString(key *Item[string], value string) {
 	c.viper.Set(key.key, value)
 }
 
-func (c *Service) SetInt(key *configItem[int], value int) {
+func (c *Service) SetInt(key *Item[int], value int) {
 	c.viper.Set(key.key, value)
 }
 
-func (c *Service) SetBool(key *configItem[bool], value bool) {
+func (c *Service) SetBool(key *Item[bool], value bool) {
 	c.viper.Set(key.key, value)
 }
 

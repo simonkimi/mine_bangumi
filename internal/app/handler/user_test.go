@@ -1,85 +1,89 @@
 package handler
 
-//import (
-//	"github.com/gavv/httpexpect/v2"
-//	"github.com/gin-gonic/gin"
-//	"github.com/simonkimi/minebangumi/api"
-//	"github.com/simonkimi/minebangumi/internal/app/config"
-//	"github.com/simonkimi/minebangumi/internal/pkg/middleware"
-//	"github.com/simonkimi/minebangumi/pkg/errno"
-//	"github.com/simonkimi/minebangumi/pkg/tests"
-//	"net/http"
-//	"net/http/httptest"
-//	"testing"
-//)
-//
-//func initGin() *gin.Engine {
-//	gin.SetMode(gin.TestMode)
-//	r := gin.New()
-//	middleware.Setup(r)
-//	return r
-//}
-//
-//func TestMain(m *testing.M) {
-//	clean := tests.MainOnTempDir()
-//	config.Setup()
-//	defer clean()
-//	m.Run()
-//}
-//
-//func TestLogin_Success(t *testing.T) {
-//	r := initGin()
-//	r.POST("/login", Login)
-//	server := httptest.NewServer(r)
-//	defer server.Close()
-//
-//	e := httpexpect.Default(t, server.URL)
-//	e.POST("/login").
-//		WithJSON(&api.LoginForm{
-//			Username: config.appConfig.User.Username,
-//			Password: config.appConfig.User.Password,
-//		}).
-//		Expect().
-//		Status(http.StatusOK).
-//		JSON().Object().
-//		ContainsKey("code").HasValue("code", errno.Success).
-//		Value("data").Object().
-//		Value("token").String().NotEmpty()
-//}
-//
-//func TestLogin_InvalidCredentials(t *testing.T) {
-//	r := initGin()
-//	r.POST("/login", Login)
-//
-//	server := httptest.NewServer(r)
-//	defer server.Close()
-//
-//	e := httpexpect.Default(t, server.URL)
-//	e.POST("/login").
-//		WithJSON(&api.LoginForm{
-//			Username: config.appConfig.User.Username + "invalid",
-//			Password: config.appConfig.User.Password + "invalid",
-//		}).
-//		Expect().
-//		Status(http.StatusOK).
-//		JSON().Object().
-//		ContainsKey("code").HasValue("code", errno.ErrorUserPasswordWrong).
-//		Value("message").String().NotEmpty()
-//}
-//
-//func TestLogin_InvalidJson(t *testing.T) {
-//	r := initGin()
-//	r.POST("/login", Login)
-//
-//	server := httptest.NewServer(r)
-//	defer server.Close()
-//
-//	e := httpexpect.Default(t, server.URL)
-//	e.POST("/login").
-//		WithText("data").
-//		Expect().
-//		Status(http.StatusOK).
-//		JSON().Object().
-//		ContainsKey("code").HasValue("code", errno.BadRequest).
-//		Value("message").String().NotEmpty()
-//}
+import (
+	"github.com/gavv/httpexpect/v2"
+	"github.com/gin-gonic/gin"
+	"github.com/simonkimi/minebangumi/api"
+	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/internal/app/service"
+	"github.com/simonkimi/minebangumi/pkg/hash"
+	"github.com/simonkimi/minebangumi/pkg/testutil"
+	"github.com/simonkimi/minebangumi/tools/xstring"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+)
+
+var testApiKey = hash.GenerateRandomKey(40)
+var testUsername = xstring.RandomString(5)
+var testPassword = xstring.RandomString(40)
+
+func initApi() (*gin.Engine, *WebApi) {
+	gin.SetMode(gin.TestMode)
+	mgr := new(service.MockManager)
+	webapi := NewWebApi(NewWebApiConfig(nil, mgr))
+	conf := config.NewMockConfig()
+	mgr.EXPECT().GetConfig().Return(conf)
+
+	conf.SetString(config.UserUsername, testUsername)
+	conf.SetString(config.UserPassword, testPassword)
+	conf.SetString(config.UserApiToken, testApiKey)
+	return webapi.Engine, webapi
+}
+
+func TestLogin_Success(t *testing.T) {
+	r, web := initApi()
+	r.POST("/login", web.login)
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	e := testutil.NewDebugHttp(t, server.URL)
+	e.POST("/login").
+		WithJSON(&api.LoginForm{
+			Username: testUsername,
+			Password: testPassword,
+		}).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().
+		ContainsKey("code").HasValue("code", api.APIStatusEnumSuccess).
+		Value("data").Object().
+		Value("token").String().NotEmpty()
+}
+
+func TestLogin_InvalidCredentials(t *testing.T) {
+	r, web := initApi()
+	r.POST("/login", web.login)
+
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	e := httpexpect.Default(t, server.URL)
+	e.POST("/login").
+		WithJSON(&api.LoginForm{
+			Username: testUsername + "invalid",
+			Password: testPassword + "invalid",
+		}).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().
+		ContainsKey("code").HasValue("code", api.APIStatusEnumUnauthorized).
+		Value("message").String().NotEmpty()
+}
+
+func TestLogin_InvalidJson(t *testing.T) {
+	r, web := initApi()
+	r.POST("/login", web.login)
+
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	e := httpexpect.Default(t, server.URL)
+	e.POST("/login").
+		WithText("data").
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().
+		ContainsKey("code").HasValue("code", api.APIStatusEnumBadRequest).
+		Value("message").String().NotEmpty()
+}

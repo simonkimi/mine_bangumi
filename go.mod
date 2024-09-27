@@ -10,7 +10,6 @@ require (
 	github.com/gin-contrib/gzip v1.0.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-resty/resty/v2 v2.15.0
-	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/wire v0.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/mmcdole/gofeed v1.3.0

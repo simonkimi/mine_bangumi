@@ -46,6 +46,9 @@ func NewWebApi(conf *WebApiConfig) *WebApi {
 }
 
 func (w *WebApi) frontend() {
+	if w.frontendFs == nil {
+		return
+	}
 	r := w.Engine
 	r.StaticFileFS("/favicon.ico", "/dist/favicon.ico", http.FS(w.frontendFs))
 	assetsFs, _ := fs.Sub(w.frontendFs, "dist/assets")

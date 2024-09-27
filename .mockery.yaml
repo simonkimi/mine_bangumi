@@ -1,3 +1,2 @@
 with-expecter: true
 inpackage: True
-testonly: True

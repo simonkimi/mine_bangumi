@@ -84,6 +84,7 @@ type ComplexityRoot struct {
 	}
 
 	UserConfigResult struct {
+		Token    func(childComplexity int) int
 		Username func(childComplexity int) int
 	}
 }
@@ -262,6 +263,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ScrapeAcgSeasonResult.Title(childComplexity), true
+
+	case "UserConfigResult.token":
+		if e.complexity.UserConfigResult.Token == nil {
+			break
+		}
+
+		return e.complexity.UserConfigResult.Token(childComplexity), true
 
 	case "UserConfigResult.username":
 		if e.complexity.UserConfigResult.Username == nil {
@@ -442,13 +450,13 @@ type ScrapeAcgResult {
     password: String
 }
 
-
 type ConfigResult {
     user: UserConfigResult!
 }
 
 type UserConfigResult {
     username: String!
+    token: String!
 }
 `, BuiltIn: false},
 	{Name: "../../../graph/schema/types/errors.graphql", Input: `enum ApiStatusEnum {
@@ -607,6 +615,8 @@ func (ec *executionContext) fieldContext_ConfigResult_user(_ context.Context, fi
 			switch field.Name {
 			case "username":
 				return ec.fieldContext_UserConfigResult_username(ctx, field)
+			case "token":
+				return ec.fieldContext_UserConfigResult_token(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserConfigResult", field.Name)
 		},
@@ -1640,6 +1650,50 @@ func (ec *executionContext) _UserConfigResult_username(ctx context.Context, fiel
 }
 
 func (ec *executionContext) fieldContext_UserConfigResult_username(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserConfigResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserConfigResult_token(ctx context.Context, field graphql.CollectedField, obj *api.UserConfigResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserConfigResult_token(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Token, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserConfigResult_token(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "UserConfigResult",
 		Field:      field,
@@ -3914,6 +3968,11 @@ func (ec *executionContext) _UserConfigResult(ctx context.Context, sel ast.Selec
 			out.Values[i] = graphql.MarshalString("UserConfigResult")
 		case "username":
 			out.Values[i] = ec._UserConfigResult_username(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "token":
+			out.Values[i] = ec._UserConfigResult_token(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

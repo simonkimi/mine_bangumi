@@ -60,6 +60,7 @@ type UserConfigInput struct {
 
 type UserConfigResult struct {
 	Username string `json:"username"`
+	Token    string `json:"token"`
 }
 
 type APIStatusEnum string

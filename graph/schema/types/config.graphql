@@ -3,11 +3,11 @@ input UserConfigInput {
     password: String
 }
 
-
 type ConfigResult {
     user: UserConfigResult!
 }
 
 type UserConfigResult {
     username: String!
+    token: String!
 }

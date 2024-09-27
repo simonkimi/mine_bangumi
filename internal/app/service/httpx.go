@@ -1,8 +1,9 @@
 package service
 
 import (
+	"fmt"
 	"github.com/go-resty/resty/v2"
-	"github.com/simonkimi/minebangumi/tools/xnet"
+	"github.com/simonkimi/minebangumi/tools/xstring"
 	"sync"
 )
 
@@ -35,7 +36,7 @@ func NewHttpX(config *HttpxConfig) *HttpX {
 
 func (h *HttpX) setClientProxy(client *resty.Client) {
 	if h.config.ProxyEnabled {
-		client.SetProxy(xnet.GetProxyUrl(
+		client.SetProxy(getProxyUrl(
 			h.config.ProxyScheme,
 			h.config.ProxyHost,
 			h.config.ProxyPort,
@@ -43,6 +44,13 @@ func (h *HttpX) setClientProxy(client *resty.Client) {
 			h.config.ProxyPassword,
 		))
 	}
+}
+
+func getProxyUrl(scheme string, host string, port string, username string, password string) string {
+	if !xstring.IsEmptyOrWhitespace(username) {
+		return fmt.Sprintf("%s://%s:%s@%s:%s", scheme, username, password, host, port)
+	}
+	return fmt.Sprintf("%s://%s:%s", scheme, host, port)
 }
 
 func (h *HttpX) newHttpClient(baseUrl string) *resty.Client {
