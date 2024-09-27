@@ -5,6 +5,7 @@ import (
 	grhandler "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
+	_ "github.com/simonkimi/minebangumi/docs"
 	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/simonkimi/minebangumi/internal/app/service"
 	"github.com/simonkimi/minebangumi/internal/pkg/middleware"
@@ -64,20 +65,23 @@ func (w *WebApi) frontend() {
 }
 
 func (w *WebApi) apiV1Group() {
-	r := w.Engine
-	apiV1 := r.Group("/api/v1")
-	apiV1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	v1 := w.Engine.Group("/api/v1")
+	v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	srv := grhandler.NewDefaultServer(NewExecutableSchema(Config{Resolvers: newResolver(w.mgr)}))
-	apiV1.POST("/query", func(c *gin.Context) {
-		srv.ServeHTTP(c.Writer, c.Request)
-	})
-	apiV1.GET("/", func(c *gin.Context) {
-		playground.Handler("GraphQL playground", "/query").ServeHTTP(c.Writer, c.Request)
-	})
-
-	proxyGroup := apiV1.Group("/proxy")
+	loginV1 := v1.Group("")
 	{
-		proxyGroup.GET("/poster", w.poster)
+		loginV1.Use(middleware.RequireAuthMiddleware())
+		srv := grhandler.NewDefaultServer(NewExecutableSchema(Config{Resolvers: newResolver(w.mgr)}))
+		loginV1.POST("/query", func(c *gin.Context) {
+			srv.ServeHTTP(c.Writer, c.Request)
+		})
+		loginV1.GET("/", func(c *gin.Context) {
+			playground.Handler("GraphQL playground", "/query").ServeHTTP(c.Writer, c.Request)
+		})
+
+		proxyGroup := loginV1.Group("/proxy")
+		{
+			proxyGroup.GET("/poster", w.poster)
+		}
 	}
 }

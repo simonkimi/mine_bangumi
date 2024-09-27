@@ -1,28 +1,4 @@
 definitions:
-  api.DownloaderForm:
-    properties:
-      api:
-        type: string
-      token:
-        type: string
-      type:
-        type: string
-      username:
-        type: string
-    required:
-    - api
-    - type
-    type: object
-  api.InitUserForm:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    required:
-    - password
-    - username
-    type: object
   api.LoginForm:
     properties:
       password:
@@ -33,160 +9,14 @@ definitions:
     - password
     - username
     type: object
-  api.ParseSourceForm:
-    properties:
-      parser:
-        type: string
-      source:
-        type: string
-    required:
-    - parser
-    - source
-    type: object
-  api.ParseSourceResponse:
-    properties:
-      files:
-        items:
-          type: string
-        type: array
-      season:
-        type: integer
-      title:
-        type: string
-    type: object
-  api.ScrapeForm:
-    properties:
-      language:
-        type: string
-      scraper:
-        type: string
-      title:
-        type: string
-    required:
-    - scraper
-    - title
-    type: object
-  api.ScrapeResponse:
-    properties:
-      background:
-        type: string
-      first_air_year:
-        type: string
-      original_title:
-        type: string
-      overview:
-        type: string
-      poster_path:
-        type: string
-      scraper:
-        type: string
-      seasons:
-        items:
-          $ref: '#/definitions/api.ScrapeSeasonResponse'
-        type: array
-      title:
-        type: string
-    type: object
-  api.ScrapeSeasonResponse:
-    properties:
-      overview:
-        type: string
-      poster:
-        type: string
-      season_id:
-        type: integer
-      title:
-        type: string
-    type: object
-  api.SystemInfo:
-    properties:
-      is_init_user:
-        type: boolean
-      is_login:
-        type: boolean
-      version:
-        type: string
-    type: object
   api.TokenResponse:
     properties:
       token:
         type: string
     type: object
-  errno.ApiError:
-    properties:
-      code:
-        type: integer
-      message:
-        type: string
-    type: object
 info:
   contact: {}
 paths:
-  /api/v1/config/downloader:
-    get:
-      consumes:
-      - application/json
-      description: Get the downloader configuration, including the type, API address,
-        and token
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.DownloaderForm'
-      summary: Get the downloader configuration
-      tags:
-      - config
-  /api/v1/config/init_user:
-    post:
-      consumes:
-      - application/json
-      description: Initialize the first user with a username and password
-      parameters:
-      - description: User initialization form
-        in: body
-        name: InitUserForm
-        required: true
-        schema:
-          $ref: '#/definitions/api.InitUserForm'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.TokenResponse'
-        "400":
-          description: Invalid form data
-          schema:
-            $ref: '#/definitions/errno.ApiError'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/errno.ApiError'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/errno.ApiError'
-      summary: Initialize the first user
-      tags:
-      - config
-  /api/v1/config/system:
-    get:
-      consumes:
-      - application/json
-      description: Get the current system version, first run status, and login status
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.SystemInfo'
-      summary: Get system information
-      tags:
-      - config
   /api/v1/proxy/poster:
     get:
       consumes:
@@ -213,56 +43,12 @@ paths:
       - ' image/jp2'
       responses:
         "200":
-          description: Poster image
+          description: poster image
           schema:
             type: file
       summary: Get poster image
       tags:
       - proxy
-  /api/v1/source/parse:
-    post:
-      consumes:
-      - application/json
-      description: Parse the source using the specified parser
-      parameters:
-      - description: Parse Source Form
-        in: body
-        name: form
-        required: true
-        schema:
-          $ref: '#/definitions/api.ParseSourceForm'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.ParseSourceResponse'
-      summary: Parse source
-      tags:
-      - parser
-  /api/v1/source/scrape:
-    post:
-      consumes:
-      - application/json
-      description: Scrape the source using the specified scraper
-      parameters:
-      - description: Scrape Form
-        in: body
-        name: form
-        required: true
-        schema:
-          $ref: '#/definitions/api.ScrapeForm'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api.ScrapeResponse'
-      summary: Scrape source
-      tags:
-      - scraper
   /api/v1/user/login:
     post:
       consumes:
@@ -279,7 +65,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: JWT Token
+          description: Token
           schema:
             $ref: '#/definitions/api.TokenResponse'
       summary: User login

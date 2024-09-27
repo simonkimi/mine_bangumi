@@ -66,14 +66,15 @@ type UserConfigResult struct {
 type APIStatusEnum string
 
 const (
-	APIStatusEnumSuccess             APIStatusEnum = "SUCCESS"
-	APIStatusEnumInternalServerError APIStatusEnum = "INTERNAL_SERVER_ERROR"
-	APIStatusEnumNotFound            APIStatusEnum = "NOT_FOUND"
-	APIStatusEnumUnauthorized        APIStatusEnum = "UNAUTHORIZED"
-	APIStatusEnumCancel              APIStatusEnum = "CANCEL"
-	APIStatusEnumTimeout             APIStatusEnum = "TIMEOUT"
-	APIStatusEnumThirdPartyAPIError  APIStatusEnum = "THIRD_PARTY_API_ERROR"
-	APIStatusEnumBadRequest          APIStatusEnum = "BAD_REQUEST"
+	APIStatusEnumSuccess              APIStatusEnum = "SUCCESS"
+	APIStatusEnumInternalServerError  APIStatusEnum = "INTERNAL_SERVER_ERROR"
+	APIStatusEnumNotFound             APIStatusEnum = "NOT_FOUND"
+	APIStatusEnumUnauthorized         APIStatusEnum = "UNAUTHORIZED"
+	APIStatusEnumUserCredentialsError APIStatusEnum = "USER_CREDENTIALS_ERROR"
+	APIStatusEnumCancel               APIStatusEnum = "CANCEL"
+	APIStatusEnumTimeout              APIStatusEnum = "TIMEOUT"
+	APIStatusEnumThirdPartyAPIError   APIStatusEnum = "THIRD_PARTY_API_ERROR"
+	APIStatusEnumBadRequest           APIStatusEnum = "BAD_REQUEST"
 )
 
 var AllAPIStatusEnum = []APIStatusEnum{
@@ -81,6 +82,7 @@ var AllAPIStatusEnum = []APIStatusEnum{
 	APIStatusEnumInternalServerError,
 	APIStatusEnumNotFound,
 	APIStatusEnumUnauthorized,
+	APIStatusEnumUserCredentialsError,
 	APIStatusEnumCancel,
 	APIStatusEnumTimeout,
 	APIStatusEnumThirdPartyAPIError,
@@ -89,7 +91,7 @@ var AllAPIStatusEnum = []APIStatusEnum{
 
 func (e APIStatusEnum) IsValid() bool {
 	switch e {
-	case APIStatusEnumSuccess, APIStatusEnumInternalServerError, APIStatusEnumNotFound, APIStatusEnumUnauthorized, APIStatusEnumCancel, APIStatusEnumTimeout, APIStatusEnumThirdPartyAPIError, APIStatusEnumBadRequest:
+	case APIStatusEnumSuccess, APIStatusEnumInternalServerError, APIStatusEnumNotFound, APIStatusEnumUnauthorized, APIStatusEnumUserCredentialsError, APIStatusEnumCancel, APIStatusEnumTimeout, APIStatusEnumThirdPartyAPIError, APIStatusEnumBadRequest:
 		return true
 	}
 	return false

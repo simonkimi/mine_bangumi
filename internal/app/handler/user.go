@@ -8,7 +8,7 @@ import (
 
 // Login godoc
 // @Summary User login
-// @Description Authenticate user and return JWT token
+// @Description Authenticate user and return token
 // @Tags user
 // @Accept json
 // @Produce json
@@ -25,7 +25,10 @@ func (w *WebApi) login(c *gin.Context) {
 	username := w.mgr.GetConfig().GetString(config.UserUsername)
 	password := w.mgr.GetConfig().GetString(config.UserPassword)
 	if form.Username != username || form.Password != password {
-		_ = c.Error(api.NewUnAuthError())
+		_ = c.Error(&api.Error{
+			Message: "invalid username or password",
+			Code:    api.APIStatusEnumUserCredentialsError,
+		})
 		return
 	}
 	token := w.mgr.GetConfig().GetString(config.UserApiToken)

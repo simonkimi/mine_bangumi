@@ -7,7 +7,7 @@ import (
 	"github.com/simonkimi/minebangumi/internal/app/service"
 )
 
-//go:embed dist
+//go:embed frontend/dist
 var frontendFS embed.FS
 
 func main() {
