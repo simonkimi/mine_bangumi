@@ -67,12 +67,15 @@ func (w *WebApi) frontend() {
 func (w *WebApi) apiV1Group() {
 	v1 := w.Engine.Group("/api/v1")
 	v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	v1.GET("/user/login", w.login)
+	v1.POST("/user/init", w.initUser)
+	v1.GET("/system/status", w.systemStatus)
 
 	loginV1 := v1.Group("")
 	{
 		loginV1.Use(middleware.RequireAuthMiddleware())
 		srv := grhandler.NewDefaultServer(NewExecutableSchema(Config{Resolvers: newResolver(w.mgr)}))
-		loginV1.POST("/query", func(c *gin.Context) {
+		loginV1.POST("/graph", func(c *gin.Context) {
 			srv.ServeHTTP(c.Writer, c.Request)
 		})
 		loginV1.GET("/", func(c *gin.Context) {

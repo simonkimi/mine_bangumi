@@ -87,3 +87,45 @@ func TestLogin_InvalidJson(t *testing.T) {
 		ContainsKey("code").HasValue("code", api.APIStatusEnumBadRequest).
 		Value("message").String().NotEmpty()
 }
+
+func TestInitUser_Ok(t *testing.T) {
+	r, web := initApi()
+	conf := web.mgr.GetConfig()
+	conf.SetBool(config.SystemInit, false)
+
+	r.POST("/init", web.initUser)
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	testutil.NewDebugHttp(t, server.URL).
+		POST("/init").
+		WithJSON(&api.LoginForm{
+			Username: testUsername,
+			Password: testPassword}).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().
+		ContainsKey("code").HasValue("code", api.APIStatusEnumSuccess).
+		Value("data").Object().
+		Value("token").String().NotEmpty()
+}
+
+func TestInitUser_Forbidden(t *testing.T) {
+	r, web := initApi()
+	conf := web.mgr.GetConfig()
+	conf.SetBool(config.SystemInit, true)
+
+	r.POST("/init", web.initUser)
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	testutil.NewDebugHttp(t, server.URL).
+		POST("/init").
+		WithJSON(&api.LoginForm{
+			Username: testUsername,
+			Password: testPassword}).
+		Expect().
+		Status(http.StatusOK).
+		JSON().Object().
+		ContainsKey("code").HasValue("code", api.APIStatusEnumForbidden)
+}

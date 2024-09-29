@@ -387,13 +387,14 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "../../../graph/schema/schema.graphql", Input: `type Query {
-    "Scraper for acg source"
+    "解析Acg数据源"
     scraperSource(input: ParseAcgSourceInput!): ParseAcgSourceResult!
-    "Scraper for acg source"
+    "刮削Acg数据源"
     scraperDb(input: ScrapeAcgSourceInput!): [ScrapeAcgResult!]!
 }
 
 type Mutation {
+    "配置用户"
     configUser(input: UserConfigInput!): ConfigResult!
 }`, BuiltIn: false},
 	{Name: "../../../graph/schema/types/acg_source.graphql", Input: `enum SourceParserEnum {
@@ -470,6 +471,7 @@ type UserConfigResult {
     THIRD_PARTY_API_ERROR
     BAD_REQUEST
     FORM_VALIDATION_ERROR
+    FORBIDDEN
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

@@ -9,7 +9,7 @@ import (
 )
 
 func newTestTmdb() *Tmdb {
-	return NewTmdb(NewConfig(api.TmdbDefaultApikey, func() *resty.Client {
+	return NewTmdb(NewConfig(TmdbDefaultApikey, func() *resty.Client {
 		return resty.New()
 	}))
 }

@@ -20,14 +20,14 @@ func V(key string, value any, tag string) *ValidateItem {
 	}
 }
 
-func asciiPrintable(fl validator.FieldLevel) bool {
+func ascii(fl validator.FieldLevel) bool {
 	re := regexp.MustCompile(`^[\x20-\x7E]+$`)
 	return re.MatchString(fl.Field().String())
 }
 
 func Validate(rules ...*ValidateItem) error {
 	v := validator.New()
-	_ = v.RegisterValidation("ascii", asciiPrintable)
+	_ = v.RegisterValidation("ascii", ascii)
 	errMsg := make(map[string]string)
 	for _, rule := range rules {
 		err := v.Var(rule.value, rule.tag)

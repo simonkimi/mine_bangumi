@@ -11,7 +11,11 @@ type Item[T any] struct {
 	defaultValue T
 }
 
-func newConfigItem[T any](key string, env string, defaultValue T) *Item[T] {
+func newConfig[T any](key string, defaultValue T) *Item[T] {
+	return &Item[T]{key: key, env: "", defaultValue: defaultValue}
+}
+
+func newConfigEnv[T any](key string, env string, defaultValue T) *Item[T] {
 	return &Item[T]{key: key, env: env, defaultValue: defaultValue}
 }
 

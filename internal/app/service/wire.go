@@ -10,6 +10,7 @@ import (
 	"github.com/simonkimi/minebangumi/internal/pkg/database"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
+	"gorm.io/gorm"
 )
 
 func provideHttpXConfig(conf config.Config) *HttpxConfig {
@@ -38,6 +39,10 @@ func provideHttpServiceConfig(conf config.Config) *HttpServiceConfig {
 	}
 }
 
+func provideGorm(db *database.Database) *gorm.DB {
+	return db.Db
+}
+
 func InitializeManager() (Manager, error) {
 	wire.Build(
 		config.NewConfig,
@@ -50,6 +55,7 @@ func InitializeManager() (Manager, error) {
 		newScraperService,
 		newSourceService,
 		database.NewDb,
+		provideGorm,
 		repository.NewRepo,
 		newApiProxyService,
 		provideHttpServiceConfig,

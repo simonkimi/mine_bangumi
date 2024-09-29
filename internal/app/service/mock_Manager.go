@@ -4,6 +4,8 @@ package service
 
 import (
 	config "github.com/simonkimi/minebangumi/internal/app/config"
+	database "github.com/simonkimi/minebangumi/internal/pkg/database"
+
 	mikan "github.com/simonkimi/minebangumi/pkg/mikan"
 
 	mock "github.com/stretchr/testify/mock"
@@ -116,6 +118,53 @@ func (_c *MockManager_GetConfig_Call) Return(_a0 config.Config) *MockManager_Get
 }
 
 func (_c *MockManager_GetConfig_Call) RunAndReturn(run func() config.Config) *MockManager_GetConfig_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetDatabase provides a mock function with given fields:
+func (_m *MockManager) GetDatabase() *database.Database {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetDatabase")
+	}
+
+	var r0 *database.Database
+	if rf, ok := ret.Get(0).(func() *database.Database); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*database.Database)
+		}
+	}
+
+	return r0
+}
+
+// MockManager_GetDatabase_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDatabase'
+type MockManager_GetDatabase_Call struct {
+	*mock.Call
+}
+
+// GetDatabase is a helper method to define mock.On call
+func (_e *MockManager_Expecter) GetDatabase() *MockManager_GetDatabase_Call {
+	return &MockManager_GetDatabase_Call{Call: _e.mock.On("GetDatabase")}
+}
+
+func (_c *MockManager_GetDatabase_Call) Run(run func()) *MockManager_GetDatabase_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockManager_GetDatabase_Call) Return(_a0 *database.Database) *MockManager_GetDatabase_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockManager_GetDatabase_Call) RunAndReturn(run func() *database.Database) *MockManager_GetDatabase_Call {
 	_c.Call.Return(run)
 	return _c
 }

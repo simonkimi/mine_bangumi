@@ -76,6 +76,7 @@ const (
 	APIStatusEnumThirdPartyAPIError   APIStatusEnum = "THIRD_PARTY_API_ERROR"
 	APIStatusEnumBadRequest           APIStatusEnum = "BAD_REQUEST"
 	APIStatusEnumFormValidationError  APIStatusEnum = "FORM_VALIDATION_ERROR"
+	APIStatusEnumForbidden            APIStatusEnum = "FORBIDDEN"
 )
 
 var AllAPIStatusEnum = []APIStatusEnum{
@@ -89,11 +90,12 @@ var AllAPIStatusEnum = []APIStatusEnum{
 	APIStatusEnumThirdPartyAPIError,
 	APIStatusEnumBadRequest,
 	APIStatusEnumFormValidationError,
+	APIStatusEnumForbidden,
 }
 
 func (e APIStatusEnum) IsValid() bool {
 	switch e {
-	case APIStatusEnumSuccess, APIStatusEnumInternalServerError, APIStatusEnumNotFound, APIStatusEnumUnauthorized, APIStatusEnumUserCredentialsError, APIStatusEnumCancel, APIStatusEnumTimeout, APIStatusEnumThirdPartyAPIError, APIStatusEnumBadRequest, APIStatusEnumFormValidationError:
+	case APIStatusEnumSuccess, APIStatusEnumInternalServerError, APIStatusEnumNotFound, APIStatusEnumUnauthorized, APIStatusEnumUserCredentialsError, APIStatusEnumCancel, APIStatusEnumTimeout, APIStatusEnumThirdPartyAPIError, APIStatusEnumBadRequest, APIStatusEnumFormValidationError, APIStatusEnumForbidden:
 		return true
 	}
 	return false

@@ -76,3 +76,11 @@ func NewUnAuthError() error {
 		Extensions: nil,
 	}
 }
+
+func NewForbiddenError() error {
+	return &Error{
+		Message:    "Forbidden",
+		Code:       APIStatusEnumForbidden,
+		Extensions: nil,
+	}
+}

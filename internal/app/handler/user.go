@@ -19,6 +19,7 @@ func (w *WebApi) login(c *gin.Context) {
 	var form api.LoginForm
 	if err := c.ShouldBindJSON(&form); err != nil {
 		_ = c.Error(api.NewBadRequestErrorf("invalid request: %s", err))
+		c.Abort()
 		return
 	}
 
@@ -32,6 +33,25 @@ func (w *WebApi) login(c *gin.Context) {
 		return
 	}
 	token := w.mgr.GetConfig().GetString(config.UserApiToken)
+	api.OkResponse(c, &api.TokenResponse{
+		Token: token,
+	})
+}
+
+func (w *WebApi) initUser(c *gin.Context) {
+	var form api.LoginForm
+	if err := c.ShouldBindJSON(&form); err != nil {
+		_ = c.Error(api.NewBadRequestErrorf("invalid request: %s", err))
+		c.Abort()
+		return
+	}
+	conf := w.mgr.GetConfig()
+	if conf.GetBool(config.SystemInit) {
+		_ = c.Error(api.NewForbiddenError())
+		c.Abort()
+		return
+	}
+	token := config.UpdateUser(conf, &form.Username, &form.Password)
 	api.OkResponse(c, &api.TokenResponse{
 		Token: token,
 	})

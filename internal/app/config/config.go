@@ -1,8 +1,8 @@
 package config
 
 import (
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
@@ -32,12 +32,29 @@ func NewConfig() (Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	v.SetConfigFile(path)
-	registerKey(v)
+
 	config := &Service{
 		viper:      v,
 		configPath: path,
+		mu:         &sync.Mutex{},
 	}
+
+	v.SetConfigFile(path)
+	registerKey(v)
+	err = v.ReadInConfig()
+	var configFileNotFound viper.ConfigFileNotFoundError
+	var fileNotFoundError *os.PathError
+	if errors.As(err, &configFileNotFound) || errors.As(err, &fileNotFoundError) {
+		fmt.Println("ConfigService file not found, use default values")
+		config.Save()
+	}
+
+	if config.GetInt(SystemConfigVersion) != appConfigVersion {
+		fmt.Printf("Updating config to version %d\n", appConfigVersion)
+		config.SetInt(SystemConfigVersion, appConfigVersion)
+		config.Save()
+	}
+
 	return config, nil
 }
 
@@ -52,12 +69,6 @@ func getConfigPath() (string, error) {
 		}
 		path = filepath.Join(wd, "config.toml")
 	}
-	err := viper.ReadInConfig()
-	var configFileNotFound viper.ConfigFileNotFoundError
-	if errors.As(err, &configFileNotFound) {
-		fmt.Println("ConfigService file not found, use default values")
-	}
-
 	return path, nil
 }
 
@@ -92,7 +103,7 @@ func (c *Service) SetBool(key *Item[bool], value bool) {
 func (c *Service) Save() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if err := viper.WriteConfigAs(c.configPath); err != nil {
+	if err := c.viper.WriteConfigAs(c.configPath); err != nil {
 		fmt.Printf("Failed to write config file, %+v", err)
 	}
 }

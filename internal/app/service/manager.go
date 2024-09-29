@@ -4,6 +4,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/simonkimi/minebangumi/internal/app/repository"
+	"github.com/simonkimi/minebangumi/internal/pkg/database"
 	"github.com/simonkimi/minebangumi/pkg/logger"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
@@ -16,6 +17,7 @@ type Manager interface {
 	GetHttpX() *HttpX
 	GetTmdb() *tmdb.Tmdb
 	GetRepo() *repository.Repo
+	GetDatabase() *database.Database
 	GetScraper() *ScraperService
 	GetSource() *SourceService
 	GetApiProxy() *ApiProxyService
@@ -27,6 +29,7 @@ type ManagerImpl struct {
 	mikan       *mikan.Client
 	httpX       *HttpX
 	tmdb        *tmdb.Tmdb
+	database    *database.Database
 	repo        *repository.Repo
 	scraper     *ScraperService
 	source      *SourceService
@@ -39,6 +42,7 @@ func newManager(
 	httpX *HttpX,
 	mikan *mikan.Client,
 	tmdb *tmdb.Tmdb,
+	database *database.Database,
 	repo *repository.Repo,
 	scraper *ScraperService,
 	source *SourceService,
@@ -51,6 +55,7 @@ func newManager(
 		mikan:       mikan,
 		tmdb:        tmdb,
 		repo:        repo,
+		database:    database,
 		scraper:     scraper,
 		source:      source,
 		apiProxy:    apiProxy,
@@ -101,4 +106,8 @@ func (m *ManagerImpl) GetApiProxy() *ApiProxyService {
 
 func (m *ManagerImpl) GetHttpService() *HttpService {
 	return m.httpService
+}
+
+func (m *ManagerImpl) GetDatabase() *database.Database {
+	return m.database
 }

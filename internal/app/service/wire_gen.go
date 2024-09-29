@@ -13,6 +13,7 @@ import (
 	"github.com/simonkimi/minebangumi/internal/pkg/database"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
+	"gorm.io/gorm"
 )
 
 // Injectors from wire.go:
@@ -28,17 +29,18 @@ func InitializeManager() (Manager, error) {
 	client := mikan.NewClient(v)
 	tmdbConfig := provideTmdbConfig(configConfig, httpX)
 	tmdbTmdb := tmdb.NewTmdb(tmdbConfig)
-	db, err := database.NewDb()
+	databaseDatabase, err := database.NewDb()
 	if err != nil {
 		return nil, err
 	}
+	db := provideGorm(databaseDatabase)
 	repo := repository.NewRepo(db)
 	scraperService := newScraperService(tmdbTmdb)
 	sourceService := newSourceService(client)
 	apiProxyService := newApiProxyService(httpX)
 	httpServiceConfig := provideHttpServiceConfig(configConfig)
 	httpService := newHttpService(httpServiceConfig)
-	manager := newManager(configConfig, httpX, client, tmdbTmdb, repo, scraperService, sourceService, apiProxyService, httpService)
+	manager := newManager(configConfig, httpX, client, tmdbTmdb, databaseDatabase, repo, scraperService, sourceService, apiProxyService, httpService)
 	return manager, nil
 }
 
@@ -68,4 +70,8 @@ func provideHttpServiceConfig(conf config.Config) *HttpServiceConfig {
 		Host: conf.GetString(config.ServerHost),
 		Port: conf.GetInt(config.ServerPort),
 	}
+}
+
+func provideGorm(db *database.Database) *gorm.DB {
+	return db.Db
 }
