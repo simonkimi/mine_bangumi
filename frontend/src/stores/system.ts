@@ -1,19 +1,19 @@
-import { getSystemConfig } from "@/api/api";
+import { getSystemStatus } from "@/api/api";
 
 export const useSystemStore = defineStore("global", () => {
-  const isInitUser = ref(true);
+  const isSystemInit = ref(true);
   const version = ref("0.0.0");
   const isLogin = ref(false);
 
   async function loadSystemData() {
-    const system = await getSystemConfig();
+    const system = await getSystemStatus();
     version.value = system.version;
     isLogin.value = system.is_login;
-    isInitUser.value = system.is_init_user;
+    isSystemInit.value = system.is_system_init;
   }
 
   return {
-    isInitUser,
+    isSystemInit,
     version,
     isLogin,
     loadSystemData,

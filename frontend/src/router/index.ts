@@ -1,8 +1,8 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
-import GuideView from "@/views/GuideView.vue";
 import SettingView from "@/views/SettingView.vue";
 import { useSystemStore } from "@/stores/system";
+import RegisterView from "@/views/RegisterView.vue";
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -13,9 +13,9 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: "/guide",
-      name: "guide",
-      component: GuideView,
+      path: "/register",
+      name: "register",
+      component: RegisterView,
       meta: {
         showAppBar: false,
       },
@@ -30,9 +30,9 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const systemStore = useSystemStore();
-  if (!systemStore.isInitUser && to.name !== "guide") {
+  if (!systemStore.isSystemInit && to.name !== "register") {
     console.log("未初始化用户信息，跳转到引导页");
-    next({ name: "guide" });
+    next({ name: "register" });
   } else {
     next();
   }

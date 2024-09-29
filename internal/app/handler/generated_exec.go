@@ -472,6 +472,7 @@ type UserConfigResult {
     BAD_REQUEST
     FORM_VALIDATION_ERROR
     FORBIDDEN
+    DATABASE_MIGRATION_ERROR
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

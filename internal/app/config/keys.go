@@ -17,7 +17,7 @@ var UserApiToken = newConfigItemFunc("user.api_token", "MBG_USER_API_TOKEN", fun
 })
 
 var ServerHost = newConfigEnv("server.host", "MBG_SERVER_HOST", "0.0.0.0")
-var ServerPort = newConfigEnv("server.port", "MBG_SERVER_PORT", 8080)
+var ServerPort = newConfigEnv("server.port", "MBG_SERVER_PORT", 7962)
 
 var DownloaderClient = newConfigEnv("downloader.client", "MBG_DOWNLOADER_CLIENT", "")
 var QBittorrentApi = newConfigEnv("downloader.qbittorrent.api", "MBG_QB_API", "")

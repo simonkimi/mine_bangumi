@@ -25,7 +25,7 @@ const showAppBar = computed(() => route.meta.showAppBar ?? true);
 
 onMounted(async () => {
   await systemStore.loadSystemData();
-  if (!systemStore.isInitUser) {
+  if (!systemStore.isSystemInit) {
     console.info("未初始化用户, 跳转到引导页");
     await routerStore.push("/guide");
   }

@@ -9,7 +9,7 @@ import (
 
 var localhostReg = regexp.MustCompile(`^https?://localhost(:\d+)?$`)
 
-func Apply(g *gin.Engine, token func() string) {
+func Apply(g *gin.Engine) {
 	g.Use(gzip.Gzip(gzip.DefaultCompression))
 	g.Use(cors.New(cors.Config{
 		AllowOriginFunc: func(origin string) bool {
@@ -22,5 +22,4 @@ func Apply(g *gin.Engine, token func() string) {
 	}))
 	g.Use(LogrusMiddleware())
 	g.Use(ResponseWrapperMiddleware())
-	g.Use(TokenAuthMiddleware(token))
 }

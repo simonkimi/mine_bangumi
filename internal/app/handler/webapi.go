@@ -6,7 +6,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
 	_ "github.com/simonkimi/minebangumi/docs"
-	"github.com/simonkimi/minebangumi/internal/app/config"
 	"github.com/simonkimi/minebangumi/internal/app/service"
 	"github.com/simonkimi/minebangumi/internal/pkg/middleware"
 	swaggerFiles "github.com/swaggo/files"
@@ -37,9 +36,10 @@ func NewWebApi(conf *WebApiConfig) *WebApi {
 	r := gin.New()
 	webapi := &WebApi{Engine: r, mgr: conf.mgr, frontendFs: conf.frontendFs}
 
-	middleware.Apply(r, func() string {
-		return conf.mgr.GetConfig().GetString(config.UserApiToken)
-	})
+	middleware.Apply(r)
+	r.Use(TokenAuthMiddleware(webapi.mgr.GetConfig()))
+	r.Use(DatabaseMigrateMiddleware(webapi.mgr.GetDatabase()))
+
 	webapi.frontend()
 	webapi.apiV1Group()
 
@@ -73,7 +73,7 @@ func (w *WebApi) apiV1Group() {
 
 	loginV1 := v1.Group("")
 	{
-		loginV1.Use(middleware.RequireAuthMiddleware())
+		loginV1.Use(RequireAuthMiddleware())
 		srv := grhandler.NewDefaultServer(NewExecutableSchema(Config{Resolvers: newResolver(w.mgr)}))
 		loginV1.POST("/graph", func(c *gin.Context) {
 			srv.ServeHTTP(c.Writer, c.Request)

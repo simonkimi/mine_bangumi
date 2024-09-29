@@ -61,6 +61,10 @@ func (d *Database) GetAppSchemaVersion() uint {
 	return appSchemaVersion
 }
 
+func (d *Database) NeedMigrate() bool {
+	return d.schemaVersion < appSchemaVersion
+}
+
 func (d *Database) Optimise() error {
 	_, err := d.rawDb.Exec("ANALYZE")
 	if err != nil {

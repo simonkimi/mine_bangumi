@@ -1,9 +1,11 @@
-package middleware
+package handler
 
 import (
 	"github.com/gavv/httpexpect/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/simonkimi/minebangumi/api"
+	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/internal/pkg/middleware"
 	"github.com/simonkimi/minebangumi/pkg/hash"
 	"github.com/simonkimi/minebangumi/pkg/testutil"
 	"net/http"
@@ -11,13 +13,18 @@ import (
 	"testing"
 )
 
+func initMockConfig(token string) config.Config {
+	conf := config.NewMockConfig()
+	conf.SetString(config.UserApiToken, token)
+	return conf
+}
+
 func TestJwtAuthMiddleware_Ok(t *testing.T) {
 	token := hash.GenerateRandomKey(40)
+	conf := initMockConfig(token)
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
-	r.Use(TokenAuthMiddleware(func() string {
-		return token
-	}))
+	r.Use(TokenAuthMiddleware(conf))
 	r.GET("/test", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"is_login": IsLogin(c),
@@ -39,9 +46,9 @@ func TestJwtAuthMiddleware_Ok(t *testing.T) {
 func TestJwtAuthMiddleware_NoToken(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
-	r.Use(TokenAuthMiddleware(func() string {
-		return "token"
-	}))
+	token := hash.GenerateRandomKey(40)
+	conf := initMockConfig(token)
+	r.Use(TokenAuthMiddleware(conf))
 	r.GET("/test", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"is_login": IsLogin(c),
@@ -62,9 +69,9 @@ func TestJwtAuthMiddleware_NoToken(t *testing.T) {
 func TestJwtAuthMiddleware_TokenError(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
-	r.Use(TokenAuthMiddleware(func() string {
-		return "token"
-	}))
+	token := hash.GenerateRandomKey(40)
+	conf := initMockConfig(token)
+	r.Use(TokenAuthMiddleware(conf))
 	r.GET("/test", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"is_login": IsLogin(c),
@@ -76,7 +83,7 @@ func TestJwtAuthMiddleware_TokenError(t *testing.T) {
 
 	httpexpect.Default(t, server.URL).
 		GET("/test").
-		WithHeader("Authorization", "Token invalid-token").
+		WithHeader("Authorization", "invalid-token").
 		Expect().
 		Status(200).
 		JSON().Object().
@@ -88,10 +95,9 @@ func TestRequireAuthMiddleware_Ok(t *testing.T) {
 	r := gin.Default()
 
 	token := hash.GenerateRandomKey(40)
+	conf := initMockConfig(token)
 	group := r.Group("/api")
-	group.Use(TokenAuthMiddleware(func() string {
-		return token
-	}))
+	group.Use(TokenAuthMiddleware(conf))
 	group.Use(RequireAuthMiddleware())
 	group.GET("/test", func(c *gin.Context) {
 		api.OkResponse(c, &gin.H{
@@ -115,11 +121,11 @@ func TestRequireAuthMiddleware_Ok(t *testing.T) {
 func TestRequireAuthMiddleware_Error(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
+	token := hash.GenerateRandomKey(40)
+	conf := initMockConfig(token)
 	group := r.Group("/api")
-	group.Use(TokenAuthMiddleware(func() string {
-		return "Token"
-	}))
-	group.Use(ResponseWrapperMiddleware())
+	group.Use(TokenAuthMiddleware(conf))
+	group.Use(middleware.ResponseWrapperMiddleware())
 	group.Use(RequireAuthMiddleware())
 	group.GET("/test", func(c *gin.Context) {
 		c.JSON(200, gin.H{

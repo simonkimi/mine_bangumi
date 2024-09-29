@@ -66,17 +66,18 @@ type UserConfigResult struct {
 type APIStatusEnum string
 
 const (
-	APIStatusEnumSuccess              APIStatusEnum = "SUCCESS"
-	APIStatusEnumInternalServerError  APIStatusEnum = "INTERNAL_SERVER_ERROR"
-	APIStatusEnumNotFound             APIStatusEnum = "NOT_FOUND"
-	APIStatusEnumUnauthorized         APIStatusEnum = "UNAUTHORIZED"
-	APIStatusEnumUserCredentialsError APIStatusEnum = "USER_CREDENTIALS_ERROR"
-	APIStatusEnumCancel               APIStatusEnum = "CANCEL"
-	APIStatusEnumTimeout              APIStatusEnum = "TIMEOUT"
-	APIStatusEnumThirdPartyAPIError   APIStatusEnum = "THIRD_PARTY_API_ERROR"
-	APIStatusEnumBadRequest           APIStatusEnum = "BAD_REQUEST"
-	APIStatusEnumFormValidationError  APIStatusEnum = "FORM_VALIDATION_ERROR"
-	APIStatusEnumForbidden            APIStatusEnum = "FORBIDDEN"
+	APIStatusEnumSuccess                APIStatusEnum = "SUCCESS"
+	APIStatusEnumInternalServerError    APIStatusEnum = "INTERNAL_SERVER_ERROR"
+	APIStatusEnumNotFound               APIStatusEnum = "NOT_FOUND"
+	APIStatusEnumUnauthorized           APIStatusEnum = "UNAUTHORIZED"
+	APIStatusEnumUserCredentialsError   APIStatusEnum = "USER_CREDENTIALS_ERROR"
+	APIStatusEnumCancel                 APIStatusEnum = "CANCEL"
+	APIStatusEnumTimeout                APIStatusEnum = "TIMEOUT"
+	APIStatusEnumThirdPartyAPIError     APIStatusEnum = "THIRD_PARTY_API_ERROR"
+	APIStatusEnumBadRequest             APIStatusEnum = "BAD_REQUEST"
+	APIStatusEnumFormValidationError    APIStatusEnum = "FORM_VALIDATION_ERROR"
+	APIStatusEnumForbidden              APIStatusEnum = "FORBIDDEN"
+	APIStatusEnumDatabaseMigrationError APIStatusEnum = "DATABASE_MIGRATION_ERROR"
 )
 
 var AllAPIStatusEnum = []APIStatusEnum{
@@ -91,11 +92,12 @@ var AllAPIStatusEnum = []APIStatusEnum{
 	APIStatusEnumBadRequest,
 	APIStatusEnumFormValidationError,
 	APIStatusEnumForbidden,
+	APIStatusEnumDatabaseMigrationError,
 }
 
 func (e APIStatusEnum) IsValid() bool {
 	switch e {
-	case APIStatusEnumSuccess, APIStatusEnumInternalServerError, APIStatusEnumNotFound, APIStatusEnumUnauthorized, APIStatusEnumUserCredentialsError, APIStatusEnumCancel, APIStatusEnumTimeout, APIStatusEnumThirdPartyAPIError, APIStatusEnumBadRequest, APIStatusEnumFormValidationError, APIStatusEnumForbidden:
+	case APIStatusEnumSuccess, APIStatusEnumInternalServerError, APIStatusEnumNotFound, APIStatusEnumUnauthorized, APIStatusEnumUserCredentialsError, APIStatusEnumCancel, APIStatusEnumTimeout, APIStatusEnumThirdPartyAPIError, APIStatusEnumBadRequest, APIStatusEnumFormValidationError, APIStatusEnumForbidden, APIStatusEnumDatabaseMigrationError:
 		return true
 	}
 	return false

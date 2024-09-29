@@ -1,12 +1,16 @@
+import { ApiStatusEnum } from "@/gql/graphql";
+
 export interface ApiResult<T> {
-  code: number;
+  code: ApiStatusEnum;
   message: string | null;
   data: T;
 }
 
 export interface SystemInfo {
   version: string;
-  is_init_user: boolean;
+  app_database_version: number;
+  current_database_version: number;
+  is_system_init: boolean;
   is_login: boolean;
 }
 
@@ -24,9 +28,9 @@ export interface UserLoginInfo {
 }
 
 export class ApiError extends Error {
-  code: number;
+  code: ApiStatusEnum;
 
-  constructor(code: number, message: string) {
+  constructor(code: ApiStatusEnum, message: string) {
     super(message);
     this.code = code;
   }

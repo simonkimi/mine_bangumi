@@ -1,54 +1,51 @@
 <template>
-  <n-form ref="userFormRef" :model="userForm" :rules="userFormRules">
-    <n-form-item label="用户名" path="username" required>
-      <n-input v-model:value="userForm.username" placeholder="" />
-    </n-form-item>
-    <n-form-item label="密码" path="password">
-      <n-input
-        v-model:value="userForm.password"
-        type="password"
-        placeholder=""
-        @keydown.enter.prevent
-      />
-    </n-form-item>
-    <n-form-item label="重复密码" path="repeatPassword">
-      <n-input
-        v-model:value="userForm.repeatPassword"
-        :disabled="!userForm.password"
-        type="password"
-        placeholder=""
-        @keydown.enter.prevent
-      />
-    </n-form-item>
-    <div class="flex space-x-4 mt-2">
-      <n-button
-        class="flex-grow-[3]"
-        type="primary"
-        @click="userNextStep"
-        :loading="props.loading"
-      >
-        下一步
-      </n-button>
-      <n-button class="flex-grow-[1]" @click="skipUser">跳过</n-button>
-    </div>
-  </n-form>
+  <div class="flex flex-col items-center justify-center h-screen px-5">
+    <h1 class="text-4xl font-bold">初始配置</h1>
+    <p class="mt-4 text-lg">欢迎使用Mine Bangumi</p>
+    <n-card class="mt-10 max-w-xl" title="用户配置">
+      <n-form ref="userFormRef" :model="userForm" :rules="userFormRules">
+        <n-form-item label="用户名" path="username" required>
+          <n-input v-model:value="userForm.username" placeholder="" />
+        </n-form-item>
+        <n-form-item label="密码" path="password">
+          <n-input
+            v-model:value="userForm.password"
+            placeholder=""
+            type="password"
+            @keydown.enter.prevent
+          />
+        </n-form-item>
+        <n-form-item label="重复密码" path="repeatPassword">
+          <n-input
+            v-model:value="userForm.repeatPassword"
+            :disabled="!userForm.password"
+            placeholder=""
+            type="password"
+            @keydown.enter.prevent
+          />
+        </n-form-item>
+        <div class="flex space-x-4 mt-2">
+          <n-button
+            :loading="isLoading"
+            class="flex-grow-[3]"
+            type="primary"
+            @click="userNextStep"
+          >
+            注册
+          </n-button>
+          <n-button class="flex-grow-[1]" @click="skipUser">跳过</n-button>
+        </div>
+      </n-form>
+    </n-card>
+  </div>
 </template>
 
-<script setup lang="tsx">
+<script lang="tsx" setup>
 import type { FormInst, FormRules } from "naive-ui";
-
-const props = defineProps<{
-  username: string;
-  loading: boolean;
-}>();
-
-const emit = defineEmits<{
-  onSkip: [];
-  onNextStep: [username: string, password: string];
-}>();
 
 const dialog = useDialog();
 const userFormRef = ref<FormInst | null>(null);
+const isLoading = ref(false);
 
 interface UserModel {
   username: string;
@@ -57,15 +54,16 @@ interface UserModel {
 }
 
 const userForm = ref<UserModel>({
-  username: props.username,
+  username: "",
   password: "",
   repeatPassword: "",
 });
 
 async function userNextStep() {
-  const isValid = await userFormRef.value?.validate();
-  if (!isValid) return;
-  emit("onNextStep", userForm.value.username, userForm.value.password);
+  if (!(await userFormRef.value?.validate())) return;
+  isLoading.value = true;
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  isLoading.value = false;
 }
 
 async function skipUser() {
@@ -89,7 +87,6 @@ async function skipUser() {
   });
 
   if (!isSkip) return;
-  emit("onSkip");
 }
 
 const userFormRules: FormRules = {
@@ -135,4 +132,4 @@ const userFormRules: FormRules = {
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped></style>
