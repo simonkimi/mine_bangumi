@@ -1,7 +1,11 @@
 <template>
-  <p>Setting</p>
+  <div class="mt-14">
+    <div>
+      <n-menu> </n-menu>
+    </div>
+  </div>
 </template>
 
-<script setup lang="ts"></script>
+<script lang="ts" setup></script>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped></style>

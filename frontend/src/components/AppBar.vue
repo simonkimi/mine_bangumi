@@ -11,15 +11,20 @@
   </div>
 </template>
 
-<script setup lang="tsx">
+<script lang="tsx" setup>
 import type { MenuOption } from "naive-ui";
 import { NIcon } from "naive-ui";
 import { Home20Regular } from "@vicons/fluent";
 import { Settings20Regular } from "@vicons/fluent";
+import { RouterLink } from "vue-router";
 
 const menuOptions: MenuOption[] = [
   {
-    label: "首页",
+    label: () => (
+      <RouterLink to={{ name: "home" }}>
+        <p>首页</p>
+      </RouterLink>
+    ),
     key: "home",
     icon: () => (
       <NIcon>
@@ -28,7 +33,11 @@ const menuOptions: MenuOption[] = [
     ),
   },
   {
-    label: "设置",
+    label: () => (
+      <RouterLink to={{ name: "setting" }}>
+        <p>设置</p>
+      </RouterLink>
+    ),
     key: "setting",
     icon: () => (
       <NIcon>
@@ -39,4 +48,4 @@ const menuOptions: MenuOption[] = [
 ];
 </script>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped></style>

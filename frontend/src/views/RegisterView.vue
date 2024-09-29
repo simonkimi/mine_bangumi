@@ -42,6 +42,7 @@
 
 <script lang="tsx" setup>
 import type { FormInst, FormRules } from "naive-ui";
+import { initUser } from "@/api/api";
 
 const dialog = useDialog();
 const userFormRef = ref<FormInst | null>(null);
@@ -60,10 +61,17 @@ const userForm = ref<UserModel>({
 });
 
 async function userNextStep() {
-  if (!(await userFormRef.value?.validate())) return;
   isLoading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  isLoading.value = false;
+  try {
+    if (!(await userFormRef.value?.validate())) return;
+    await initUser(userForm.value.username, userForm.value.password);
+  } catch (error) {
+    dialog.error({
+      title: "注册失败",
+    });
+  } finally {
+    isLoading.value = false;
+  }
 }
 
 async function skipUser() {

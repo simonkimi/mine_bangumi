@@ -21,6 +21,7 @@ func UpdateUser(c Config, username *string, password *string) string {
 		token = hash.GenerateRandomKey(40)
 		c.SetString(UserApiToken, token)
 	}
+	c.SetBool(SystemInit, true)
 	c.Save()
 	return token
 }
