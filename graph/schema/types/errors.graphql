@@ -8,4 +8,5 @@ enum ApiStatusEnum {
     TIMEOUT
     THIRD_PARTY_API_ERROR
     BAD_REQUEST
+    FORM_VALIDATION_ERROR
 }

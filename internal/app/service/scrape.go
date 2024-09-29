@@ -26,7 +26,7 @@ func (s *ScraperService) ScrapeService(ctx context.Context, input *api.ScrapeAcg
 }
 
 func (s *ScraperService) scrapeTmDb(ctx context.Context, form *api.ScrapeAcgSourceInput) ([]*api.ScrapeAcgResult, error) {
-	language, err := s.tmdb.GetTmdbLanguage(form.Language)
+	language, err := tmdb.GetTmdbLanguage(form.Language)
 	if err != nil {
 		return nil, err
 	}

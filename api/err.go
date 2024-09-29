@@ -58,6 +58,17 @@ func NewBadRequestErrorf(format string, args ...any) error {
 	}
 }
 
+func NewFormValidationError(errMsg map[string]string) error {
+	return &Error{
+		Message:       "Form validation error",
+		Code:          APIStatusEnumFormValidationError,
+		internalError: nil,
+		Extensions: map[string]any{
+			"fields": errMsg,
+		},
+	}
+}
+
 func NewUnAuthError() error {
 	return &Error{
 		Message:    "Unauthorized",

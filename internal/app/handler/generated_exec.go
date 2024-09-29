@@ -469,6 +469,7 @@ type UserConfigResult {
     TIMEOUT
     THIRD_PARTY_API_ERROR
     BAD_REQUEST
+    FORM_VALIDATION_ERROR
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

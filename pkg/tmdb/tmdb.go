@@ -10,6 +10,12 @@ import (
 	"strconv"
 )
 
+const (
+	TmdbDefaultApikey = "32b19d6a05b512190a056fa4e747cbbc"
+	TmdbHost          = "https://api.themoviedb.org"
+	TmdbImageHost     = "https://image.tmdb.org"
+)
+
 type Config struct {
 	apiKey string
 	client func() *resty.Client
@@ -27,7 +33,7 @@ func NewTmdb(config *Config) *Tmdb {
 	return &Tmdb{config: config}
 }
 
-func (t *Tmdb) GetTmdbLanguage(language api.ScraperLanguage) (string, error) {
+func GetTmdbLanguage(language api.ScraperLanguage) (string, error) {
 	switch language {
 	case api.ScraperLanguageEn:
 		return "en-US", nil
@@ -43,7 +49,7 @@ func (t *Tmdb) GetTmdbLanguage(language api.ScraperLanguage) (string, error) {
 
 func (t *Tmdb) getApiKey() string {
 	if xstring.IsEmptyOrWhitespace(t.config.apiKey) {
-		return api.TmdbDefaultApikey
+		return TmdbDefaultApikey
 	}
 	return t.config.apiKey
 }
@@ -53,7 +59,9 @@ func (t *Tmdb) Search(ctx context.Context, title string) ([]*SearchResultItem, e
 	results := make([]*SearchResultItem, 0)
 	for {
 		var result rawSearchResult
-		req, err := t.config.client().R().
+		req, err := t.config.client().
+			SetBaseURL(TmdbHost).
+			R().
 			SetContext(ctx).
 			SetQueryParams(map[string]string{
 				"api_key":       t.getApiKey(),
@@ -85,7 +93,9 @@ func (t *Tmdb) Search(ctx context.Context, title string) ([]*SearchResultItem, e
 
 func (t *Tmdb) QueryForDetail(ctx context.Context, id int, language string) (*DetailData, error) {
 	var detail DetailData
-	req, err := t.config.client().R().
+	req, err := t.config.client().
+		SetBaseURL(TmdbHost).
+		R().
 		SetContext(ctx).
 		SetQueryParams(map[string]string{
 			"api_key":  t.getApiKey(),

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-resty/resty/v2"
 	"github.com/simonkimi/minebangumi/api"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
@@ -22,7 +23,9 @@ func TestSearch(t *testing.T) {
 }
 
 func TestDetail(t *testing.T) {
-	result, err := newTestTmdb().QueryForDetail(context.Background(), 30980, api.LanguageZhHans)
+	language, err := GetTmdbLanguage(api.ScraperLanguageEn)
+	require.Nil(t, err)
+	result, err := newTestTmdb().QueryForDetail(context.Background(), 30980, language)
 	if err != nil {
 		t.Error(err)
 	}

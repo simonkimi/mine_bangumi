@@ -9,6 +9,13 @@ import (
 
 // ConfigUser is the resolver for the configUser field.
 func (r *mutationResolver) ConfigUser(_ context.Context, input api.UserConfigInput) (*api.ConfigResult, error) {
+	if err := api.Validate(
+		api.V("username", input.Username, "omitempty,ascii,min=3,max=20"),
+		api.V("password", input.Password, "omitempty,ascii,max=40,ascii"),
+	); err != nil {
+		return nil, err
+	}
+
 	conf := r.mgr.GetConfig()
 	if input.Username != nil {
 		conf.SetString(config.UserUsername, *input.Username)
