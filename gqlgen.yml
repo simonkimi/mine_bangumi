@@ -16,6 +16,7 @@ struct_tag: json
 
 autobind:
   - "github.com/simonkimi/minebangumi/api"
+  - "github.com/simonkimi/minebangumi/internal/app/model"
 
 models:
   ID:
@@ -29,3 +30,4 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+

@@ -6,4 +6,5 @@ type SystemInfo struct {
 	CurrentDatabaseVersion uint   `json:"current_database_version"`
 	IsSystemInit           bool   `json:"is_system_init"`
 	IsLogin                bool   `json:"is_login"`
+	Username               string `json:"username"`
 }

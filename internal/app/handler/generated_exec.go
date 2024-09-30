@@ -51,7 +51,8 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		ConfigUser func(childComplexity int, input api.UserConfigInput) int
+		ConfigUser      func(childComplexity int, input api.UserConfigInput) int
+		RefreshAPIToken func(childComplexity int) int
 	}
 
 	ParseAcgSourceResult struct {
@@ -91,6 +92,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	ConfigUser(ctx context.Context, input api.UserConfigInput) (*api.ConfigResult, error)
+	RefreshAPIToken(ctx context.Context) (*api.UserConfigResult, error)
 }
 type QueryResolver interface {
 	ScraperSource(ctx context.Context, input api.ParseAcgSourceInput) (*api.ParseAcgSourceResult, error)
@@ -134,6 +136,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ConfigUser(childComplexity, args["input"].(api.UserConfigInput)), true
+
+	case "Mutation.refreshApiToken":
+		if e.complexity.Mutation.RefreshAPIToken == nil {
+			break
+		}
+
+		return e.complexity.Mutation.RefreshAPIToken(childComplexity), true
 
 	case "ParseAcgSourceResult.files":
 		if e.complexity.ParseAcgSourceResult.Files == nil {
@@ -396,6 +405,8 @@ var sources = []*ast.Source{
 type Mutation {
     "配置用户"
     configUser(input: UserConfigInput!): ConfigResult!
+    "刷新API令牌"
+    refreshApiToken: UserConfigResult!
 }`, BuiltIn: false},
 	{Name: "../../../graph/schema/types/acg_source.graphql", Input: `enum SourceParserEnum {
     BANGUMI
@@ -684,6 +695,56 @@ func (ec *executionContext) fieldContext_Mutation_configUser(ctx context.Context
 	if fc.Args, err = ec.field_Mutation_configUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_refreshApiToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_refreshApiToken(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RefreshAPIToken(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*api.UserConfigResult)
+	fc.Result = res
+	return ec.marshalNUserConfigResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐUserConfigResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_refreshApiToken(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "username":
+				return ec.fieldContext_UserConfigResult_username(ctx, field)
+			case "token":
+				return ec.fieldContext_UserConfigResult_token(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserConfigResult", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -3666,6 +3727,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "refreshApiToken":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_refreshApiToken(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4586,6 +4654,10 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 func (ec *executionContext) unmarshalNUserConfigInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐUserConfigInput(ctx context.Context, v interface{}) (api.UserConfigInput, error) {
 	res, err := ec.unmarshalInputUserConfigInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUserConfigResult2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐUserConfigResult(ctx context.Context, sel ast.SelectionSet, v api.UserConfigResult) graphql.Marshaler {
+	return ec._UserConfigResult(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNUserConfigResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐUserConfigResult(ctx context.Context, sel ast.SelectionSet, v *api.UserConfigResult) graphql.Marshaler {

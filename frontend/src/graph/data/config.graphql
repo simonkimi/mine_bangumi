@@ -1,0 +1,10 @@
+fragment UserConfigData on UserConfigResult {
+    username
+    token
+}
+
+fragment ConfigData on ConfigResult {
+    user {
+        ...UserConfigData
+    }
+}

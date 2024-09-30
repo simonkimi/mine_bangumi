@@ -8,4 +8,6 @@ type Query {
 type Mutation {
     "配置用户"
     configUser(input: UserConfigInput!): ConfigResult!
+    "刷新API令牌"
+    refreshApiToken: UserConfigResult!
 }

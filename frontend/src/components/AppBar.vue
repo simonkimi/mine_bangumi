@@ -14,34 +14,33 @@
 <script lang="tsx" setup>
 import type { MenuOption } from "naive-ui";
 import { NIcon } from "naive-ui";
-import { Home20Regular } from "@vicons/fluent";
-import { Settings20Regular } from "@vicons/fluent";
 import { RouterLink } from "vue-router";
+import { HomeRoute, SettingsRoute } from "@/router";
 
 const menuOptions: MenuOption[] = [
   {
     label: () => (
-      <RouterLink to={{ name: "home" }}>
+      <RouterLink to={{ name: HomeRoute }}>
         <p>首页</p>
       </RouterLink>
     ),
     key: "home",
     icon: () => (
       <NIcon>
-        <Home20Regular />
+        <i-tabler-home />
       </NIcon>
     ),
   },
   {
     label: () => (
-      <RouterLink to={{ name: "setting" }}>
+      <RouterLink to={{ name: SettingsRoute }}>
         <p>设置</p>
       </RouterLink>
     ),
-    key: "setting",
+    key: "settings",
     icon: () => (
       <NIcon>
-        <Settings20Regular />
+        <i-ant-design-setting-outlined />
       </NIcon>
     ),
   },

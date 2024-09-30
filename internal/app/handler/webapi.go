@@ -67,7 +67,7 @@ func (w *WebApi) frontend() {
 func (w *WebApi) apiV1Group() {
 	v1 := w.Engine.Group("/api/v1")
 	v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	v1.GET("/user/login", w.login)
+	v1.POST("/user/login", w.login)
 	v1.POST("/user/init", w.initUser)
 	v1.GET("/system/status", w.systemStatus)
 
@@ -79,7 +79,7 @@ func (w *WebApi) apiV1Group() {
 			srv.ServeHTTP(c.Writer, c.Request)
 		})
 		loginV1.GET("/", func(c *gin.Context) {
-			playground.Handler("GraphQL playground", "/query").ServeHTTP(c.Writer, c.Request)
+			playground.Handler("GraphQL playground", "/playground").ServeHTTP(c.Writer, c.Request)
 		})
 
 		proxyGroup := loginV1.Group("/proxy")

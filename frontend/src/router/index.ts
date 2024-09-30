@@ -1,41 +1,91 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
-import SettingView from "@/views/SettingView.vue";
-import { useSystemStore } from "@/stores/system";
+import { useSystemStore } from "@/stores/systemStore";
 import RegisterView from "@/views/RegisterView.vue";
+import { useUserStore } from "@/stores/userStore";
+
+export const HomeRoute = "Home";
+export const RegisterRoute = "Register";
+export const SettingsRoute = "Settings";
+export const UserSettingsRoute = "UserSettings";
+export const RssSettingsRoute = "RssSettings";
+export const DownloaderSettingsRoute = "DownloaderSettings";
+export const LoginRoute = "Login";
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes: [
     {
       path: "/",
-      name: "home",
+      name: HomeRoute,
       component: HomeView,
     },
     {
       path: "/register",
-      name: "register",
+      name: RegisterRoute,
       component: RegisterView,
       meta: {
         showAppBar: false,
       },
     },
     {
-      path: "/setting",
-      name: "setting",
-      component: SettingView,
+      path: "/login",
+      name: LoginRoute,
+      component: () => import("@/views/LoginView.vue"),
+      meta: {
+        showAppBar: false,
+      },
+    },
+    {
+      path: "/settings",
+      name: SettingsRoute,
+      component: () => import("@/views/SettingsView.vue"),
+      children: [
+        {
+          path: "",
+          redirect: { name: UserSettingsRoute },
+        },
+        {
+          path: "user",
+          name: UserSettingsRoute,
+          component: () => import("@/components/UserSettings.vue"),
+        },
+        {
+          path: "rss",
+          name: RssSettingsRoute,
+          component: () => import("@/components/RssSettings.vue"),
+        },
+        {
+          path: "downloader",
+          name: DownloaderSettingsRoute,
+          component: () => import("@/components/DownloaderSettings.vue"),
+        },
+      ],
     },
   ],
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const systemStore = useSystemStore();
-  if (!systemStore.isSystemInit && to.name !== "register") {
-    console.log("未初始化用户信息，跳转到引导页");
-    next({ name: "register" });
-  } else {
-    next();
+  const userStore = useUserStore();
+  if (!systemStore.isStoreInit) {
+    await systemStore.loadSystemData();
+    await userStore.setUsername(systemStore.username);
   }
+
+  if (!systemStore.isSystemInit && to.name !== RegisterRoute) {
+    console.log("未初始化用户信息，跳转到引导页");
+    next({ name: RegisterRoute });
+    return;
+  }
+
+  if (!systemStore.isLogin && to.name !== LoginRoute) {
+    console.log("未登录，跳转到登录页");
+    next({ name: LoginRoute, query: { redirect: to.fullPath } });
+    return;
+  }
+
+  next();
 });
 
 export default router;

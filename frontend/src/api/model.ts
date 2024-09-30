@@ -1,4 +1,4 @@
-import { ApiStatusEnum } from "@/gql/graphql";
+import { ApiStatusEnum } from "@/generate/graphql";
 
 export interface ApiResult<T> {
   code: ApiStatusEnum;
@@ -12,6 +12,7 @@ export interface SystemInfo {
   current_database_version: number;
   is_system_init: boolean;
   is_login: boolean;
+  username: string;
 }
 
 export type DownloaderType = "qbittorrent" | "aria2" | "builtin";

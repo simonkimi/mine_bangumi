@@ -1,0 +1,11 @@
+mutation ConfigUser($input: UserConfigInput!) {
+    configUser(input: $input) {
+        ...ConfigData
+    }
+}
+
+mutation RefreshApiToken {
+    refreshApiToken {
+        ...UserConfigData
+    }
+}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/simonkimi/minebangumi/api"
 	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/pkg/hash"
 )
 
 // ConfigUser is the resolver for the configUser field.
@@ -18,6 +19,12 @@ func (r *mutationResolver) ConfigUser(_ context.Context, input api.UserConfigInp
 	conf := r.mgr.GetConfig()
 	config.UpdateUser(conf, input.Username, input.Password)
 	return getConfigResult(conf), nil
+}
+
+func (r *mutationResolver) RefreshAPIToken(ctx context.Context) (*api.UserConfigResult, error) {
+	conf := r.mgr.GetConfig()
+	conf.SetString(config.UserApiToken, hash.GenerateRandomKey(40))
+	return getUserConfig(conf), nil
 }
 
 func getUserConfig(conf config.Config) *api.UserConfigResult {

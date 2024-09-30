@@ -42,8 +42,9 @@
 
 <script lang="tsx" setup>
 import type { FormInst, FormRules } from "naive-ui";
-import { initUser } from "@/api/api";
+import { useApi } from "@/api/api";
 
+const { initUser } = useApi();
 const dialog = useDialog();
 const userFormRef = ref<FormInst | null>(null);
 const isLoading = ref(false);
