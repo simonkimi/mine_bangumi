@@ -43,11 +43,17 @@
 <script lang="tsx" setup>
 import type { FormInst, FormRules } from "naive-ui";
 import { useApi } from "@/api/api";
+import { HomeRoute } from "@/router";
+import { useUserStore } from "@/stores/userStore";
+import { apiErrorMessage } from "@/api/errno";
+import { asyncDialog } from "@/utils/async_dialog";
 
 const { initUser } = useApi();
 const dialog = useDialog();
 const userFormRef = ref<FormInst | null>(null);
 const isLoading = ref(false);
+const router = useRouter();
+const userStore = useUserStore();
 
 interface UserModel {
   username: string;
@@ -65,10 +71,17 @@ async function userNextStep() {
   isLoading.value = true;
   try {
     if (!(await userFormRef.value?.validate())) return;
-    await initUser(userForm.value.username, userForm.value.password);
+    const result = await initUser(
+      userForm.value.username,
+      userForm.value.password
+    );
+    await userStore.setApiToken(result.token);
+    await router.push({ name: HomeRoute });
   } catch (error) {
+    const errMsg = apiErrorMessage(error) ?? "注册失败";
     dialog.error({
-      title: "注册失败",
+      title: "错误",
+      content: errMsg,
     });
   } finally {
     isLoading.value = false;
@@ -76,26 +89,37 @@ async function userNextStep() {
 }
 
 async function skipUser() {
-  const isSkip = await new Promise((resolve) => {
-    dialog.warning({
-      title: "是否跳过配置",
-      content: () => (
-        <div class="my-2">
-          <p>跳过用户配置将进行无密码登录</p>
-          <p class="text-red-500 text-sm">
-            <strong>请确保在安全的环境下使用</strong>
-          </p>
-        </div>
-      ),
-      positiveText: "跳过",
-      negativeText: "取消",
-      onPositiveClick: () => resolve(true),
-      onNegativeClick: () => resolve(false),
-      onMaskClick: () => resolve(false),
-    });
+  const isSkip = await asyncDialog(dialog.warning, {
+    title: "是否跳过配置",
+    content: () => (
+      <div class="my-2">
+        <p>跳过用户配置将进行无密码登录</p>
+        <p class="text-red-500 text-sm">
+          <strong>请确保在安全的环境下使用</strong>
+        </p>
+      </div>
+    ),
+    positiveText: "跳过",
+    negativeText: "取消",
+    positiveValue: true,
   });
 
   if (!isSkip) return;
+  isLoading.value = true;
+
+  try {
+    const result = await initUser("admin", "");
+    await userStore.setApiToken(result.token);
+    await router.push({ name: HomeRoute });
+  } catch (error) {
+    const errMsg = apiErrorMessage(error) ?? "跳过配置失败";
+    dialog.error({
+      title: "错误",
+      content: errMsg,
+    });
+  } finally {
+    isLoading.value = false;
+  }
 }
 
 const userFormRules: FormRules = {

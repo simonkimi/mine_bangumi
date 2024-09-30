@@ -5,7 +5,7 @@ import {
   type SystemInfo,
   type UserLoginInfo,
 } from "@/api/model";
-import { ApiStatusEnum } from "@/generate/graphql";
+import { ApiStatusEnum } from "@/gql/graphql";
 import { useUserStore } from "@/stores/userStore";
 
 const client = axios.create({
