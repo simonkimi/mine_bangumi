@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"runtime/debug"
 	"sync"
+	"time"
 )
 
 type Manager struct {
@@ -61,6 +62,7 @@ func (m *Manager) AddJob(ctx context.Context, exec Exec) int {
 	if len(m.queue) == 1 {
 		m.notEmpty.Broadcast()
 	}
+	m.notifyJobAdd(j)
 	return j.ID
 }
 
@@ -132,27 +134,31 @@ func (m *Manager) loop() {
 
 func (m *Manager) startJob(ctx context.Context, j *Job) chan struct{} {
 	ctx, cancel := context.WithCancel(ctx)
-	j.onJobStart(cancel)
+	t := time.Now()
+	j.Status = StatusRunning
+	j.StartTime = &t
+	j.cancelFunc = cancel
 	done := make(chan struct{})
 	go m.execJob(ctx, j, done)
+	m.notifyJobUpdate(j)
 	return done
 }
 
 func (m *Manager) execJob(ctx context.Context, j *Job, done chan struct{}) {
 	defer close(done)
-	defer j.onJobFinish()
+	defer m.onJobFinish(j)
 	defer func() {
 		if r := recover(); r != nil {
 			logrus.Errorf("panic in job %d: %v", j.ID, r)
 			logrus.Error(string(debug.Stack()))
-			j.onJobFailed()
+			m.onJobFailed(j)
 		}
 	}()
 
 	progress := m.newProgress(j)
 	err := j.exec.Execute(ctx, progress)
 	if err != nil {
-		j.onJobError(err)
+		m.onJobError(j, err)
 		logrus.WithError(err).Errorf("task failed")
 	}
 }

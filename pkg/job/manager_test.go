@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const tinyTime = 100 * time.Millisecond
+const tinyTime = 10 * time.Millisecond
 
 type testJobExec struct {
 	started   chan struct{}
@@ -124,4 +124,90 @@ func TestCancel(t *testing.T) {
 	req.NotNil(job1.EndTime)
 	req.Len(m.queue, 0)
 	req.True(exec1.cancelled)
+}
+
+func TestListener(t *testing.T) {
+	m := NewManager()
+	ctx, cancel := context.WithCancel(context.Background())
+	notifier := m.Subscribe(ctx)
+
+	exec1 := newTestJobExec(t, make(chan struct{}))
+	job1Id := m.AddJob(context.Background(), exec1)
+
+	req := require.New(t)
+	req.Len(m.listeners, 1)
+
+	select {
+	case newJob := <-notifier.NewJob:
+		req.Equal(job1Id, newJob.ID)
+		req.Equal(StatusReady, newJob.Status)
+	case <-time.After(time.Second):
+		t.Error("no new job notification")
+	}
+
+	select {
+	case newJob := <-notifier.UpdatedJob:
+		req.Equal(job1Id, newJob.ID)
+		req.Equal(StatusRunning, newJob.Status)
+	case <-time.After(time.Second):
+		t.Error("no updated job notification")
+	}
+
+	select {
+	case <-exec1.started:
+	case <-time.After(time.Second):
+		t.Error("exec was not started")
+	}
+
+	exec1.progress.SetPercent(0.1)
+	select {
+	case updatedJob := <-notifier.UpdatedJob:
+		req.Equal(job1Id, updatedJob.ID)
+		req.Equal(0.1, updatedJob.Progress)
+	case <-time.After(time.Second):
+		t.Error("no updated job notification")
+	}
+
+	exec1.progress.SetPercent(0.5)
+	select {
+	case updatedJob := <-notifier.UpdatedJob:
+		req.Equal(job1Id, updatedJob.ID)
+		req.Equal(0.5, updatedJob.Progress)
+	case <-time.After(time.Second):
+		t.Error("no updated job notification")
+	}
+
+	close(exec1.finish)
+
+	select {
+	case removeJob := <-notifier.RemovedJob:
+		req.Equal(job1Id, removeJob.ID)
+		req.Equal(StatusFinished, removeJob.Status)
+	case <-time.After(time.Second):
+		t.Error("no removed job notification")
+	}
+
+	select {
+	case <-notifier.UpdatedJob:
+		t.Error("received an additional updatedJob")
+	case <-time.After(100 * time.Millisecond):
+	}
+
+	// cancel job
+	exec2 := newTestJobExec(t, make(chan struct{}))
+	job2Id := m.AddJob(context.Background(), exec2)
+	m.CancelJob(job2Id)
+
+	select {
+	case removeJob := <-notifier.RemovedJob:
+		req.Equal(job2Id, removeJob.ID)
+		req.Equal(StatusCancelled, removeJob.Status)
+	case <-time.After(time.Second):
+		t.Error("no removed job notification")
+	}
+
+	// cancel subscription
+	cancel()
+	time.Sleep(tinyTime)
+	req.Len(m.listeners, 0)
 }

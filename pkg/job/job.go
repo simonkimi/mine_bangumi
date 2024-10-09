@@ -2,7 +2,6 @@ package job
 
 import (
 	"context"
-	"sync"
 	"time"
 )
 
@@ -24,8 +23,6 @@ type Job struct {
 	StartTime *time.Time
 	EndTime   *time.Time
 	errMsg    *string
-
-	mux sync.Mutex
 
 	exec       Exec
 	outerCtx   context.Context
@@ -51,18 +48,9 @@ func (j *Job) cancel() {
 	}
 }
 
-func (j *Job) onJobStart(cancel context.CancelFunc) {
-	j.mux.Lock()
-	defer j.mux.Unlock()
-	t := time.Now()
-	j.StartTime = &t
-	j.Status = StatusRunning
-	j.cancelFunc = cancel
-}
-
-func (j *Job) onJobFinish() {
-	j.mux.Lock()
-	defer j.mux.Unlock()
+func (m *Manager) onJobFinish(j *Job) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	if j.Status == StatusStopping {
 		j.Status = StatusCancelled
 	} else if j.Status != StatusFailed {
@@ -72,17 +60,17 @@ func (j *Job) onJobFinish() {
 	j.EndTime = &t
 }
 
-func (j *Job) onJobFailed() {
-	j.mux.Lock()
-	defer j.mux.Unlock()
+func (m *Manager) onJobFailed(j *Job) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	j.Status = StatusFailed
 	t := time.Now()
 	j.EndTime = &t
 }
 
-func (j *Job) onJobError(err error) {
-	j.mux.Lock()
-	defer j.mux.Unlock()
+func (m *Manager) onJobError(j *Job, err error) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	errStr := err.Error()
 	j.errMsg = &errStr
 	j.Status = StatusFailed
