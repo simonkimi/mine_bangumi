@@ -46,17 +46,24 @@
         <n-input :value="apiKey" placeholder="" readonly />
         <n-tooltip>
           <template #trigger>
-            <n-button class="ml-3" size="small" type="primary">
+            <n-button
+              class="ml-3"
+              size="small"
+              type="primary"
+              @click="copyApiKey"
+            >
               <n-icon>
                 <i-ph-copy-fill />
               </n-icon>
             </n-button>
           </template>
-          <span>点击复制</span>
+          <span>{{ copyTooltip }}</span>
         </n-tooltip>
       </n-form-item>
       <div class="flex">
-        <n-button size="small" type="primary">更新ApiKey</n-button>
+        <n-button size="small" type="primary" @click="updateApiKey"
+          >更新ApiKey
+        </n-button>
       </div>
     </n-form>
   </div>
@@ -66,10 +73,23 @@
 import type { FormInst, FormItemRule, FormRules } from "naive-ui";
 import { useUserStore } from "@/stores/userStore";
 import { validateForm } from "@/utils/form";
+import { asyncDialog } from "@/utils/async_dialog";
+import {
+  type UserConfigDataFragment,
+  type RefreshApiTokenMutation,
+  RefreshApiTokenDocument,
+} from "@/gql/graphql";
+import { useMutation } from "@vue/apollo-composable";
 
 const userStore = useUserStore();
-
+const dialog = useDialog();
 const apiKey = ref(userStore.apiToken);
+const clipboard = useClipboard();
+const message = useMessage();
+
+const refreshToken = useMutation<RefreshApiTokenMutation>(
+  RefreshApiTokenDocument
+);
 
 const userRef = ref<FormInst | null>();
 const userForm = ref({
@@ -77,12 +97,42 @@ const userForm = ref({
   password: "",
   repeatPassword: "",
 });
+const copyTooltip = ref("点击复制");
 
 async function updateUser() {
   console.log(userForm.value);
   if (!(await validateForm(userRef.value))) {
     return;
   }
+}
+
+async function updateApiKey() {
+  const check = await asyncDialog(dialog.info, {
+    title: "更新ApiKey",
+    content: "确定要更新ApiKey吗?",
+    positiveText: "确定",
+    negativeText: "取消",
+    positiveValue: true,
+  });
+
+  if (!check) {
+    return;
+  }
+  console.log("updateApiKey");
+  const data = await refreshToken.mutate();
+  const token = data?.data?.refreshApiToken as UserConfigDataFragment;
+  if (token) {
+    apiKey.value = token.token;
+    await userStore.setApiToken(token.token);
+  }
+}
+
+async function copyApiKey() {
+  clipboard.copy(apiKey.value);
+  copyTooltip.value = "已复制";
+  useTimeoutFn(() => {
+    copyTooltip.value = "点击复制";
+  }, 1000);
 }
 
 const userRules: FormRules = {

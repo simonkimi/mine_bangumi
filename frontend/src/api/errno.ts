@@ -1,4 +1,12 @@
-import { ApiStatusEnum } from "@/generate/graphql";
+import { ApiStatusEnum } from "@/gql/graphql";
+import { ApiError } from "@/api/model";
+
+export function apiErrorMessage(error: any): string | null {
+  if (error instanceof ApiError) {
+    return errorMessage(error.code);
+  }
+  return null;
+}
 
 export function errorMessage(code: ApiStatusEnum): string {
   switch (code) {

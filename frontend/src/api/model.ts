@@ -1,4 +1,4 @@
-import { ApiStatusEnum } from "@/generate/graphql";
+import { ApiStatusEnum } from "@/gql/graphql";
 
 export interface ApiResult<T> {
   code: ApiStatusEnum;
