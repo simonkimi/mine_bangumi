@@ -33,8 +33,9 @@ func Validate(rules ...*ValidateItem) error {
 		err := v.Var(rule.value, rule.tag)
 		if err != nil {
 			var verr validator.ValidationErrors
-			errors.As(err, &verr)
-			errMsg[rule.key] = verr[0].Tag()
+			if errors.As(err, &verr) {
+				errMsg[rule.key] = verr[0].Tag()
+			}
 		}
 	}
 	if len(errMsg) == 0 {

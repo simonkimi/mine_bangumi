@@ -1,0 +1,30 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "adult": false,
+      "backdrop_path": "/73uQJImy9J9w93zFEh8JtdQVOQR.jpg",
+      "genre_ids": [
+        16,
+        10765,
+        35,
+        9648
+      ],
+      "id": 30980,
+      "origin_country": [
+        "JP"
+      ],
+      "original_language": "ja",
+      "original_name": "とある魔術の禁書目録",
+      "overview": "Kamijo is a student in Academy City, where people use science to develop supernatural abilities. The guy’s got a lot of heart – luckily for a young nun named Index. She’s on the run from a sorcery society that covets the astonishing 103,000 volumes of magical knowledge stored in her memory. When Index stumbles into Kamijo’s life, she finds a faithful friend and protector, and while Kamijo’s easily the weakest kid in Academy City, he’s got something else going for him: the Imagine Breaker, an unexplainable power stored in his right hand that negates the powers of others. With scientists and sorcerers attacking from all sides, the Imagine Breaker will definitely come in handy – but it’s Kamijo’s loyalty to Index that will be his greatest weapon in the fight to keep her safe.",
+      "popularity": 135.524,
+      "poster_path": "/v3Ka0J3iMte50oiH4cmXPISM3rm.jpg",
+      "first_air_date": "2008-10-05",
+      "name": "A Certain Magical Index",
+      "vote_average": 7.6,
+      "vote_count": 149
+    }
+  ],
+  "total_pages": 1,
+  "total_results": 1
+}

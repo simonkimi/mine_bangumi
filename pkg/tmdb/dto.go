@@ -17,13 +17,6 @@ type SearchResultItem struct {
 	VoteCount        int      `json:"vote_count"`
 }
 
-type rawSearchResult struct {
-	Page         int                 `json:"page"`
-	Results      []*SearchResultItem `json:"results"`
-	TotalPages   int                 `json:"total_pages"`
-	TotalResults int                 `json:"total_results"`
-}
-
 type DetailData struct {
 	Adult          bool   `json:"adult"`
 	BackdropPath   string `json:"backdrop_path"`

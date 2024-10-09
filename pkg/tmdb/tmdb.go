@@ -108,3 +108,10 @@ func (t *Tmdb) QueryForDetail(ctx context.Context, id int, language string) (*De
 	}
 	return &detail, nil
 }
+
+type rawSearchResult struct {
+	Page         int                 `json:"page"`
+	Results      []*SearchResultItem `json:"results"`
+	TotalPages   int                 `json:"total_pages"`
+	TotalResults int                 `json:"total_results"`
+}

@@ -1,28 +1,28 @@
 package model
 
-import (
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
+import "gorm.io/datatypes"
 
+// Bangumi 番剧
 type Bangumi struct {
 	gorm.Model
-	OfficialTitle   string `gorm:"default:'official_title'"` // 番剧名称
-	Year            string `gorm:"default:''"`               // 番剧年份
-	TitleRaw        string `gorm:"default:'title_raw'"`      // 番剧原名
-	Season          int    `gorm:"default:1"`                // 番剧季度
-	SeasonRaw       string `gorm:"default:''"`               // 番剧季度原名
-	GroupName       string `gorm:"default:''"`               // 字幕组
-	Dpi             string `gorm:"default:''"`               // 分辨率
-	Source          string `gorm:"default:''"`               // 来源
-	Subtitle        string `gorm:"default:''"`               // 字幕
-	EpsCollect      bool   `gorm:"default:false"`            // 是否已收集
-	Offset          int    `gorm:"default:0"`                // 番剧偏移量
-	BlackListFilter string `gorm:"default:'720,\\d+-\\d+'"`  // 黑名单过滤器
-	WhiteListFilter string `gorm:"default:''"`               // 白名单过滤器
-	RssLink         string `gorm:"default:''"`               // 番剧RSS链接
-	PosterLink      string `gorm:"default:''"`               // 番剧海报链接
-	Added           bool   `gorm:"default:false"`            // 是否已添加
-	RuleName        string `gorm:"default:''"`               // 番剧规则名
-	SavePath        string `gorm:"default:''"`               // 番剧保存路径
-	IsDeleted       bool   `gorm:"default:false"`            // 是否已删除
+	SubscriptionID uint           `gorm:"column:subscription_id"`
+	Subscription   *Subscription  `gorm:"foreignKey:SubscriptionID"` // 订阅
+	OfficialTitle  string         `gorm:"column:official_title"`     // 名称
+	FirstAirData   string         `gorm:"column:first_air_data"`     // 首播日期
+	Season         int            `gorm:"column:season"`             // 季度
+	GroupName      string         `gorm:"column:group_name"`         // 字幕组/发布者
+	Poster         string         `gorm:"column:poster"`             // 海报
+	Meta           datatypes.JSON `gorm:"column:meta"`               // 元数据
+}
+
+// BangumiEpisode 番剧集
+type BangumiEpisode struct {
+	gorm.Model
+	SubscriptionFileID uint              `gorm:"column:subscription_file_id"`
+	SubscriptionFile   *SubscriptionFile `gorm:"foreignKey:SubscriptionFileID"` // 订阅文件项
+	Name               string            `gorm:"column:name"`                   // 名称
+	Episode            int               `gorm:"column:episode"`                // 集数
+	Poster             string            `gorm:"column:poster"`                 // 海报
+	Overview           string            `gorm:"column:overview"`               // 简介
 }
