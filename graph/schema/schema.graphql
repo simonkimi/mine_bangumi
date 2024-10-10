@@ -1,8 +1,9 @@
 type Query {
-    "解析Acg数据源"
-    scraperSource(input: ParseAcgSourceInput!): ParseAcgSourceResult!
     "刮削Acg数据源"
-    scraperDb(input: ScrapeAcgSourceInput!): [ScrapeAcgResult!]!
+    scraperSearch(input: ScrapeSearchInput!): [ScrapeSearchResult!]!
+
+    "解析Acg数据源"
+    parseAcgSubscription(input: ParseAcgSubscriptionInput!): ParseAcgSubscriptionResult!
 }
 
 type Mutation {
@@ -10,4 +11,8 @@ type Mutation {
     configUser(input: UserConfigInput!): ConfigResult!
     "刷新API令牌"
     refreshApiToken: UserConfigResult!
+
+
+    "添加Acg订阅"
+    addAcgSubscription(input: AddSubscriptionInput!): Boolean
 }

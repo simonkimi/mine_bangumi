@@ -8,14 +8,8 @@ import (
 	"testing"
 )
 
-func newTestTmdb() *Tmdb {
-	return NewTmdb(NewConfig(TmdbDefaultApikey, func() *resty.Client {
-		return resty.New()
-	}))
-}
-
 func TestSearch(t *testing.T) {
-	result, err := newTestTmdb().Search(context.Background(), "魔法禁书目录")
+	result, err := Search(context.Background(), resty.New(), DefaultApikey, "魔法禁书目录")
 	if err != nil {
 		t.Error(err)
 	}
@@ -25,7 +19,7 @@ func TestSearch(t *testing.T) {
 func TestDetail(t *testing.T) {
 	language, err := GetTmdbLanguage(api.ScraperLanguageEn)
 	require.Nil(t, err)
-	result, err := newTestTmdb().QueryForDetail(context.Background(), 30980, language)
+	result, err := QueryForDetail(context.Background(), resty.New(), DefaultApikey, 30980, language)
 	if err != nil {
 		t.Error(err)
 	}

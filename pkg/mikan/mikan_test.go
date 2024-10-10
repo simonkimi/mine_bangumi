@@ -14,10 +14,7 @@ func TestParseBangumi(t *testing.T) {
 		http.ServeFile(w, r, "testdata/atri_bangumi.xml")
 	}))
 	defer mockServer.Close()
-	client := NewClient(func() *resty.Client {
-		return resty.New()
-	})
-	result, err := client.ParseBangumiByUrl(context.Background(), mockServer.URL)
+	result, err := ParseBangumiUrl(context.Background(), resty.New(), mockServer.URL)
 	if err != nil {
 		t.Error(err)
 	}
@@ -30,11 +27,7 @@ func TestParserMyBangumi(t *testing.T) {
 	}))
 	defer mockServer.Close()
 
-	client := NewClient(func() *resty.Client {
-		return resty.New()
-	})
-
-	result, err := client.ParseBangumiByUrl(context.Background(), mockServer.URL)
+	result, err := ParseBangumiUrl(context.Background(), resty.New(), mockServer.URL)
 	if err != nil {
 		t.Error(err)
 	}

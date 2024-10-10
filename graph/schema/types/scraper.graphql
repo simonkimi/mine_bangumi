@@ -1,18 +1,3 @@
-enum SourceParserEnum {
-    BANGUMI
-}
-
-input ParseAcgSourceInput {
-    source: String!
-    parser: SourceParserEnum!
-}
-
-type ParseAcgSourceResult {
-    title: String!
-    files: [String!]!
-    season: Int!
-}
-
 enum ScraperLanguage {
     Zh_HANS
     Zh_HANT
@@ -24,26 +9,27 @@ enum ScraperEnum {
     TMDB
 }
 
-input ScrapeAcgSourceInput {
+input ScrapeSearchInput {
     title: String!
     scraper: ScraperEnum!
     language: ScraperLanguage!
 }
 
-type ScrapeAcgSeasonResult {
+type ScrapeSearchSeasonResult {
     seasonId: Int!
     title: String!
     overview: String!
     poster: String!
 }
 
-type ScrapeAcgResult {
+type ScrapeSearchResult {
     scraper: ScraperEnum!
+    Id: String!
     title: String!
     originalTitle: String!
     firstAirDate: String!
     overview: String!
     poster: String!
     backdrop: String!
-    seasons: [ScrapeAcgSeasonResult!]!
+    seasons: [ScrapeSearchSeasonResult!]!
 }

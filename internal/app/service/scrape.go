@@ -2,49 +2,32 @@ package service
 
 import (
 	"context"
+	"github.com/go-resty/resty/v2"
 	"github.com/simonkimi/minebangumi/api"
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
+	"strconv"
 )
 
-const ScrapeTmDb = "tmdb"
-
-type ScraperService struct {
-	tmdb *tmdb.Tmdb
-}
-
-func newScraperService(tmdb *tmdb.Tmdb) *ScraperService {
-	return &ScraperService{tmdb: tmdb}
-}
-
-func (s *ScraperService) ScrapeService(ctx context.Context, input *api.ScrapeAcgSourceInput) ([]*api.ScrapeAcgResult, error) {
-	switch input.Scraper {
-	case api.ScraperEnumTmdb:
-		return s.scrapeTmDb(ctx, input)
-	default:
-		return nil, api.NewBadRequestErrorf("Unsupported scraper: %s", input.Scraper)
-	}
-}
-
-func (s *ScraperService) scrapeTmDb(ctx context.Context, form *api.ScrapeAcgSourceInput) ([]*api.ScrapeAcgResult, error) {
+func ScrapeTmDb(ctx context.Context, client *resty.Client, apiKey string, form *api.ScrapeSearchInput) ([]*api.ScrapeSearchResult, error) {
 	language, err := tmdb.GetTmdbLanguage(form.Language)
 	if err != nil {
 		return nil, err
 	}
 
-	var result []*api.ScrapeAcgResult
-	tmdbSearch, err := s.tmdb.Search(ctx, form.Title)
+	var result []*api.ScrapeSearchResult
+	tmdbSearch, err := tmdb.Search(ctx, client, apiKey, form.Title)
 	if err != nil {
 		return nil, err
 	}
 	for _, item := range tmdbSearch {
-		detail, err := s.tmdb.QueryForDetail(ctx, item.ID, language)
+		detail, err := tmdb.QueryForDetail(ctx, client, apiKey, item.ID, language)
 		if err != nil {
 			return nil, err
 		}
 
-		var seasons []*api.ScrapeAcgSeasonResult
+		var seasons []*api.ScrapeSearchSeasonResult
 		for _, season := range detail.Seasons {
-			seasons = append(seasons, &api.ScrapeAcgSeasonResult{
+			seasons = append(seasons, &api.ScrapeSearchSeasonResult{
 				SeasonID: season.ID,
 				Title:    season.Name,
 				Overview: season.Overview,
@@ -52,8 +35,9 @@ func (s *ScraperService) scrapeTmDb(ctx context.Context, form *api.ScrapeAcgSour
 			})
 		}
 
-		result = append(result, &api.ScrapeAcgResult{
-			Scraper:       ScrapeTmDb,
+		result = append(result, &api.ScrapeSearchResult{
+			Scraper:       api.ScraperEnumTmdb,
+			ID:            strconv.Itoa(detail.ID),
 			Title:         detail.Name,
 			OriginalTitle: detail.OriginalName,
 			FirstAirDate:  detail.FirstAirDate,

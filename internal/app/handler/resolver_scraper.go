@@ -3,15 +3,17 @@ package handler
 import (
 	"context"
 	"github.com/simonkimi/minebangumi/api"
+	"github.com/simonkimi/minebangumi/internal/app/config"
+	"github.com/simonkimi/minebangumi/internal/app/service"
 )
 
-// ScraperSource is the resolver for the scraperSource field.
-func (r *queryResolver) ScraperSource(ctx context.Context, input api.ParseAcgSourceInput) (*api.ParseAcgSourceResult, error) {
-	//return service.ParseSource(ctx, input.Source, input.Parser)
-	return r.mgr.GetSource().ParseSource(ctx, input.Source, input.Parser)
-}
-
-// ScraperDb is the resolver for the scraperDb field.
-func (r *queryResolver) ScraperDb(ctx context.Context, input api.ScrapeAcgSourceInput) ([]*api.ScrapeAcgResult, error) {
-	return r.mgr.GetScraper().ScrapeService(ctx, &input)
+func (q *queryResolver) ScraperSearch(ctx context.Context, input api.ScrapeSearchInput) ([]*api.ScrapeSearchResult, error) {
+	switch input.Scraper {
+	case api.ScraperEnumTmdb:
+		apiKey := q.mgr.GetConfig().GetString(config.TmdbApiKey)
+		client := q.mgr.GetHttpX().GetClient()
+		return service.ScrapeTmDb(ctx, client, apiKey, &input)
+	default:
+		return nil, api.NewBadRequestErrorf("unsupported scraper %s", input.Scraper)
+	}
 }

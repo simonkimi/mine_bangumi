@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/simonkimi/minebangumi/api"
+	"github.com/simonkimi/minebangumi/internal/app/service"
 	"net/http"
 	"path/filepath"
 )
@@ -25,7 +26,10 @@ func (w *WebApi) poster(c *gin.Context) {
 		_ = c.Error(api.NewBadRequestErrorf("invalid query: %s", err))
 		return
 	}
-	data, err := w.mgr.GetApiProxy().GetPoster(ctx, query.TargetType, query.Target)
+
+	client := w.mgr.GetHttpX().GetClient()
+
+	data, err := service.GetPoster(ctx, client, query.TargetType, query.Target)
 	if err != nil {
 		_ = c.Error(err)
 		return

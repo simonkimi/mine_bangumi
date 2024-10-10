@@ -1,0 +1,28 @@
+enum SourceEnum {
+    BANGUMI
+}
+
+input ParseAcgSubscriptionInput {
+    url: String!
+    source: SourceEnum!
+}
+
+type ParseAcgSubscriptionResult {
+    title: String!
+    files: [String!]!
+    season: Int!
+}
+
+input AddSubscriptionInput {
+    "Rss地址"
+    url: String!
+    "订阅名称"
+    displayName: String!
+    "刮削器类型"
+    scraper: ScraperEnum
+    "刮削器Id"
+    scraperId: String
+}
+
+
+

@@ -22,19 +22,6 @@ func (m *Manager) newProgress(job *Job) *Progress {
 	}
 }
 
-func (p *Progress) Percent() float64 {
-	if p.total <= 0 {
-		return -1
-	}
-
-	percent := float64(p.step) / float64(p.total)
-	if percent > 1 {
-		percent = 1
-	}
-
-	return percent
-}
-
 func (p *Progress) SetTotal(total int) {
 	p.mux.Lock()
 	defer p.mux.Unlock()

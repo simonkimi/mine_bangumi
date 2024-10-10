@@ -8,6 +8,17 @@ import (
 	"strconv"
 )
 
+type AddSubscriptionInput struct {
+	// Rss地址
+	URL string `json:"url"`
+	// 订阅名称
+	DisplayName string `json:"displayName"`
+	// 刮削器类型
+	Scraper *ScraperEnum `json:"scraper,omitempty"`
+	// 刮削器Id
+	ScraperID *string `json:"scraperId,omitempty"`
+}
+
 type ConfigResult struct {
 	User *UserConfigResult `json:"user"`
 }
@@ -15,12 +26,12 @@ type ConfigResult struct {
 type Mutation struct {
 }
 
-type ParseAcgSourceInput struct {
-	Source string           `json:"source"`
-	Parser SourceParserEnum `json:"parser"`
+type ParseAcgSubscriptionInput struct {
+	URL    string     `json:"url"`
+	Source SourceEnum `json:"source"`
 }
 
-type ParseAcgSourceResult struct {
+type ParseAcgSubscriptionResult struct {
 	Title  string   `json:"title"`
 	Files  []string `json:"files"`
 	Season int      `json:"season"`
@@ -29,28 +40,29 @@ type ParseAcgSourceResult struct {
 type Query struct {
 }
 
-type ScrapeAcgResult struct {
-	Scraper       ScraperEnum              `json:"scraper"`
-	Title         string                   `json:"title"`
-	OriginalTitle string                   `json:"originalTitle"`
-	FirstAirDate  string                   `json:"firstAirDate"`
-	Overview      string                   `json:"overview"`
-	Poster        string                   `json:"poster"`
-	Backdrop      string                   `json:"backdrop"`
-	Seasons       []*ScrapeAcgSeasonResult `json:"seasons"`
+type ScrapeSearchInput struct {
+	Title    string          `json:"title"`
+	Scraper  ScraperEnum     `json:"scraper"`
+	Language ScraperLanguage `json:"language"`
 }
 
-type ScrapeAcgSeasonResult struct {
+type ScrapeSearchResult struct {
+	Scraper       ScraperEnum                 `json:"scraper"`
+	ID            string                      `json:"Id"`
+	Title         string                      `json:"title"`
+	OriginalTitle string                      `json:"originalTitle"`
+	FirstAirDate  string                      `json:"firstAirDate"`
+	Overview      string                      `json:"overview"`
+	Poster        string                      `json:"poster"`
+	Backdrop      string                      `json:"backdrop"`
+	Seasons       []*ScrapeSearchSeasonResult `json:"seasons"`
+}
+
+type ScrapeSearchSeasonResult struct {
 	SeasonID int    `json:"seasonId"`
 	Title    string `json:"title"`
 	Overview string `json:"overview"`
 	Poster   string `json:"poster"`
-}
-
-type ScrapeAcgSourceInput struct {
-	Title    string          `json:"title"`
-	Scraper  ScraperEnum     `json:"scraper"`
-	Language ScraperLanguage `json:"language"`
 }
 
 type UserConfigInput struct {
@@ -208,41 +220,41 @@ func (e ScraperLanguage) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
-type SourceParserEnum string
+type SourceEnum string
 
 const (
-	SourceParserEnumBangumi SourceParserEnum = "BANGUMI"
+	SourceEnumBangumi SourceEnum = "BANGUMI"
 )
 
-var AllSourceParserEnum = []SourceParserEnum{
-	SourceParserEnumBangumi,
+var AllSourceEnum = []SourceEnum{
+	SourceEnumBangumi,
 }
 
-func (e SourceParserEnum) IsValid() bool {
+func (e SourceEnum) IsValid() bool {
 	switch e {
-	case SourceParserEnumBangumi:
+	case SourceEnumBangumi:
 		return true
 	}
 	return false
 }
 
-func (e SourceParserEnum) String() string {
+func (e SourceEnum) String() string {
 	return string(e)
 }
 
-func (e *SourceParserEnum) UnmarshalGQL(v interface{}) error {
+func (e *SourceEnum) UnmarshalGQL(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
 	}
 
-	*e = SourceParserEnum(str)
+	*e = SourceEnum(str)
 	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid SourceParserEnum", str)
+		return fmt.Errorf("%s is not a valid SourceEnum", str)
 	}
 	return nil
 }
 
-func (e SourceParserEnum) MarshalGQL(w io.Writer) {
+func (e SourceEnum) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

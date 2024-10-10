@@ -51,24 +51,26 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		ConfigUser      func(childComplexity int, input api.UserConfigInput) int
-		RefreshAPIToken func(childComplexity int) int
+		AddAcgSubscription func(childComplexity int, input api.AddSubscriptionInput) int
+		ConfigUser         func(childComplexity int, input api.UserConfigInput) int
+		RefreshAPIToken    func(childComplexity int) int
 	}
 
-	ParseAcgSourceResult struct {
+	ParseAcgSubscriptionResult struct {
 		Files  func(childComplexity int) int
 		Season func(childComplexity int) int
 		Title  func(childComplexity int) int
 	}
 
 	Query struct {
-		ScraperDb     func(childComplexity int, input api.ScrapeAcgSourceInput) int
-		ScraperSource func(childComplexity int, input api.ParseAcgSourceInput) int
+		ParseAcgSubscription func(childComplexity int, input api.ParseAcgSubscriptionInput) int
+		ScraperSearch        func(childComplexity int, input api.ScrapeSearchInput) int
 	}
 
-	ScrapeAcgResult struct {
+	ScrapeSearchResult struct {
 		Backdrop      func(childComplexity int) int
 		FirstAirDate  func(childComplexity int) int
+		ID            func(childComplexity int) int
 		OriginalTitle func(childComplexity int) int
 		Overview      func(childComplexity int) int
 		Poster        func(childComplexity int) int
@@ -77,7 +79,7 @@ type ComplexityRoot struct {
 		Title         func(childComplexity int) int
 	}
 
-	ScrapeAcgSeasonResult struct {
+	ScrapeSearchSeasonResult struct {
 		Overview func(childComplexity int) int
 		Poster   func(childComplexity int) int
 		SeasonID func(childComplexity int) int
@@ -93,10 +95,11 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	ConfigUser(ctx context.Context, input api.UserConfigInput) (*api.ConfigResult, error)
 	RefreshAPIToken(ctx context.Context) (*api.UserConfigResult, error)
+	AddAcgSubscription(ctx context.Context, input api.AddSubscriptionInput) (*bool, error)
 }
 type QueryResolver interface {
-	ScraperSource(ctx context.Context, input api.ParseAcgSourceInput) (*api.ParseAcgSourceResult, error)
-	ScraperDb(ctx context.Context, input api.ScrapeAcgSourceInput) ([]*api.ScrapeAcgResult, error)
+	ScraperSearch(ctx context.Context, input api.ScrapeSearchInput) ([]*api.ScrapeSearchResult, error)
+	ParseAcgSubscription(ctx context.Context, input api.ParseAcgSubscriptionInput) (*api.ParseAcgSubscriptionResult, error)
 }
 
 type executableSchema struct {
@@ -125,6 +128,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ConfigResult.User(childComplexity), true
 
+	case "Mutation.addAcgSubscription":
+		if e.complexity.Mutation.AddAcgSubscription == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addAcgSubscription_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddAcgSubscription(childComplexity, args["input"].(api.AddSubscriptionInput)), true
+
 	case "Mutation.configUser":
 		if e.complexity.Mutation.ConfigUser == nil {
 			break
@@ -144,134 +159,141 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RefreshAPIToken(childComplexity), true
 
-	case "ParseAcgSourceResult.files":
-		if e.complexity.ParseAcgSourceResult.Files == nil {
+	case "ParseAcgSubscriptionResult.files":
+		if e.complexity.ParseAcgSubscriptionResult.Files == nil {
 			break
 		}
 
-		return e.complexity.ParseAcgSourceResult.Files(childComplexity), true
+		return e.complexity.ParseAcgSubscriptionResult.Files(childComplexity), true
 
-	case "ParseAcgSourceResult.season":
-		if e.complexity.ParseAcgSourceResult.Season == nil {
+	case "ParseAcgSubscriptionResult.season":
+		if e.complexity.ParseAcgSubscriptionResult.Season == nil {
 			break
 		}
 
-		return e.complexity.ParseAcgSourceResult.Season(childComplexity), true
+		return e.complexity.ParseAcgSubscriptionResult.Season(childComplexity), true
 
-	case "ParseAcgSourceResult.title":
-		if e.complexity.ParseAcgSourceResult.Title == nil {
+	case "ParseAcgSubscriptionResult.title":
+		if e.complexity.ParseAcgSubscriptionResult.Title == nil {
 			break
 		}
 
-		return e.complexity.ParseAcgSourceResult.Title(childComplexity), true
+		return e.complexity.ParseAcgSubscriptionResult.Title(childComplexity), true
 
-	case "Query.scraperDb":
-		if e.complexity.Query.ScraperDb == nil {
+	case "Query.parseAcgSubscription":
+		if e.complexity.Query.ParseAcgSubscription == nil {
 			break
 		}
 
-		args, err := ec.field_Query_scraperDb_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_parseAcgSubscription_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.ScraperDb(childComplexity, args["input"].(api.ScrapeAcgSourceInput)), true
+		return e.complexity.Query.ParseAcgSubscription(childComplexity, args["input"].(api.ParseAcgSubscriptionInput)), true
 
-	case "Query.scraperSource":
-		if e.complexity.Query.ScraperSource == nil {
+	case "Query.scraperSearch":
+		if e.complexity.Query.ScraperSearch == nil {
 			break
 		}
 
-		args, err := ec.field_Query_scraperSource_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_scraperSearch_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.ScraperSource(childComplexity, args["input"].(api.ParseAcgSourceInput)), true
+		return e.complexity.Query.ScraperSearch(childComplexity, args["input"].(api.ScrapeSearchInput)), true
 
-	case "ScrapeAcgResult.backdrop":
-		if e.complexity.ScrapeAcgResult.Backdrop == nil {
+	case "ScrapeSearchResult.backdrop":
+		if e.complexity.ScrapeSearchResult.Backdrop == nil {
 			break
 		}
 
-		return e.complexity.ScrapeAcgResult.Backdrop(childComplexity), true
+		return e.complexity.ScrapeSearchResult.Backdrop(childComplexity), true
 
-	case "ScrapeAcgResult.firstAirDate":
-		if e.complexity.ScrapeAcgResult.FirstAirDate == nil {
+	case "ScrapeSearchResult.firstAirDate":
+		if e.complexity.ScrapeSearchResult.FirstAirDate == nil {
 			break
 		}
 
-		return e.complexity.ScrapeAcgResult.FirstAirDate(childComplexity), true
+		return e.complexity.ScrapeSearchResult.FirstAirDate(childComplexity), true
 
-	case "ScrapeAcgResult.originalTitle":
-		if e.complexity.ScrapeAcgResult.OriginalTitle == nil {
+	case "ScrapeSearchResult.Id":
+		if e.complexity.ScrapeSearchResult.ID == nil {
 			break
 		}
 
-		return e.complexity.ScrapeAcgResult.OriginalTitle(childComplexity), true
+		return e.complexity.ScrapeSearchResult.ID(childComplexity), true
 
-	case "ScrapeAcgResult.overview":
-		if e.complexity.ScrapeAcgResult.Overview == nil {
+	case "ScrapeSearchResult.originalTitle":
+		if e.complexity.ScrapeSearchResult.OriginalTitle == nil {
 			break
 		}
 
-		return e.complexity.ScrapeAcgResult.Overview(childComplexity), true
+		return e.complexity.ScrapeSearchResult.OriginalTitle(childComplexity), true
 
-	case "ScrapeAcgResult.poster":
-		if e.complexity.ScrapeAcgResult.Poster == nil {
+	case "ScrapeSearchResult.overview":
+		if e.complexity.ScrapeSearchResult.Overview == nil {
 			break
 		}
 
-		return e.complexity.ScrapeAcgResult.Poster(childComplexity), true
+		return e.complexity.ScrapeSearchResult.Overview(childComplexity), true
 
-	case "ScrapeAcgResult.scraper":
-		if e.complexity.ScrapeAcgResult.Scraper == nil {
+	case "ScrapeSearchResult.poster":
+		if e.complexity.ScrapeSearchResult.Poster == nil {
 			break
 		}
 
-		return e.complexity.ScrapeAcgResult.Scraper(childComplexity), true
+		return e.complexity.ScrapeSearchResult.Poster(childComplexity), true
 
-	case "ScrapeAcgResult.seasons":
-		if e.complexity.ScrapeAcgResult.Seasons == nil {
+	case "ScrapeSearchResult.scraper":
+		if e.complexity.ScrapeSearchResult.Scraper == nil {
 			break
 		}
 
-		return e.complexity.ScrapeAcgResult.Seasons(childComplexity), true
+		return e.complexity.ScrapeSearchResult.Scraper(childComplexity), true
 
-	case "ScrapeAcgResult.title":
-		if e.complexity.ScrapeAcgResult.Title == nil {
+	case "ScrapeSearchResult.seasons":
+		if e.complexity.ScrapeSearchResult.Seasons == nil {
 			break
 		}
 
-		return e.complexity.ScrapeAcgResult.Title(childComplexity), true
+		return e.complexity.ScrapeSearchResult.Seasons(childComplexity), true
 
-	case "ScrapeAcgSeasonResult.overview":
-		if e.complexity.ScrapeAcgSeasonResult.Overview == nil {
+	case "ScrapeSearchResult.title":
+		if e.complexity.ScrapeSearchResult.Title == nil {
 			break
 		}
 
-		return e.complexity.ScrapeAcgSeasonResult.Overview(childComplexity), true
+		return e.complexity.ScrapeSearchResult.Title(childComplexity), true
 
-	case "ScrapeAcgSeasonResult.poster":
-		if e.complexity.ScrapeAcgSeasonResult.Poster == nil {
+	case "ScrapeSearchSeasonResult.overview":
+		if e.complexity.ScrapeSearchSeasonResult.Overview == nil {
 			break
 		}
 
-		return e.complexity.ScrapeAcgSeasonResult.Poster(childComplexity), true
+		return e.complexity.ScrapeSearchSeasonResult.Overview(childComplexity), true
 
-	case "ScrapeAcgSeasonResult.seasonId":
-		if e.complexity.ScrapeAcgSeasonResult.SeasonID == nil {
+	case "ScrapeSearchSeasonResult.poster":
+		if e.complexity.ScrapeSearchSeasonResult.Poster == nil {
 			break
 		}
 
-		return e.complexity.ScrapeAcgSeasonResult.SeasonID(childComplexity), true
+		return e.complexity.ScrapeSearchSeasonResult.Poster(childComplexity), true
 
-	case "ScrapeAcgSeasonResult.title":
-		if e.complexity.ScrapeAcgSeasonResult.Title == nil {
+	case "ScrapeSearchSeasonResult.seasonId":
+		if e.complexity.ScrapeSearchSeasonResult.SeasonID == nil {
 			break
 		}
 
-		return e.complexity.ScrapeAcgSeasonResult.Title(childComplexity), true
+		return e.complexity.ScrapeSearchSeasonResult.SeasonID(childComplexity), true
+
+	case "ScrapeSearchSeasonResult.title":
+		if e.complexity.ScrapeSearchSeasonResult.Title == nil {
+			break
+		}
+
+		return e.complexity.ScrapeSearchSeasonResult.Title(childComplexity), true
 
 	case "UserConfigResult.token":
 		if e.complexity.UserConfigResult.Token == nil {
@@ -295,8 +317,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputParseAcgSourceInput,
-		ec.unmarshalInputScrapeAcgSourceInput,
+		ec.unmarshalInputAddSubscriptionInput,
+		ec.unmarshalInputParseAcgSubscriptionInput,
+		ec.unmarshalInputScrapeSearchInput,
 		ec.unmarshalInputUserConfigInput,
 	)
 	first := true
@@ -396,10 +419,11 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "../../../graph/schema/schema.graphql", Input: `type Query {
-    "解析Acg数据源"
-    scraperSource(input: ParseAcgSourceInput!): ParseAcgSourceResult!
     "刮削Acg数据源"
-    scraperDb(input: ScrapeAcgSourceInput!): [ScrapeAcgResult!]!
+    scraperSearch(input: ScrapeSearchInput!): [ScrapeSearchResult!]!
+
+    "解析Acg数据源"
+    parseAcgSubscription(input: ParseAcgSubscriptionInput!): ParseAcgSubscriptionResult!
 }
 
 type Mutation {
@@ -407,55 +431,10 @@ type Mutation {
     configUser(input: UserConfigInput!): ConfigResult!
     "刷新API令牌"
     refreshApiToken: UserConfigResult!
-}`, BuiltIn: false},
-	{Name: "../../../graph/schema/types/acg_source.graphql", Input: `enum SourceParserEnum {
-    BANGUMI
-}
 
-input ParseAcgSourceInput {
-    source: String!
-    parser: SourceParserEnum!
-}
 
-type ParseAcgSourceResult {
-    title: String!
-    files: [String!]!
-    season: Int!
-}
-
-enum ScraperLanguage {
-    Zh_HANS
-    Zh_HANT
-    JA
-    EN
-}
-
-enum ScraperEnum {
-    TMDB
-}
-
-input ScrapeAcgSourceInput {
-    title: String!
-    scraper: ScraperEnum!
-    language: ScraperLanguage!
-}
-
-type ScrapeAcgSeasonResult {
-    seasonId: Int!
-    title: String!
-    overview: String!
-    poster: String!
-}
-
-type ScrapeAcgResult {
-    scraper: ScraperEnum!
-    title: String!
-    originalTitle: String!
-    firstAirDate: String!
-    overview: String!
-    poster: String!
-    backdrop: String!
-    seasons: [ScrapeAcgSeasonResult!]!
+    "添加Acg订阅"
+    addAcgSubscription(input: AddSubscriptionInput!): Boolean
 }`, BuiltIn: false},
 	{Name: "../../../graph/schema/types/config.graphql", Input: `input UserConfigInput {
     username: String
@@ -485,12 +464,91 @@ type UserConfigResult {
     FORBIDDEN
     DATABASE_MIGRATION_ERROR
 }`, BuiltIn: false},
+	{Name: "../../../graph/schema/types/scraper.graphql", Input: `enum ScraperLanguage {
+    Zh_HANS
+    Zh_HANT
+    JA
+    EN
+}
+
+enum ScraperEnum {
+    TMDB
+}
+
+input ScrapeSearchInput {
+    title: String!
+    scraper: ScraperEnum!
+    language: ScraperLanguage!
+}
+
+type ScrapeSearchSeasonResult {
+    seasonId: Int!
+    title: String!
+    overview: String!
+    poster: String!
+}
+
+type ScrapeSearchResult {
+    scraper: ScraperEnum!
+    Id: String!
+    title: String!
+    originalTitle: String!
+    firstAirDate: String!
+    overview: String!
+    poster: String!
+    backdrop: String!
+    seasons: [ScrapeSearchSeasonResult!]!
+}`, BuiltIn: false},
+	{Name: "../../../graph/schema/types/subscription.graphql", Input: `enum SourceEnum {
+    BANGUMI
+}
+
+input ParseAcgSubscriptionInput {
+    url: String!
+    source: SourceEnum!
+}
+
+type ParseAcgSubscriptionResult {
+    title: String!
+    files: [String!]!
+    season: Int!
+}
+
+input AddSubscriptionInput {
+    "Rss地址"
+    url: String!
+    "订阅名称"
+    displayName: String!
+    "刮削器类型"
+    scraper: ScraperEnum
+    "刮削器Id"
+    scraperId: String
+}
+
+
+
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_addAcgSubscription_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 api.AddSubscriptionInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNAddSubscriptionInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐAddSubscriptionInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_configUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -522,13 +580,13 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_scraperDb_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_parseAcgSubscription_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 api.ScrapeAcgSourceInput
+	var arg0 api.ParseAcgSubscriptionInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNScrapeAcgSourceInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgSourceInput(ctx, tmp)
+		arg0, err = ec.unmarshalNParseAcgSubscriptionInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSubscriptionInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -537,13 +595,13 @@ func (ec *executionContext) field_Query_scraperDb_args(ctx context.Context, rawA
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_scraperSource_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_scraperSearch_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 api.ParseAcgSourceInput
+	var arg0 api.ScrapeSearchInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNParseAcgSourceInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSourceInput(ctx, tmp)
+		arg0, err = ec.unmarshalNScrapeSearchInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeSearchInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -749,8 +807,60 @@ func (ec *executionContext) fieldContext_Mutation_refreshApiToken(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _ParseAcgSourceResult_title(ctx context.Context, field graphql.CollectedField, obj *api.ParseAcgSourceResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ParseAcgSourceResult_title(ctx, field)
+func (ec *executionContext) _Mutation_addAcgSubscription(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addAcgSubscription(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddAcgSubscription(rctx, fc.Args["input"].(api.AddSubscriptionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addAcgSubscription(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addAcgSubscription_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ParseAcgSubscriptionResult_title(ctx context.Context, field graphql.CollectedField, obj *api.ParseAcgSubscriptionResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ParseAcgSubscriptionResult_title(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -780,9 +890,9 @@ func (ec *executionContext) _ParseAcgSourceResult_title(ctx context.Context, fie
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ParseAcgSourceResult_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ParseAcgSubscriptionResult_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ParseAcgSourceResult",
+		Object:     "ParseAcgSubscriptionResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -793,8 +903,8 @@ func (ec *executionContext) fieldContext_ParseAcgSourceResult_title(_ context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _ParseAcgSourceResult_files(ctx context.Context, field graphql.CollectedField, obj *api.ParseAcgSourceResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ParseAcgSourceResult_files(ctx, field)
+func (ec *executionContext) _ParseAcgSubscriptionResult_files(ctx context.Context, field graphql.CollectedField, obj *api.ParseAcgSubscriptionResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ParseAcgSubscriptionResult_files(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -824,9 +934,9 @@ func (ec *executionContext) _ParseAcgSourceResult_files(ctx context.Context, fie
 	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ParseAcgSourceResult_files(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ParseAcgSubscriptionResult_files(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ParseAcgSourceResult",
+		Object:     "ParseAcgSubscriptionResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -837,8 +947,8 @@ func (ec *executionContext) fieldContext_ParseAcgSourceResult_files(_ context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _ParseAcgSourceResult_season(ctx context.Context, field graphql.CollectedField, obj *api.ParseAcgSourceResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ParseAcgSourceResult_season(ctx, field)
+func (ec *executionContext) _ParseAcgSubscriptionResult_season(ctx context.Context, field graphql.CollectedField, obj *api.ParseAcgSubscriptionResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ParseAcgSubscriptionResult_season(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -868,9 +978,9 @@ func (ec *executionContext) _ParseAcgSourceResult_season(ctx context.Context, fi
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ParseAcgSourceResult_season(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ParseAcgSubscriptionResult_season(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ParseAcgSourceResult",
+		Object:     "ParseAcgSubscriptionResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -881,8 +991,8 @@ func (ec *executionContext) fieldContext_ParseAcgSourceResult_season(_ context.C
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_scraperSource(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_scraperSource(ctx, field)
+func (ec *executionContext) _Query_scraperSearch(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_scraperSearch(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -895,7 +1005,7 @@ func (ec *executionContext) _Query_scraperSource(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ScraperSource(rctx, fc.Args["input"].(api.ParseAcgSourceInput))
+		return ec.resolvers.Query().ScraperSearch(rctx, fc.Args["input"].(api.ScrapeSearchInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -907,75 +1017,12 @@ func (ec *executionContext) _Query_scraperSource(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*api.ParseAcgSourceResult)
+	res := resTmp.([]*api.ScrapeSearchResult)
 	fc.Result = res
-	return ec.marshalNParseAcgSourceResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSourceResult(ctx, field.Selections, res)
+	return ec.marshalNScrapeSearchResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeSearchResultᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_scraperSource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "title":
-				return ec.fieldContext_ParseAcgSourceResult_title(ctx, field)
-			case "files":
-				return ec.fieldContext_ParseAcgSourceResult_files(ctx, field)
-			case "season":
-				return ec.fieldContext_ParseAcgSourceResult_season(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ParseAcgSourceResult", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_scraperSource_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_scraperDb(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_scraperDb(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ScraperDb(rctx, fc.Args["input"].(api.ScrapeAcgSourceInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*api.ScrapeAcgResult)
-	fc.Result = res
-	return ec.marshalNScrapeAcgResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgResultᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_scraperDb(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_scraperSearch(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -984,23 +1031,25 @@ func (ec *executionContext) fieldContext_Query_scraperDb(ctx context.Context, fi
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "scraper":
-				return ec.fieldContext_ScrapeAcgResult_scraper(ctx, field)
+				return ec.fieldContext_ScrapeSearchResult_scraper(ctx, field)
+			case "Id":
+				return ec.fieldContext_ScrapeSearchResult_Id(ctx, field)
 			case "title":
-				return ec.fieldContext_ScrapeAcgResult_title(ctx, field)
+				return ec.fieldContext_ScrapeSearchResult_title(ctx, field)
 			case "originalTitle":
-				return ec.fieldContext_ScrapeAcgResult_originalTitle(ctx, field)
+				return ec.fieldContext_ScrapeSearchResult_originalTitle(ctx, field)
 			case "firstAirDate":
-				return ec.fieldContext_ScrapeAcgResult_firstAirDate(ctx, field)
+				return ec.fieldContext_ScrapeSearchResult_firstAirDate(ctx, field)
 			case "overview":
-				return ec.fieldContext_ScrapeAcgResult_overview(ctx, field)
+				return ec.fieldContext_ScrapeSearchResult_overview(ctx, field)
 			case "poster":
-				return ec.fieldContext_ScrapeAcgResult_poster(ctx, field)
+				return ec.fieldContext_ScrapeSearchResult_poster(ctx, field)
 			case "backdrop":
-				return ec.fieldContext_ScrapeAcgResult_backdrop(ctx, field)
+				return ec.fieldContext_ScrapeSearchResult_backdrop(ctx, field)
 			case "seasons":
-				return ec.fieldContext_ScrapeAcgResult_seasons(ctx, field)
+				return ec.fieldContext_ScrapeSearchResult_seasons(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ScrapeAcgResult", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ScrapeSearchResult", field.Name)
 		},
 	}
 	defer func() {
@@ -1010,7 +1059,70 @@ func (ec *executionContext) fieldContext_Query_scraperDb(ctx context.Context, fi
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_scraperDb_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_scraperSearch_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_parseAcgSubscription(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_parseAcgSubscription(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ParseAcgSubscription(rctx, fc.Args["input"].(api.ParseAcgSubscriptionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*api.ParseAcgSubscriptionResult)
+	fc.Result = res
+	return ec.marshalNParseAcgSubscriptionResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSubscriptionResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_parseAcgSubscription(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_ParseAcgSubscriptionResult_title(ctx, field)
+			case "files":
+				return ec.fieldContext_ParseAcgSubscriptionResult_files(ctx, field)
+			case "season":
+				return ec.fieldContext_ParseAcgSubscriptionResult_season(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ParseAcgSubscriptionResult", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_parseAcgSubscription_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1146,8 +1258,8 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _ScrapeAcgResult_scraper(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeAcgResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScrapeAcgResult_scraper(ctx, field)
+func (ec *executionContext) _ScrapeSearchResult_scraper(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchResult_scraper(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1177,9 +1289,9 @@ func (ec *executionContext) _ScrapeAcgResult_scraper(ctx context.Context, field 
 	return ec.marshalNScraperEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScraperEnum(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ScrapeAcgResult_scraper(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ScrapeSearchResult_scraper(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ScrapeAcgResult",
+		Object:     "ScrapeSearchResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1190,8 +1302,52 @@ func (ec *executionContext) fieldContext_ScrapeAcgResult_scraper(_ context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _ScrapeAcgResult_title(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeAcgResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScrapeAcgResult_title(ctx, field)
+func (ec *executionContext) _ScrapeSearchResult_Id(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchResult_Id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ScrapeSearchResult_Id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ScrapeSearchResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ScrapeSearchResult_title(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchResult_title(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1221,9 +1377,9 @@ func (ec *executionContext) _ScrapeAcgResult_title(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ScrapeAcgResult_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ScrapeSearchResult_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ScrapeAcgResult",
+		Object:     "ScrapeSearchResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1234,8 +1390,8 @@ func (ec *executionContext) fieldContext_ScrapeAcgResult_title(_ context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _ScrapeAcgResult_originalTitle(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeAcgResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScrapeAcgResult_originalTitle(ctx, field)
+func (ec *executionContext) _ScrapeSearchResult_originalTitle(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchResult_originalTitle(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1265,9 +1421,9 @@ func (ec *executionContext) _ScrapeAcgResult_originalTitle(ctx context.Context, 
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ScrapeAcgResult_originalTitle(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ScrapeSearchResult_originalTitle(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ScrapeAcgResult",
+		Object:     "ScrapeSearchResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1278,8 +1434,8 @@ func (ec *executionContext) fieldContext_ScrapeAcgResult_originalTitle(_ context
 	return fc, nil
 }
 
-func (ec *executionContext) _ScrapeAcgResult_firstAirDate(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeAcgResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScrapeAcgResult_firstAirDate(ctx, field)
+func (ec *executionContext) _ScrapeSearchResult_firstAirDate(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchResult_firstAirDate(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1309,9 +1465,9 @@ func (ec *executionContext) _ScrapeAcgResult_firstAirDate(ctx context.Context, f
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ScrapeAcgResult_firstAirDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ScrapeSearchResult_firstAirDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ScrapeAcgResult",
+		Object:     "ScrapeSearchResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1322,8 +1478,8 @@ func (ec *executionContext) fieldContext_ScrapeAcgResult_firstAirDate(_ context.
 	return fc, nil
 }
 
-func (ec *executionContext) _ScrapeAcgResult_overview(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeAcgResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScrapeAcgResult_overview(ctx, field)
+func (ec *executionContext) _ScrapeSearchResult_overview(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchResult_overview(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1353,9 +1509,9 @@ func (ec *executionContext) _ScrapeAcgResult_overview(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ScrapeAcgResult_overview(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ScrapeSearchResult_overview(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ScrapeAcgResult",
+		Object:     "ScrapeSearchResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1366,8 +1522,8 @@ func (ec *executionContext) fieldContext_ScrapeAcgResult_overview(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _ScrapeAcgResult_poster(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeAcgResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScrapeAcgResult_poster(ctx, field)
+func (ec *executionContext) _ScrapeSearchResult_poster(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchResult_poster(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1397,9 +1553,9 @@ func (ec *executionContext) _ScrapeAcgResult_poster(ctx context.Context, field g
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ScrapeAcgResult_poster(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ScrapeSearchResult_poster(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ScrapeAcgResult",
+		Object:     "ScrapeSearchResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1410,8 +1566,8 @@ func (ec *executionContext) fieldContext_ScrapeAcgResult_poster(_ context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _ScrapeAcgResult_backdrop(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeAcgResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScrapeAcgResult_backdrop(ctx, field)
+func (ec *executionContext) _ScrapeSearchResult_backdrop(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchResult_backdrop(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1441,9 +1597,9 @@ func (ec *executionContext) _ScrapeAcgResult_backdrop(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ScrapeAcgResult_backdrop(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ScrapeSearchResult_backdrop(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ScrapeAcgResult",
+		Object:     "ScrapeSearchResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1454,8 +1610,8 @@ func (ec *executionContext) fieldContext_ScrapeAcgResult_backdrop(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _ScrapeAcgResult_seasons(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeAcgResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScrapeAcgResult_seasons(ctx, field)
+func (ec *executionContext) _ScrapeSearchResult_seasons(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchResult_seasons(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1480,36 +1636,36 @@ func (ec *executionContext) _ScrapeAcgResult_seasons(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*api.ScrapeAcgSeasonResult)
+	res := resTmp.([]*api.ScrapeSearchSeasonResult)
 	fc.Result = res
-	return ec.marshalNScrapeAcgSeasonResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgSeasonResultᚄ(ctx, field.Selections, res)
+	return ec.marshalNScrapeSearchSeasonResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeSearchSeasonResultᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ScrapeAcgResult_seasons(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ScrapeSearchResult_seasons(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ScrapeAcgResult",
+		Object:     "ScrapeSearchResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "seasonId":
-				return ec.fieldContext_ScrapeAcgSeasonResult_seasonId(ctx, field)
+				return ec.fieldContext_ScrapeSearchSeasonResult_seasonId(ctx, field)
 			case "title":
-				return ec.fieldContext_ScrapeAcgSeasonResult_title(ctx, field)
+				return ec.fieldContext_ScrapeSearchSeasonResult_title(ctx, field)
 			case "overview":
-				return ec.fieldContext_ScrapeAcgSeasonResult_overview(ctx, field)
+				return ec.fieldContext_ScrapeSearchSeasonResult_overview(ctx, field)
 			case "poster":
-				return ec.fieldContext_ScrapeAcgSeasonResult_poster(ctx, field)
+				return ec.fieldContext_ScrapeSearchSeasonResult_poster(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ScrapeAcgSeasonResult", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ScrapeSearchSeasonResult", field.Name)
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _ScrapeAcgSeasonResult_seasonId(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeAcgSeasonResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScrapeAcgSeasonResult_seasonId(ctx, field)
+func (ec *executionContext) _ScrapeSearchSeasonResult_seasonId(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchSeasonResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchSeasonResult_seasonId(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1539,9 +1695,9 @@ func (ec *executionContext) _ScrapeAcgSeasonResult_seasonId(ctx context.Context,
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ScrapeAcgSeasonResult_seasonId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ScrapeSearchSeasonResult_seasonId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ScrapeAcgSeasonResult",
+		Object:     "ScrapeSearchSeasonResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1552,8 +1708,8 @@ func (ec *executionContext) fieldContext_ScrapeAcgSeasonResult_seasonId(_ contex
 	return fc, nil
 }
 
-func (ec *executionContext) _ScrapeAcgSeasonResult_title(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeAcgSeasonResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScrapeAcgSeasonResult_title(ctx, field)
+func (ec *executionContext) _ScrapeSearchSeasonResult_title(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchSeasonResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchSeasonResult_title(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1583,9 +1739,9 @@ func (ec *executionContext) _ScrapeAcgSeasonResult_title(ctx context.Context, fi
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ScrapeAcgSeasonResult_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ScrapeSearchSeasonResult_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ScrapeAcgSeasonResult",
+		Object:     "ScrapeSearchSeasonResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1596,8 +1752,8 @@ func (ec *executionContext) fieldContext_ScrapeAcgSeasonResult_title(_ context.C
 	return fc, nil
 }
 
-func (ec *executionContext) _ScrapeAcgSeasonResult_overview(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeAcgSeasonResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScrapeAcgSeasonResult_overview(ctx, field)
+func (ec *executionContext) _ScrapeSearchSeasonResult_overview(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchSeasonResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchSeasonResult_overview(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1627,9 +1783,9 @@ func (ec *executionContext) _ScrapeAcgSeasonResult_overview(ctx context.Context,
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ScrapeAcgSeasonResult_overview(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ScrapeSearchSeasonResult_overview(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ScrapeAcgSeasonResult",
+		Object:     "ScrapeSearchSeasonResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1640,8 +1796,8 @@ func (ec *executionContext) fieldContext_ScrapeAcgSeasonResult_overview(_ contex
 	return fc, nil
 }
 
-func (ec *executionContext) _ScrapeAcgSeasonResult_poster(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeAcgSeasonResult) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScrapeAcgSeasonResult_poster(ctx, field)
+func (ec *executionContext) _ScrapeSearchSeasonResult_poster(ctx context.Context, field graphql.CollectedField, obj *api.ScrapeSearchSeasonResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ScrapeSearchSeasonResult_poster(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1671,9 +1827,9 @@ func (ec *executionContext) _ScrapeAcgSeasonResult_poster(ctx context.Context, f
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ScrapeAcgSeasonResult_poster(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ScrapeSearchSeasonResult_poster(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ScrapeAcgSeasonResult",
+		Object:     "ScrapeSearchSeasonResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -3545,42 +3701,90 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputParseAcgSourceInput(ctx context.Context, obj interface{}) (api.ParseAcgSourceInput, error) {
-	var it api.ParseAcgSourceInput
+func (ec *executionContext) unmarshalInputAddSubscriptionInput(ctx context.Context, obj interface{}) (api.AddSubscriptionInput, error) {
+	var it api.AddSubscriptionInput
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"source", "parser"}
+	fieldsInOrder := [...]string{"url", "displayName", "scraper", "scraperId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "source":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
+		case "url":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Source = data
-		case "parser":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parser"))
-			data, err := ec.unmarshalNSourceParserEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐSourceParserEnum(ctx, v)
+			it.URL = data
+		case "displayName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("displayName"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Parser = data
+			it.DisplayName = data
+		case "scraper":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scraper"))
+			data, err := ec.unmarshalOScraperEnum2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScraperEnum(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Scraper = data
+		case "scraperId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scraperId"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ScraperID = data
 		}
 	}
 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputScrapeAcgSourceInput(ctx context.Context, obj interface{}) (api.ScrapeAcgSourceInput, error) {
-	var it api.ScrapeAcgSourceInput
+func (ec *executionContext) unmarshalInputParseAcgSubscriptionInput(ctx context.Context, obj interface{}) (api.ParseAcgSubscriptionInput, error) {
+	var it api.ParseAcgSubscriptionInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"url", "source"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "url":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.URL = data
+		case "source":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
+			data, err := ec.unmarshalNSourceEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐSourceEnum(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Source = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputScrapeSearchInput(ctx context.Context, obj interface{}) (api.ScrapeSearchInput, error) {
+	var it api.ScrapeSearchInput
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -3734,6 +3938,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "addAcgSubscription":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addAcgSubscription(ctx, field)
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3757,29 +3965,29 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var parseAcgSourceResultImplementors = []string{"ParseAcgSourceResult"}
+var parseAcgSubscriptionResultImplementors = []string{"ParseAcgSubscriptionResult"}
 
-func (ec *executionContext) _ParseAcgSourceResult(ctx context.Context, sel ast.SelectionSet, obj *api.ParseAcgSourceResult) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, parseAcgSourceResultImplementors)
+func (ec *executionContext) _ParseAcgSubscriptionResult(ctx context.Context, sel ast.SelectionSet, obj *api.ParseAcgSubscriptionResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, parseAcgSubscriptionResultImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ParseAcgSourceResult")
+			out.Values[i] = graphql.MarshalString("ParseAcgSubscriptionResult")
 		case "title":
-			out.Values[i] = ec._ParseAcgSourceResult_title(ctx, field, obj)
+			out.Values[i] = ec._ParseAcgSubscriptionResult_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "files":
-			out.Values[i] = ec._ParseAcgSourceResult_files(ctx, field, obj)
+			out.Values[i] = ec._ParseAcgSubscriptionResult_files(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "season":
-			out.Values[i] = ec._ParseAcgSourceResult_season(ctx, field, obj)
+			out.Values[i] = ec._ParseAcgSubscriptionResult_season(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3825,7 +4033,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "scraperSource":
+		case "scraperSearch":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -3834,7 +4042,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_scraperSource(ctx, field)
+				res = ec._Query_scraperSearch(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -3847,7 +4055,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "scraperDb":
+		case "parseAcgSubscription":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -3856,7 +4064,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_scraperDb(ctx, field)
+				res = ec._Query_parseAcgSubscription(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -3900,54 +4108,59 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var scrapeAcgResultImplementors = []string{"ScrapeAcgResult"}
+var scrapeSearchResultImplementors = []string{"ScrapeSearchResult"}
 
-func (ec *executionContext) _ScrapeAcgResult(ctx context.Context, sel ast.SelectionSet, obj *api.ScrapeAcgResult) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, scrapeAcgResultImplementors)
+func (ec *executionContext) _ScrapeSearchResult(ctx context.Context, sel ast.SelectionSet, obj *api.ScrapeSearchResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, scrapeSearchResultImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ScrapeAcgResult")
+			out.Values[i] = graphql.MarshalString("ScrapeSearchResult")
 		case "scraper":
-			out.Values[i] = ec._ScrapeAcgResult_scraper(ctx, field, obj)
+			out.Values[i] = ec._ScrapeSearchResult_scraper(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "Id":
+			out.Values[i] = ec._ScrapeSearchResult_Id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "title":
-			out.Values[i] = ec._ScrapeAcgResult_title(ctx, field, obj)
+			out.Values[i] = ec._ScrapeSearchResult_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "originalTitle":
-			out.Values[i] = ec._ScrapeAcgResult_originalTitle(ctx, field, obj)
+			out.Values[i] = ec._ScrapeSearchResult_originalTitle(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "firstAirDate":
-			out.Values[i] = ec._ScrapeAcgResult_firstAirDate(ctx, field, obj)
+			out.Values[i] = ec._ScrapeSearchResult_firstAirDate(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "overview":
-			out.Values[i] = ec._ScrapeAcgResult_overview(ctx, field, obj)
+			out.Values[i] = ec._ScrapeSearchResult_overview(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "poster":
-			out.Values[i] = ec._ScrapeAcgResult_poster(ctx, field, obj)
+			out.Values[i] = ec._ScrapeSearchResult_poster(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "backdrop":
-			out.Values[i] = ec._ScrapeAcgResult_backdrop(ctx, field, obj)
+			out.Values[i] = ec._ScrapeSearchResult_backdrop(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "seasons":
-			out.Values[i] = ec._ScrapeAcgResult_seasons(ctx, field, obj)
+			out.Values[i] = ec._ScrapeSearchResult_seasons(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3974,34 +4187,34 @@ func (ec *executionContext) _ScrapeAcgResult(ctx context.Context, sel ast.Select
 	return out
 }
 
-var scrapeAcgSeasonResultImplementors = []string{"ScrapeAcgSeasonResult"}
+var scrapeSearchSeasonResultImplementors = []string{"ScrapeSearchSeasonResult"}
 
-func (ec *executionContext) _ScrapeAcgSeasonResult(ctx context.Context, sel ast.SelectionSet, obj *api.ScrapeAcgSeasonResult) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, scrapeAcgSeasonResultImplementors)
+func (ec *executionContext) _ScrapeSearchSeasonResult(ctx context.Context, sel ast.SelectionSet, obj *api.ScrapeSearchSeasonResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, scrapeSearchSeasonResultImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ScrapeAcgSeasonResult")
+			out.Values[i] = graphql.MarshalString("ScrapeSearchSeasonResult")
 		case "seasonId":
-			out.Values[i] = ec._ScrapeAcgSeasonResult_seasonId(ctx, field, obj)
+			out.Values[i] = ec._ScrapeSearchSeasonResult_seasonId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "title":
-			out.Values[i] = ec._ScrapeAcgSeasonResult_title(ctx, field, obj)
+			out.Values[i] = ec._ScrapeSearchSeasonResult_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "overview":
-			out.Values[i] = ec._ScrapeAcgSeasonResult_overview(ctx, field, obj)
+			out.Values[i] = ec._ScrapeSearchSeasonResult_overview(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
 		case "poster":
-			out.Values[i] = ec._ScrapeAcgSeasonResult_poster(ctx, field, obj)
+			out.Values[i] = ec._ScrapeSearchSeasonResult_poster(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4398,6 +4611,11 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) unmarshalNAddSubscriptionInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐAddSubscriptionInput(ctx context.Context, v interface{}) (api.AddSubscriptionInput, error) {
+	res, err := ec.unmarshalInputAddSubscriptionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4442,26 +4660,31 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNParseAcgSourceInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSourceInput(ctx context.Context, v interface{}) (api.ParseAcgSourceInput, error) {
-	res, err := ec.unmarshalInputParseAcgSourceInput(ctx, v)
+func (ec *executionContext) unmarshalNParseAcgSubscriptionInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSubscriptionInput(ctx context.Context, v interface{}) (api.ParseAcgSubscriptionInput, error) {
+	res, err := ec.unmarshalInputParseAcgSubscriptionInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNParseAcgSourceResult2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSourceResult(ctx context.Context, sel ast.SelectionSet, v api.ParseAcgSourceResult) graphql.Marshaler {
-	return ec._ParseAcgSourceResult(ctx, sel, &v)
+func (ec *executionContext) marshalNParseAcgSubscriptionResult2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSubscriptionResult(ctx context.Context, sel ast.SelectionSet, v api.ParseAcgSubscriptionResult) graphql.Marshaler {
+	return ec._ParseAcgSubscriptionResult(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNParseAcgSourceResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSourceResult(ctx context.Context, sel ast.SelectionSet, v *api.ParseAcgSourceResult) graphql.Marshaler {
+func (ec *executionContext) marshalNParseAcgSubscriptionResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐParseAcgSubscriptionResult(ctx context.Context, sel ast.SelectionSet, v *api.ParseAcgSubscriptionResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._ParseAcgSourceResult(ctx, sel, v)
+	return ec._ParseAcgSubscriptionResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNScrapeAcgResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgResultᚄ(ctx context.Context, sel ast.SelectionSet, v []*api.ScrapeAcgResult) graphql.Marshaler {
+func (ec *executionContext) unmarshalNScrapeSearchInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeSearchInput(ctx context.Context, v interface{}) (api.ScrapeSearchInput, error) {
+	res, err := ec.unmarshalInputScrapeSearchInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNScrapeSearchResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeSearchResultᚄ(ctx context.Context, sel ast.SelectionSet, v []*api.ScrapeSearchResult) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4485,7 +4708,7 @@ func (ec *executionContext) marshalNScrapeAcgResult2ᚕᚖgithubᚗcomᚋsimonki
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNScrapeAcgResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgResult(ctx, sel, v[i])
+			ret[i] = ec.marshalNScrapeSearchResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeSearchResult(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4505,17 +4728,17 @@ func (ec *executionContext) marshalNScrapeAcgResult2ᚕᚖgithubᚗcomᚋsimonki
 	return ret
 }
 
-func (ec *executionContext) marshalNScrapeAcgResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgResult(ctx context.Context, sel ast.SelectionSet, v *api.ScrapeAcgResult) graphql.Marshaler {
+func (ec *executionContext) marshalNScrapeSearchResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeSearchResult(ctx context.Context, sel ast.SelectionSet, v *api.ScrapeSearchResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._ScrapeAcgResult(ctx, sel, v)
+	return ec._ScrapeSearchResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNScrapeAcgSeasonResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgSeasonResultᚄ(ctx context.Context, sel ast.SelectionSet, v []*api.ScrapeAcgSeasonResult) graphql.Marshaler {
+func (ec *executionContext) marshalNScrapeSearchSeasonResult2ᚕᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeSearchSeasonResultᚄ(ctx context.Context, sel ast.SelectionSet, v []*api.ScrapeSearchSeasonResult) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4539,7 +4762,7 @@ func (ec *executionContext) marshalNScrapeAcgSeasonResult2ᚕᚖgithubᚗcomᚋs
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNScrapeAcgSeasonResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgSeasonResult(ctx, sel, v[i])
+			ret[i] = ec.marshalNScrapeSearchSeasonResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeSearchSeasonResult(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4559,19 +4782,14 @@ func (ec *executionContext) marshalNScrapeAcgSeasonResult2ᚕᚖgithubᚗcomᚋs
 	return ret
 }
 
-func (ec *executionContext) marshalNScrapeAcgSeasonResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgSeasonResult(ctx context.Context, sel ast.SelectionSet, v *api.ScrapeAcgSeasonResult) graphql.Marshaler {
+func (ec *executionContext) marshalNScrapeSearchSeasonResult2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeSearchSeasonResult(ctx context.Context, sel ast.SelectionSet, v *api.ScrapeSearchSeasonResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._ScrapeAcgSeasonResult(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNScrapeAcgSourceInput2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScrapeAcgSourceInput(ctx context.Context, v interface{}) (api.ScrapeAcgSourceInput, error) {
-	res, err := ec.unmarshalInputScrapeAcgSourceInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
+	return ec._ScrapeSearchSeasonResult(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNScraperEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScraperEnum(ctx context.Context, v interface{}) (api.ScraperEnum, error) {
@@ -4594,13 +4812,13 @@ func (ec *executionContext) marshalNScraperLanguage2githubᚗcomᚋsimonkimiᚋm
 	return v
 }
 
-func (ec *executionContext) unmarshalNSourceParserEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐSourceParserEnum(ctx context.Context, v interface{}) (api.SourceParserEnum, error) {
-	var res api.SourceParserEnum
+func (ec *executionContext) unmarshalNSourceEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐSourceEnum(ctx context.Context, v interface{}) (api.SourceEnum, error) {
+	var res api.SourceEnum
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNSourceParserEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐSourceParserEnum(ctx context.Context, sel ast.SelectionSet, v api.SourceParserEnum) graphql.Marshaler {
+func (ec *executionContext) marshalNSourceEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐSourceEnum(ctx context.Context, sel ast.SelectionSet, v api.SourceEnum) graphql.Marshaler {
 	return v
 }
 
@@ -4947,6 +5165,22 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOScraperEnum2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScraperEnum(ctx context.Context, v interface{}) (*api.ScraperEnum, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(api.ScraperEnum)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOScraperEnum2ᚖgithubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐScraperEnum(ctx context.Context, sel ast.SelectionSet, v *api.ScraperEnum) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

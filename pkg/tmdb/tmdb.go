@@ -11,27 +11,10 @@ import (
 )
 
 const (
-	TmdbDefaultApikey = "32b19d6a05b512190a056fa4e747cbbc"
-	TmdbHost          = "https://api.themoviedb.org"
-	TmdbImageHost     = "https://image.tmdb.org"
+	DefaultApikey = "32b19d6a05b512190a056fa4e747cbbc"
+	Host          = "https://api.themoviedb.org"
+	ImageHost     = "https://image.tmdb.org"
 )
-
-type Config struct {
-	apiKey string
-	client func() *resty.Client
-}
-
-func NewConfig(apiKey string, client func() *resty.Client) *Config {
-	return &Config{apiKey: apiKey, client: client}
-}
-
-type Tmdb struct {
-	config *Config
-}
-
-func NewTmdb(config *Config) *Tmdb {
-	return &Tmdb{config: config}
-}
 
 func GetTmdbLanguage(language api.ScraperLanguage) (string, error) {
 	switch language {
@@ -47,24 +30,24 @@ func GetTmdbLanguage(language api.ScraperLanguage) (string, error) {
 	return "", errors.New(fmt.Sprintf("Unsupported language: %s", language))
 }
 
-func (t *Tmdb) getApiKey() string {
-	if xstring.IsEmptyOrWhitespace(t.config.apiKey) {
-		return TmdbDefaultApikey
+func getApiKey(key string) string {
+	if xstring.IsEmptyOrWhitespace(key) {
+		return DefaultApikey
 	}
-	return t.config.apiKey
+	return key
 }
 
-func (t *Tmdb) Search(ctx context.Context, title string) ([]*SearchResultItem, error) {
+func Search(ctx context.Context, client *resty.Client, apiKey string, title string) ([]*SearchResultItem, error) {
 	page := 1
 	results := make([]*SearchResultItem, 0)
 	for {
 		var result rawSearchResult
-		req, err := t.config.client().
-			SetBaseURL(TmdbHost).
+		req, err := client.
+			SetBaseURL(Host).
 			R().
 			SetContext(ctx).
 			SetQueryParams(map[string]string{
-				"api_key":       t.getApiKey(),
+				"api_key":       getApiKey(apiKey),
 				"page":          strconv.Itoa(page),
 				"query":         title,
 				"include_adult": "true",
@@ -91,14 +74,14 @@ func (t *Tmdb) Search(ctx context.Context, title string) ([]*SearchResultItem, e
 	return results, nil
 }
 
-func (t *Tmdb) QueryForDetail(ctx context.Context, id int, language string) (*DetailData, error) {
+func QueryForDetail(ctx context.Context, client *resty.Client, apiKey string, id int, language string) (*DetailData, error) {
 	var detail DetailData
-	req, err := t.config.client().
-		SetBaseURL(TmdbHost).
+	req, err := client.
+		SetBaseURL(Host).
 		R().
 		SetContext(ctx).
 		SetQueryParams(map[string]string{
-			"api_key":  t.getApiKey(),
+			"api_key":  getApiKey(apiKey),
 			"language": language,
 		}).
 		SetResult(&detail).

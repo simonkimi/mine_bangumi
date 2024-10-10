@@ -16,17 +16,8 @@ type HttpService struct {
 	ActualPort int
 }
 
-type HttpServiceConfig struct {
-	Host string
-	Port int
-}
-
-func NewHttpServiceConfig(host string, port int) *HttpServiceConfig {
-	return &HttpServiceConfig{Host: host, Port: port}
-}
-
-func newHttpService(config *HttpServiceConfig) *HttpService {
-	return &HttpService{host: config.Host, ActualPort: config.Port}
+func newHttpService(host string, port int) *HttpService {
+	return &HttpService{host: host, ActualPort: port}
 }
 
 func (s *HttpService) StartHttpService(ctx context.Context, engine *gin.Engine) {
