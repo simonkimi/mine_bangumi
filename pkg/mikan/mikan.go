@@ -2,17 +2,17 @@ package mikan
 
 import (
 	"context"
-	"github.com/go-resty/resty/v2"
 	"github.com/mmcdole/gofeed"
 	"github.com/pkg/errors"
 	"github.com/simonkimi/minebangumi/api"
+	"github.com/simonkimi/minebangumi/pkg/request"
 	"strconv"
 	"strings"
 )
 
-func ParseBangumiUrl(ctx context.Context, client *resty.Client, url string) (*Bangumi, error) {
-	resp, err := client.R().SetContext(ctx).Get(url)
-	if err != nil || resp.IsError() {
+func ParseBangumiUrl(ctx context.Context, client request.Client, url string) (*Bangumi, error) {
+	resp := client.R().SetContext(ctx).Get(url)
+	if err := resp.Error(); err != nil {
 		if errors.As(err, context.Canceled) {
 			return nil, api.NewCancelErrorf("Mikan feed request canceled: %s", url)
 		}
@@ -22,7 +22,7 @@ func ParseBangumiUrl(ctx context.Context, client *resty.Client, url string) (*Ba
 		return nil, api.NewThirdPartyErrorf(err, url, "failed to fetch mikan feed")
 	}
 	feed := gofeed.NewParser()
-	feedData, err := feed.ParseString(string(resp.Body()))
+	feedData, err := feed.ParseString(resp.String())
 	if err != nil {
 		return nil, api.NewThirdPartyErrorf(err, url, "failed to parse mikan feed: %s", url)
 	}

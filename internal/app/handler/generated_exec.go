@@ -517,12 +517,18 @@ type ParseAcgSubscriptionResult {
 input AddSubscriptionInput {
     "Rss地址"
     url: String!
+    "源类型"
+    source: SourceEnum!
     "订阅名称"
     displayName: String!
     "刮削器类型"
     scraper: ScraperEnum
     "刮削器Id"
     scraperId: String
+    "黑名单"
+    blackListFilter: [String!]
+    "白名单"
+    whiteListFilter: [String!]
 }
 
 
@@ -3708,7 +3714,7 @@ func (ec *executionContext) unmarshalInputAddSubscriptionInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"url", "displayName", "scraper", "scraperId"}
+	fieldsInOrder := [...]string{"url", "source", "displayName", "scraper", "scraperId", "blackListFilter", "whiteListFilter"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3722,6 +3728,13 @@ func (ec *executionContext) unmarshalInputAddSubscriptionInput(ctx context.Conte
 				return it, err
 			}
 			it.URL = data
+		case "source":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
+			data, err := ec.unmarshalNSourceEnum2githubᚗcomᚋsimonkimiᚋminebangumiᚋapiᚐSourceEnum(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Source = data
 		case "displayName":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("displayName"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -3743,6 +3756,20 @@ func (ec *executionContext) unmarshalInputAddSubscriptionInput(ctx context.Conte
 				return it, err
 			}
 			it.ScraperID = data
+		case "blackListFilter":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blackListFilter"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.BlackListFilter = data
+		case "whiteListFilter":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("whiteListFilter"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.WhiteListFilter = data
 		}
 	}
 
@@ -5181,6 +5208,44 @@ func (ec *executionContext) marshalOScraperEnum2ᚖgithubᚗcomᚋsimonkimiᚋmi
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

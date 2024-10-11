@@ -16,12 +16,18 @@ type ParseAcgSubscriptionResult {
 input AddSubscriptionInput {
     "Rss地址"
     url: String!
+    "源类型"
+    source: SourceEnum!
     "订阅名称"
     displayName: String!
     "刮削器类型"
     scraper: ScraperEnum
     "刮削器Id"
     scraperId: String
+    "黑名单"
+    blackListFilter: [String!]
+    "白名单"
+    whiteListFilter: [String!]
 }
 
 

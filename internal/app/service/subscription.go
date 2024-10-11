@@ -2,13 +2,13 @@ package service
 
 import (
 	"context"
-	"github.com/go-resty/resty/v2"
 	"github.com/simonkimi/minebangumi/api"
 	"github.com/simonkimi/minebangumi/pkg/bangumi"
 	"github.com/simonkimi/minebangumi/pkg/mikan"
+	"github.com/simonkimi/minebangumi/pkg/request"
 )
 
-func ParseAcgSubscriptionSource(ctx context.Context, client *resty.Client, targetUrl string, source api.SourceEnum) (*api.ParseAcgSubscriptionResult, error) {
+func ParseAcgSubscriptionSource(ctx context.Context, client request.Client, targetUrl string, source api.SourceEnum) (*api.ParseAcgSubscriptionResult, error) {
 	switch source {
 	case api.SourceEnumBangumi:
 		mikanResult, err := mikan.ParseBangumiUrl(ctx, client, targetUrl)

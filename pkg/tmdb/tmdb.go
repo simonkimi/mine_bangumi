@@ -3,9 +3,9 @@ package tmdb
 import (
 	"context"
 	"fmt"
-	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	"github.com/simonkimi/minebangumi/api"
+	"github.com/simonkimi/minebangumi/pkg/request"
 	"github.com/simonkimi/minebangumi/tools/xstring"
 	"strconv"
 )
@@ -37,12 +37,12 @@ func getApiKey(key string) string {
 	return key
 }
 
-func Search(ctx context.Context, client *resty.Client, apiKey string, title string) ([]*SearchResultItem, error) {
+func Search(ctx context.Context, client request.Client, apiKey string, title string) ([]*SearchResultItem, error) {
 	page := 1
 	results := make([]*SearchResultItem, 0)
 	for {
 		var result rawSearchResult
-		req, err := client.
+		req := client.
 			SetBaseURL(Host).
 			R().
 			SetContext(ctx).
@@ -54,14 +54,14 @@ func Search(ctx context.Context, client *resty.Client, apiKey string, title stri
 			}).
 			SetResult(&result).
 			Get("/3/search/tv")
-		if err != nil {
+		if err := req.Error(); err != nil {
 			if errors.As(err, context.Canceled) {
 				return nil, api.NewCancelErrorf("Search tmdb tv series canceled: %s", title)
 			}
 			if errors.As(err, context.DeadlineExceeded) {
 				return nil, api.NewTimeoutErrorf("Search tmdb tv series timeout: %s", title)
 			}
-			return nil, api.NewThirdPartyErrorf(err, req.Request.URL, "Failed to search tmdb tv series: %s", title)
+			return nil, api.NewThirdPartyErrorf(err, req.Request().Url(), "Failed to search tmdb tv series: %s", title)
 		}
 
 		results = append(results, result.Results...)
@@ -74,9 +74,9 @@ func Search(ctx context.Context, client *resty.Client, apiKey string, title stri
 	return results, nil
 }
 
-func QueryForDetail(ctx context.Context, client *resty.Client, apiKey string, id int, language string) (*DetailData, error) {
+func QueryForDetail(ctx context.Context, client request.Client, apiKey string, id int, language string) (*DetailData, error) {
 	var detail DetailData
-	req, err := client.
+	req := client.
 		SetBaseURL(Host).
 		R().
 		SetContext(ctx).
@@ -86,9 +86,16 @@ func QueryForDetail(ctx context.Context, client *resty.Client, apiKey string, id
 		}).
 		SetResult(&detail).
 		Get("/3/tv/" + strconv.Itoa(id))
-	if err != nil || req.IsError() {
-		return nil, api.NewThirdPartyErrorf(err, req.Request.URL, "Failed to get tmdb tv series detail: %d", id)
+	if err := req.Error(); err != nil {
+		if errors.As(err, context.Canceled) {
+			return nil, api.NewCancelErrorf("Get tmdb tv series detail canceled: %d", id)
+		}
+		if errors.As(err, context.DeadlineExceeded) {
+			return nil, api.NewTimeoutErrorf("Get tmdb tv series detail timeout: %d", id)
+		}
+		return nil, api.NewThirdPartyErrorf(err, req.Request().Url(), "Failed to get tmdb tv series detail: %d", id)
 	}
+
 	return &detail, nil
 }
 

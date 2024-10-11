@@ -11,12 +11,18 @@ import (
 type AddSubscriptionInput struct {
 	// Rss地址
 	URL string `json:"url"`
+	// 源类型
+	Source SourceEnum `json:"source"`
 	// 订阅名称
 	DisplayName string `json:"displayName"`
 	// 刮削器类型
 	Scraper *ScraperEnum `json:"scraper,omitempty"`
 	// 刮削器Id
 	ScraperID *string `json:"scraperId,omitempty"`
+	// 黑名单
+	BlackListFilter []string `json:"blackListFilter,omitempty"`
+	// 白名单
+	WhiteListFilter []string `json:"whiteListFilter,omitempty"`
 }
 
 type ConfigResult struct {

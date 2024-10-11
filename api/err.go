@@ -84,3 +84,11 @@ func NewForbiddenError() error {
 		Extensions: nil,
 	}
 }
+
+func NewInternalServerError(err error) error {
+	return &Error{
+		Message:       "Internal server error",
+		Code:          APIStatusEnumInternalServerError,
+		internalError: err,
+	}
+}

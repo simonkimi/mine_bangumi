@@ -2,13 +2,13 @@ package service
 
 import (
 	"context"
-	"github.com/go-resty/resty/v2"
 	"github.com/simonkimi/minebangumi/api"
+	"github.com/simonkimi/minebangumi/pkg/request"
 	"github.com/simonkimi/minebangumi/pkg/tmdb"
 	"strconv"
 )
 
-func ScrapeTmDb(ctx context.Context, client *resty.Client, apiKey string, form *api.ScrapeSearchInput) ([]*api.ScrapeSearchResult, error) {
+func ScrapeTmDb(ctx context.Context, client request.Client, apiKey string, form *api.ScrapeSearchInput) ([]*api.ScrapeSearchResult, error) {
 	language, err := tmdb.GetTmdbLanguage(form.Language)
 	if err != nil {
 		return nil, err
