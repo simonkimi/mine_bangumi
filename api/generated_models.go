@@ -229,16 +229,16 @@ func (e ScraperLanguage) MarshalGQL(w io.Writer) {
 type SourceEnum string
 
 const (
-	SourceEnumBangumi SourceEnum = "BANGUMI"
+	SourceEnumMikan SourceEnum = "MIKAN"
 )
 
 var AllSourceEnum = []SourceEnum{
-	SourceEnumBangumi,
+	SourceEnumMikan,
 }
 
 func (e SourceEnum) IsValid() bool {
 	switch e {
-	case SourceEnumBangumi:
+	case SourceEnumMikan:
 		return true
 	}
 	return false

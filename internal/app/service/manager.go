@@ -40,7 +40,7 @@ func initializeManager() (Manager, error) {
 		return nil, err
 	}
 
-	db, err := database.NewDb()
+	db, err := database.NewDb("app.sqlite")
 	if err != nil {
 		return nil, err
 	}

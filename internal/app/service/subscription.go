@@ -10,7 +10,7 @@ import (
 
 func ParseAcgSubscriptionSource(ctx context.Context, client request.Client, targetUrl string, source api.SourceEnum) (*api.ParseAcgSubscriptionResult, error) {
 	switch source {
-	case api.SourceEnumBangumi:
+	case api.SourceEnumMikan:
 		mikanResult, err := mikan.ParseBangumiUrl(ctx, client, targetUrl)
 		if err != nil {
 			return nil, err

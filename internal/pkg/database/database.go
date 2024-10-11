@@ -13,8 +13,8 @@ type Database struct {
 	schemaVersion uint
 }
 
-func NewDb() (*Database, error) {
-	db, err := gorm.Open(sqlite.Open("app.sqlite3"), &gorm.Config{})
+func NewDb(path string) (*Database, error) {
+	db, err := gorm.Open(sqlite.Open(path), &gorm.Config{})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to connect to database")
 	}
@@ -75,4 +75,8 @@ func (d *Database) Optimise() error {
 		return errors.Wrap(err, "failed to vacuum database")
 	}
 	return nil
+}
+
+func (d *Database) Close() error {
+	return d.rawDb.Close()
 }

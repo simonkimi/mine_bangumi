@@ -500,7 +500,7 @@ type ScrapeSearchResult {
     seasons: [ScrapeSearchSeasonResult!]!
 }`, BuiltIn: false},
 	{Name: "../../../graph/schema/types/subscription.graphql", Input: `enum SourceEnum {
-    BANGUMI
+    MIKAN
 }
 
 input ParseAcgSubscriptionInput {

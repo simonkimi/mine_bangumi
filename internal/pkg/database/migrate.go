@@ -46,7 +46,11 @@ func (m *migrator) isNewDb() bool {
 	return m.getSchemaVersion() == 0
 }
 
-func (d *Database) Migrate() error {
+func (m *migrator) Migrate() error {
+	err := m.m.Up()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

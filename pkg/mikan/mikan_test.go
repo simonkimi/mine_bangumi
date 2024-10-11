@@ -4,17 +4,15 @@ import (
 	"context"
 	"github.com/simonkimi/minebangumi/pkg/request"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestParseBangumi(t *testing.T) {
-	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "testdata/atri_bangumi.xml")
-	}))
-	defer mockServer.Close()
-	result, err := ParseBangumiUrl(context.Background(), request.Default(), mockServer.URL)
+	client, err := request.NewMockFileClient("testdata/atri_bangumi.xml")
+	require.Nil(t, err)
+
+	result, err := ParseBangumiUrl(context.Background(), client, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -22,12 +20,10 @@ func TestParseBangumi(t *testing.T) {
 }
 
 func TestParserMyBangumi(t *testing.T) {
-	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "testdata/MyBangumi.xml")
-	}))
-	defer mockServer.Close()
+	client, err := request.NewMockFileClient("testdata/MyBangumi.xml")
+	require.Nil(t, err)
 
-	result, err := ParseBangumiUrl(context.Background(), request.Default(), mockServer.URL)
+	result, err := ParseBangumiUrl(context.Background(), client, "")
 	if err != nil {
 		t.Error(err)
 	}
