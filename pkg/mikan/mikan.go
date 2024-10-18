@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func ParseBangumiUrl(ctx context.Context, client request.Client, url string) (*Bangumi, error) {
+func ParseUrl(ctx context.Context, client request.Client, url string) (*Bangumi, error) {
 	resp := client.R().SetContext(ctx).Get(url)
 	if err := resp.Error(); err != nil {
 		if errors.As(err, context.Canceled) {

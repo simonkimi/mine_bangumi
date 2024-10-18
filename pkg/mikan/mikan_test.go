@@ -12,7 +12,7 @@ func TestParseBangumi(t *testing.T) {
 	client, err := request.NewMockFileClient("testdata/atri_bangumi.xml")
 	require.Nil(t, err)
 
-	result, err := ParseBangumiUrl(context.Background(), client, "")
+	result, err := ParseUrl(context.Background(), client, "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -23,7 +23,7 @@ func TestParserMyBangumi(t *testing.T) {
 	client, err := request.NewMockFileClient("testdata/MyBangumi.xml")
 	require.Nil(t, err)
 
-	result, err := ParseBangumiUrl(context.Background(), client, "")
+	result, err := ParseUrl(context.Background(), client, "")
 	if err != nil {
 		t.Error(err)
 	}

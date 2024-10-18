@@ -12,6 +12,7 @@ type Subscription struct {
 	BlackListFilter datatypes.JSONSlice[string] `gorm:"column:black_list_filter"` // 黑名单过滤器
 	WhiteListFilter datatypes.JSONSlice[string] `gorm:"column:white_list_filter"` // 白名单过滤器
 	IsEnabled       bool                        `gorm:"column:is_enabled"`        // 是否启用
+	IsActive        bool                        `gorm:"column:is_active"`         // 是否激活(判断完结, 是否有更新)
 }
 
 // SubscriptionFile 订阅文件项

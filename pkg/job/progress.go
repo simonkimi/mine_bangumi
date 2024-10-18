@@ -60,6 +60,14 @@ func (p *Progress) NextStep() {
 	p.update()
 }
 
+func (p *Progress) NextStepWithError(err error) {
+	p.mux.Lock()
+	defer p.mux.Unlock()
+	p.step++
+	p.calcPercent()
+	p.update()
+}
+
 func (p *Progress) calcPercent() {
 	if p.total <= 0 {
 		p.percent = 0
